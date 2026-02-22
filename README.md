@@ -27,12 +27,22 @@ src/
     npm install
     ```
 
-2.  Start the development server:
+2.  Configure RateHawk proxy credentials (required for autocomplete/search):
+    - Copy `.env.example` to `.env`
+    - Set `RATEHAWK_API_ID` and `RATEHAWK_API_KEY`
+    - Keep `.env` private (it is ignored by git)
+
+3.  Start the proxy server (port 5000):
+    ```bash
+    node server.js
+    ```
+
+4.  Start the React development server (port 3000):
     ```bash
     npm start
     ```
 
-3.  Build for production:
+5.  Build for production:
     ```bash
     npm run build
     ```

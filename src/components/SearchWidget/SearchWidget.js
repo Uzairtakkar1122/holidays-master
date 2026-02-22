@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Flatpickr from 'react-flatpickr';
 import { MapPin, Calendar, Users, Search, Minus, Plus, ChevronDown, Bed, Info } from 'lucide-react';
 import { rateHawkService } from '../../api/ratehawk';
+import { countries } from '../../data/geoData';
 import "flatpickr/dist/themes/light.css";
 import './SearchWidget.css';
 
@@ -10,7 +11,7 @@ const SearchWidget = ({ initialData = null }) => {
     // --- State ---
     const [destination, setDestination] = useState(initialData?.location || '');
     const [selectedLocation, setSelectedLocation] = useState(
-        initialData ? { id: initialData.region_id, name: initialData.location, type: 'region' } : null
+        initialData ? { id: initialData.region_id, name: initialData.location, selectionType: 'region' } : null
     );
     const [suggestions, setSuggestions] = useState({ regions: [], hotels: [] });
     const [isSearchingLocation, setIsSearchingLocation] = useState(false);
@@ -27,6 +28,17 @@ const SearchWidget = ({ initialData = null }) => {
     const [children, setChildren] = useState(initialData?.children_ages || []);
     const [showGuestsPopup, setShowGuestsPopup] = useState(false);
     const flatpickrRef = useRef(null);
+    const seededQueryRef = useRef('');
+    const isMountedRef = useRef(false);
+    const prevShowLocationPopupRef = useRef(false);
+    const seedInFlightRef = useRef(false);
+
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     // Residency and Currency synchronized with global selection (Navbar)
     const [residency, setResidency] = useState(() => {
@@ -110,24 +122,75 @@ const SearchWidget = ({ initialData = null }) => {
 
     // --- Search Autocomplete Logic ---
     useEffect(() => {
-        const delayDebounceFn = setTimeout(async () => {
-            if (destination.length >= 2 && !selectedLocation) {
-                setIsSearchingLocation(true);
-                setShowLocationPopup(true);
-                const results = await rateHawkService.autocomplete(destination);
-                setSuggestions(results);
-                setIsSearchingLocation(false);
-            } else {
-                setSuggestions({ regions: [], hotels: [] });
-            }
+        let cancelled = false;
+        const delayDebounceFn = setTimeout(() => {
+            (async () => {
+                if (destination.length >= 2 && !selectedLocation) {
+                    try {
+                        setIsSearchingLocation(true);
+                        setShowLocationPopup(true);
+                        const results = await rateHawkService.autocomplete(destination);
+                        if (cancelled) return;
+                        setSuggestions(results);
+                        seededQueryRef.current = destination;
+                    } catch (e) {
+                        if (cancelled) return;
+                        setSuggestions({ regions: [], hotels: [] });
+                    } finally {
+                        if (isMountedRef.current) setIsSearchingLocation(false);
+                    }
+                } else if (selectedLocation) {
+                    setSuggestions({ regions: [], hotels: [] });
+                }
+            })();
         }, 500);
 
-        return () => clearTimeout(delayDebounceFn);
+        return () => {
+            cancelled = true;
+            clearTimeout(delayDebounceFn);
+        };
     }, [destination, selectedLocation]);
+
+    // Seed suggestions when user opens the dropdown without typing (professional UX)
+    useEffect(() => {
+        const wasOpen = prevShowLocationPopupRef.current;
+        prevShowLocationPopupRef.current = showLocationPopup;
+
+        // Only run seeding when the popup transitions from closed -> open.
+        if (!showLocationPopup || wasOpen) return;
+        if (selectedLocation) return;
+        if (destination.length >= 2) return;
+        if (seedInFlightRef.current) return;
+
+        const residencyCode = (residency || 'pk').toLowerCase();
+        const countryName = countries.find(c => c.code === residencyCode)?.name || '';
+        const seedQuery = countryName || 'Pakistan';
+        if (seededQueryRef.current === seedQuery) return;
+
+        let cancelled = false;
+        (async () => {
+            try {
+                seedInFlightRef.current = true;
+                setIsSearchingLocation(true);
+                const results = await rateHawkService.autocomplete(seedQuery);
+                if (cancelled) return;
+                setSuggestions(results);
+                seededQueryRef.current = seedQuery;
+            } finally {
+                seedInFlightRef.current = false;
+                if (isMountedRef.current) setIsSearchingLocation(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [showLocationPopup, destination.length, selectedLocation, residency]);
 
     const handleLocationSelect = (item, type) => {
         setDestination(item.name);
-        setSelectedLocation({ ...item, type });
+        // Keep RateHawk's region.type (City / Province (State) / etc). Store our selection kind separately.
+        setSelectedLocation({ ...item, selectionType: type });
         setShowLocationPopup(false);
     };
 
@@ -208,12 +271,13 @@ const SearchWidget = ({ initialData = null }) => {
                                 className="w-full text-gray-900 font-semibold placeholder-gray-400 outline-none bg-transparent text-base p-0"
                                 value={destination}
                                 onChange={handleLocationInput}
+                                onFocus={() => setShowLocationPopup(true)}
                             />
                         </div>
                     </div>
 
                     {/* Results Dropdown */}
-                    {showLocationPopup && destination.length >= 2 && (
+                    {showLocationPopup && (
                         <div className="absolute top-[calc(100%+8px)] left-0 w-full md:w-[480px] bg-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] border border-gray-100 overflow-hidden z-[100] animate-slide-down text-left">
                             <div className="max-h-[420px] overflow-y-auto custom-scrollbar p-3">
                                 {isSearchingLocation && (
@@ -223,26 +287,69 @@ const SearchWidget = ({ initialData = null }) => {
                                     </div>
                                 )}
 
-                                {suggestions.regions?.length > 0 && (
-                                    <div className="mb-3">
-                                        <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Destinations</div>
-                                        {suggestions.regions.map(region => (
-                                            <div
-                                                key={region.id}
-                                                className="search-result-item flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl cursor-pointer transition-all group"
-                                                onClick={() => handleLocationSelect(region, 'region')}
-                                            >
-                                                <div className="icon-box w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 transition-all shrink-0 group-hover:bg-blue-100">
-                                                    <MapPin size={20} />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="text-[15px] font-semibold text-gray-800 truncate group-hover:text-blue-600">{region.name}</div>
-                                                    <div className="text-[13px] text-gray-500 font-medium">{region.country_code?.toUpperCase()}</div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                {!isSearchingLocation && destination.length < 2 && (suggestions.regions?.length || 0) === 0 && (suggestions.hotels?.length || 0) === 0 && (
+                                    <div className="px-4 py-10 text-center text-sm text-gray-500 font-medium">
+                                        Start typing to search cities and states.
                                     </div>
                                 )}
+
+                                {(() => {
+                                    const regions = suggestions.regions || [];
+                                    const cities = [];
+                                    const states = [];
+                                    const otherRegions = [];
+                                    for (const r of regions) {
+                                        const t = String(r.type || '').toLowerCase();
+                                        if (t.includes('city')) cities.push(r);
+                                        else if (t.includes('province') || t.includes('state')) states.push(r);
+                                        else otherRegions.push(r);
+                                    }
+
+                                    const renderRegionRow = (region) => (
+                                        <div
+                                            key={region.id}
+                                            className="search-result-item flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl cursor-pointer transition-all group"
+                                            onClick={() => handleLocationSelect(region, 'region')}
+                                        >
+                                            <div className="icon-box w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 transition-all shrink-0 group-hover:bg-blue-100">
+                                                <MapPin size={20} />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="text-[15px] font-semibold text-gray-800 truncate group-hover:text-blue-600">{region.name}</div>
+                                                <div className="text-[13px] text-gray-500 font-medium flex items-center gap-2">
+                                                    <span>{region.type || 'Region'}</span>
+                                                    <span className="text-gray-300">•</span>
+                                                    <span>{region.country_code?.toUpperCase()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+
+                                    return (
+                                        <>
+                                            {cities.length > 0 && (
+                                                <div className="mb-3">
+                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Cities</div>
+                                                    {cities.map(renderRegionRow)}
+                                                </div>
+                                            )}
+
+                                            {states.length > 0 && (
+                                                <div className="mb-3">
+                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">States / Provinces</div>
+                                                    {states.map(renderRegionRow)}
+                                                </div>
+                                            )}
+
+                                            {otherRegions.length > 0 && (
+                                                <div className="mb-3">
+                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Regions</div>
+                                                    {otherRegions.map(renderRegionRow)}
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
 
                                 {suggestions.hotels?.length > 0 && (
                                     <div className="mb-3 mt-4">

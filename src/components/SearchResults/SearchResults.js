@@ -364,42 +364,68 @@ const SearchResults = () => {
         // Use current residency from state (may have changed from Navbar)
         const activeResidency = currentResidency || searchParams.residency;
         console.log('🔍 Starting search for region:', searchParams.region_id, 'with residency:', activeResidency);
+
+        const fetchJsonWithTimeout = async (url, options = {}, timeoutMs = 30000) => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(url, { ...options, signal: controller.signal });
+                if (!res.ok) {
+                    const text = await res.text().catch(() => '');
+                    throw new Error(`Request failed (${res.status}) for ${url}: ${text.slice(0, 200)}`);
+                }
+                return await res.json();
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        };
         
         try {
+            let rawCandidates = [];
+            let candidateById = {};
+            let first10Enriched = [];
+            let infoById = {};
+
             // Step 1: Fetch candidate IDs from FastAPI
             console.log('📡 Step 1: Fetching hotels from FastAPI...');
-            const metadataRes = await fetch(`https://fastapiratehawk.co.uk/hotels/search?region_id=${searchParams.region_id}&limit=200`);
-            const metadata = await metadataRes.json();
-            const rawCandidates = metadata.data?.hotels || [];
-            const candidateById = {};
-            rawCandidates.forEach(h => {
-                candidateById[String(h.id).trim()] = h;
-            });
-            console.log(`✅ FastAPI returned ${rawCandidates.length} hotels`);
-
-            if (rawCandidates.length === 0) {
-                console.log('❌ No hotels found from FastAPI');
-                setAllAvailableHotels([]);
-                setMetaLoading(false);
-                setLoading(false);
-                return;
+            try {
+                const metadata = await fetchJsonWithTimeout(
+                    `https://fastapiratehawk.co.uk/hotels/search?region_id=${searchParams.region_id}&limit=200`,
+                    {},
+                    20000
+                );
+                rawCandidates = metadata.data?.hotels || [];
+                candidateById = {};
+                rawCandidates.forEach(h => {
+                    candidateById[String(h.id).trim()] = h;
+                });
+                console.log(`✅ FastAPI returned ${rawCandidates.length} hotels`);
+            } catch (e) {
+                console.warn('⚠️ FastAPI candidate fetch failed, continuing with pricing-only flow:', e);
+                rawCandidates = [];
+                candidateById = {};
             }
 
-            // Step 2: Fetch Initial Metadata for first 10 hotels (for names/stars/images)
-            console.log('📡 Step 2: Fetching details for first 10 hotels...');
-            const first10Ids = rawCandidates.slice(0, 10).map(h => h.id);
-            const infoById = await fetchHotelsInfoBatched(first10Ids);
-            const first10Enriched = enrichHotelsWithBulkInfo(
-                rawCandidates.slice(0, 10).map(h => ({ ...h, rates: [], hasPricing: false, loadingPrice: true })),
-                infoById
-            );
-            console.log(`✅ Enriched first 10 hotels, showing with skeleton loaders`);
+            // Step 2: If FastAPI gave candidates, enrich first 10 for instant paint
+            if (rawCandidates.length > 0) {
+                console.log('📡 Step 2: Fetching details for first 10 hotels...');
+                const first10Ids = rawCandidates.slice(0, 10).map(h => h.id);
+                infoById = await fetchHotelsInfoBatched(first10Ids);
+                first10Enriched = enrichHotelsWithBulkInfo(
+                    rawCandidates.slice(0, 10).map(h => ({ ...h, rates: [], hasPricing: false, loadingPrice: true })),
+                    infoById
+                );
+                console.log(`✅ Enriched first 10 hotels, showing with skeleton loaders`);
 
-            // Show first 10 hotels immediately with skeleton price loaders
-            if (runId !== searchRunIdRef.current) return;
-            setFirst10Hotels(first10Enriched);
-            setAllAvailableHotels(first10Enriched);
-            setMetaLoading(false);
+                // Show first 10 hotels immediately with skeleton price loaders
+                if (runId !== searchRunIdRef.current) return;
+                setFirst10Hotels(first10Enriched);
+                setAllAvailableHotels(first10Enriched);
+                setMetaLoading(false);
+            } else {
+                // Province/State IDs often return 0 from FastAPI — still continue to pricing.
+                console.log('ℹ️ FastAPI returned 0 candidates; continuing with pricing-only flow (common for Province/State regions).');
+            }
 
             // Step 3: Fetch Pricing from RateHawk Proxy in background
             console.log('🔍 Currency Debug:', {
@@ -409,25 +435,28 @@ const SearchResults = () => {
             });
             const activeCurrency = currentCurrency?.code || searchParams.currency || 'USD';
             console.log('💰 Step 3: Fetching pricing from RateHawk with residency:', activeResidency, 'and currency:', activeCurrency);
-            const pricingRes = await fetch('/api/search', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    checkin: searchParams.checkin,
-                    checkout: searchParams.checkout,
-                    residency: activeResidency, // Use active residency
-                    language: 'en',
-                    currency: activeCurrency, // Pass currency to API
-                    guests: [
-                        {
-                            adults: searchParams.adults,
-                            children: searchParams.children_ages
-                        }
-                    ],
-                    region_id: searchParams.region_id
-                })
-            });
-            const pricingData = await pricingRes.json();
+            const pricingData = await fetchJsonWithTimeout(
+                '/api/search',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        checkin: searchParams.checkin,
+                        checkout: searchParams.checkout,
+                        residency: activeResidency, // Use active residency
+                        language: 'en',
+                        currency: activeCurrency, // Pass currency to API
+                        guests: [
+                            {
+                                adults: searchParams.adults,
+                                children: searchParams.children_ages
+                            }
+                        ],
+                        region_id: searchParams.region_id
+                    })
+                },
+                60000
+            );
             console.log(`✅ RateHawk returned pricing for ${pricingData.data?.hotels?.length || 0} hotels`);
 
             if (pricingData.data?.hotels && pricingData.data.hotels.length > 0) {
@@ -444,25 +473,27 @@ const SearchResults = () => {
                     composePricedHotel(ph, null, candidateById[ph._id] || {})
                 );
 
-                // Build first 10 from FAST initial list, then mark each as priced/sold-out
-                const first10Final = first10Enriched.map(fastHotel => {
-                    const fastId = String(fastHotel.id).trim();
-                    const pricingHotel = pricingById[fastId];
+                // Build first 10 from FAST initial list, then mark each as priced/sold-out (only when we have the fast list)
+                const first10Final = (first10Enriched.length > 0)
+                    ? first10Enriched.map(fastHotel => {
+                        const fastId = String(fastHotel.id).trim();
+                        const pricingHotel = pricingById[fastId];
 
-                    if (!pricingHotel) {
-                        return {
-                            ...fastHotel,
-                            rates: [],
-                            hasPricing: false,
-                            loadingPrice: false,
-                            soldOut: true,
-                            meal_plans: [],
-                            serp_filters: []
-                        };
-                    }
+                        if (!pricingHotel) {
+                            return {
+                                ...fastHotel,
+                                rates: [],
+                                hasPricing: false,
+                                loadingPrice: false,
+                                soldOut: true,
+                                meal_plans: [],
+                                serp_filters: []
+                            };
+                        }
 
-                    return composePricedHotel(pricingHotel, infoById[fastId], candidateById[fastId] || fastHotel);
-                });
+                        return composePricedHotel(pricingHotel, infoById[fastId], candidateById[fastId] || fastHotel);
+                    })
+                    : [];
 
                 // Enrich only first page immediately (fast UX), lazy-load next pages later
                 const firstPagePricing = pricingHotels.slice(0, resultsPerPage);
@@ -484,6 +515,7 @@ const SearchResults = () => {
                 if (runId !== searchRunIdRef.current) return;
                 setFirst10Hotels(first10Final);
                 setAllAvailableHotels(hydratedPricedList);
+                setMetaLoading(false);
 
                 // Background prefetch: pull hotel info for ALL priced hotels in big batches (500 IDs/request)
                 // This prevents lots of small calls when paginating.
@@ -498,19 +530,22 @@ const SearchResults = () => {
             } else {
                 // No priced hotels from search API
                 console.log('⚠️ No hotels available from RateHawk search response');
-                const soldOutFirst10 = first10Enriched.map(h => ({
-                    ...h,
-                    rates: [],
-                    hasPricing: false,
-                    loadingPrice: false,
-                    soldOut: true,
-                    meal_plans: [],
-                    serp_filters: []
-                }));
+                const soldOutFirst10 = (first10Enriched.length > 0)
+                    ? first10Enriched.map(h => ({
+                        ...h,
+                        rates: [],
+                        hasPricing: false,
+                        loadingPrice: false,
+                        soldOut: true,
+                        meal_plans: [],
+                        serp_filters: []
+                    }))
+                    : [];
                 setFirst10Hotels(soldOutFirst10);
                 setAllAvailableHotels([]);
+                setMetaLoading(false);
             }
-// test changes to commit it 
+
         } catch (err) {
             console.error('❌ Search failed:', err);
             setError('Failed to load results. Please try again.');

@@ -10,7 +10,7 @@ function assertRateHawkConfig(res) {
     if (!API_ID || !API_KEY) {
         res.status(500).json({
             error: 'RateHawk credentials are not configured on the server',
-            hint: 'Set RATEHAWK_API_ID and RATEHAWK_API_KEY in your environment (e.g., .env)'
+            hint: 'Set RATEHAWK_API_ID and RATEHAWK_API_KEY in your environment (copy .env.example to .env)'
         });
         return false;
     }
@@ -110,12 +110,12 @@ async function handleRegionSearch(req, res) {
         apiRes.on('end', () => {
             try {
                 const jsonData = JSON.parse(body);
-                
+
                 // Log what currency RateHawk actually returned
                 const firstHotel = jsonData?.data?.hotels?.[0];
                 const returnedCurrency = firstHotel?.rates?.[0]?.payment_options?.payment_types?.[0]?.show_currency_code;
                 console.log('✅ RateHawk Response - Hotels:', jsonData?.data?.hotels?.length || 0, '| Returned Currency:', returnedCurrency || 'N/A');
-                
+
                 res.status(apiRes.statusCode).json(jsonData);
             } catch (e) {
                 res.status(500).json({ error: 'Invalid response from API' });
