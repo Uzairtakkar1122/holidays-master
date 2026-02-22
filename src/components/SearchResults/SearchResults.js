@@ -510,7 +510,7 @@ const SearchResults = () => {
                 setFirst10Hotels(soldOutFirst10);
                 setAllAvailableHotels([]);
             }
-
+// test changes to commit it 
         } catch (err) {
             console.error('❌ Search failed:', err);
             setError('Failed to load results. Please try again.');
