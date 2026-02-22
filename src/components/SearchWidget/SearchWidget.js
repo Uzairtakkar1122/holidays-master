@@ -1,0 +1,411 @@
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Flatpickr from 'react-flatpickr';
+import { MapPin, Calendar, Users, Search, Minus, Plus, ChevronDown, Bed, Info } from 'lucide-react';
+import { rateHawkService } from '../../api/ratehawk';
+import "flatpickr/dist/themes/light.css";
+import './SearchWidget.css';
+
+const SearchWidget = ({ initialData = null }) => {
+    // --- State ---
+    const [destination, setDestination] = useState(initialData?.location || '');
+    const [selectedLocation, setSelectedLocation] = useState(
+        initialData ? { id: initialData.region_id, name: initialData.location, type: 'region' } : null
+    );
+    const [suggestions, setSuggestions] = useState({ regions: [], hotels: [] });
+    const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+    const [showLocationPopup, setShowLocationPopup] = useState(false);
+    const navigate = useNavigate();
+
+    const [dateRange, setDateRange] = useState(
+        initialData?.checkin && initialData?.checkout
+            ? [new Date(initialData.checkin), new Date(initialData.checkout)]
+            : [new Date(), new Date(new Date().setDate(new Date().getDate() + 1))]
+    );
+
+    const [adults, setAdults] = useState(initialData?.adults || 2);
+    const [children, setChildren] = useState(initialData?.children_ages || []);
+    const [showGuestsPopup, setShowGuestsPopup] = useState(false);
+    const flatpickrRef = useRef(null);
+
+    // Residency and Currency synchronized with global selection (Navbar)
+    const [residency, setResidency] = useState(() => {
+        const saved = localStorage.getItem('user_residency');
+        return saved || 'pk';
+    });
+    
+    const [currency, setCurrency] = useState(() => {
+        const saved = localStorage.getItem('user_currency');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                return parsed.code || 'USD';
+            } catch {
+                return 'USD';
+            }
+        }
+        return 'USD';
+    });
+
+    // Listen to Navbar currency/residency changes
+    useEffect(() => {
+        const handleResidencyChange = (e) => {
+            if (e.detail?.countryCode) {
+                setResidency(e.detail.countryCode.toLowerCase());
+            }
+        };
+        
+        const handleCurrencyChange = (e) => {
+            if (e.detail?.currencyCode) {
+                setCurrency(e.detail.currencyCode);
+            }
+        };
+        
+        window.addEventListener('residencyChanged', handleResidencyChange);
+        window.addEventListener('currencyChanged', handleCurrencyChange);
+        
+        return () => {
+            window.removeEventListener('residencyChanged', handleResidencyChange);
+            window.removeEventListener('currencyChanged', handleCurrencyChange);
+        };
+    }, []);
+
+    const locationRef = useRef(null);
+    const guestsRef = useRef(null);
+    const dateOptions = useMemo(() => {
+        const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+        return {
+            mode: 'range',
+            minDate: 'today',
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'd M Y',
+            rangeSeparator: ' — ',
+            altInputClass: "w-full text-gray-900 font-semibold placeholder-gray-400 outline-none bg-transparent text-base cursor-pointer p-0",
+            enableTime: false,
+            showMonths: isDesktop ? 2 : 1,
+            disableMobile: false,
+            allowInput: false,
+            clickOpens: true,
+            closeOnSelect: false,
+            onClose: (selectedDates, dateStr, instance) => {
+                if (selectedDates.length === 1) {
+                    setTimeout(() => {
+                        instance.open();
+                    }, 0);
+                }
+            }
+        };
+    }, []);
+
+    // --- Effects ---
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (locationRef.current && !locationRef.current.contains(event.target)) setShowLocationPopup(false);
+            if (guestsRef.current && !guestsRef.current.contains(event.target)) setShowGuestsPopup(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // --- Search Autocomplete Logic ---
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(async () => {
+            if (destination.length >= 2 && !selectedLocation) {
+                setIsSearchingLocation(true);
+                setShowLocationPopup(true);
+                const results = await rateHawkService.autocomplete(destination);
+                setSuggestions(results);
+                setIsSearchingLocation(false);
+            } else {
+                setSuggestions({ regions: [], hotels: [] });
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [destination, selectedLocation]);
+
+    const handleLocationSelect = (item, type) => {
+        setDestination(item.name);
+        setSelectedLocation({ ...item, type });
+        setShowLocationPopup(false);
+    };
+
+    const handleLocationInput = (e) => {
+        setDestination(e.target.value);
+        setSelectedLocation(null);
+    };
+
+    const handleGuestChange = (type, action) => {
+        if (type === 'adults') {
+            if (action === 'increment' && adults < 6) setAdults(adults + 1);
+            if (action === 'decrement' && adults > 1) setAdults(adults - 1);
+        } else if (type === 'children') {
+            if (action === 'increment' && children.length < 4) {
+                setChildren([...children, 0]);
+            }
+            if (action === 'decrement' && children.length > 0) {
+                setChildren(children.slice(0, -1));
+            }
+        }
+    };
+
+    const handleChildAgeChange = (index, age) => {
+        const newChildren = [...children];
+        newChildren[index] = parseInt(age);
+        setChildren(newChildren);
+    };
+
+    const handleDateChange = (dates, dateStr, instance) => {
+        setDateRange(dates);
+        if (dates.length === 2) {
+            setTimeout(() => {
+                instance.close();
+            }, 150);
+            return;
+        }
+        if (!instance.isOpen) {
+            instance.open();
+        }
+    };
+
+    const handleSearch = () => {
+        if (!selectedLocation) {
+            alert('Please select a destination from the list.');
+            return;
+        }
+
+        const params = new URLSearchParams({
+            location: destination,
+            region_id: selectedLocation.id,
+            checkin: dateRange[0] ? dateRange[0].toISOString().split('T')[0] : '',
+            checkout: dateRange[1] ? dateRange[1].toISOString().split('T')[0] : '',
+            adults: adults.toString(),
+            children_ages: JSON.stringify(children),
+            residency: residency, // Use current residency state from Navbar
+            currency: currency // Pass currency for price display
+        });
+
+        navigate(`/search?${params.toString()}`);
+    };
+
+    return (
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 relative z-[60] text-left">
+            <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-200/60 p-3 flex flex-col md:flex-row items-stretch gap-2 relative z-50">
+
+                {/* Destination Input Section */}
+                <div className="flex-1 min-w-0 relative" ref={locationRef}>
+                    <div
+                        className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 transition-all duration-200 cursor-text group border border-transparent hover:border-gray-200"
+                        onClick={() => setShowLocationPopup(true)}
+                    >
+                        <MapPin className="text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" size={22} />
+                        <div className="flex-1">
+                            <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Where</label>
+                            <input
+                                type="text"
+                                placeholder="Search destinations"
+                                className="w-full text-gray-900 font-semibold placeholder-gray-400 outline-none bg-transparent text-base p-0"
+                                value={destination}
+                                onChange={handleLocationInput}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Results Dropdown */}
+                    {showLocationPopup && destination.length >= 2 && (
+                        <div className="absolute top-[calc(100%+8px)] left-0 w-full md:w-[480px] bg-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] border border-gray-100 overflow-hidden z-[100] animate-slide-down text-left">
+                            <div className="max-h-[420px] overflow-y-auto custom-scrollbar p-3">
+                                {isSearchingLocation && (
+                                    <div className="flex items-center justify-center py-10 gap-3 text-gray-400">
+                                        <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                        <span className="text-sm font-medium">Searching...</span>
+                                    </div>
+                                )}
+
+                                {suggestions.regions?.length > 0 && (
+                                    <div className="mb-3">
+                                        <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Destinations</div>
+                                        {suggestions.regions.map(region => (
+                                            <div
+                                                key={region.id}
+                                                className="search-result-item flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl cursor-pointer transition-all group"
+                                                onClick={() => handleLocationSelect(region, 'region')}
+                                            >
+                                                <div className="icon-box w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 transition-all shrink-0 group-hover:bg-blue-100">
+                                                    <MapPin size={20} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="text-[15px] font-semibold text-gray-800 truncate group-hover:text-blue-600">{region.name}</div>
+                                                    <div className="text-[13px] text-gray-500 font-medium">{region.country_code?.toUpperCase()}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {suggestions.hotels?.length > 0 && (
+                                    <div className="mb-3 mt-4">
+                                        <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Hotels</div>
+                                        {suggestions.hotels.map(hotel => (
+                                            <div
+                                                key={hotel.id}
+                                                className="search-result-item flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl cursor-pointer transition-all group"
+                                                onClick={() => handleLocationSelect(hotel, 'hotel')}
+                                            >
+                                                <div className="icon-box w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 transition-all shrink-0 group-hover:bg-blue-100">
+                                                    <Bed size={20} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="text-[15px] font-semibold text-gray-800 truncate group-hover:text-blue-600">{hotel.name}</div>
+                                                    <div className="text-[13px] text-gray-500 font-medium">{hotel.region_name}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="hidden md:block w-[1px] bg-gray-200/60 my-3"></div>
+
+                {/* Dates Section */}
+                <div className="flex-1 relative">
+                    <div className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 transition-all duration-200 cursor-pointer group border border-transparent hover:border-gray-200">
+                        <Calendar className="text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" size={22} />
+                        <div className="flex-1 text-left overflow-hidden">
+                            <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Check in - Check out</label>
+                            <Flatpickr
+                                ref={flatpickrRef}
+                                className="hidden"
+                                options={dateOptions}
+                                value={dateRange}
+                                onChange={handleDateChange}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="hidden md:block w-[1px] bg-gray-200/60 my-3"></div>
+
+                {/* Guests Selection Section */}
+                <div className="flex-1 relative" ref={guestsRef}>
+                    <div
+                        className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 transition-all duration-200 cursor-pointer group border border-transparent hover:border-gray-200"
+                        onClick={() => setShowGuestsPopup(!showGuestsPopup)}
+                    >
+                        <Users className="text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" size={22} />
+                        <div className="flex-1 text-left">
+                            <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Who</label>
+                            <div className="text-gray-900 font-semibold text-base truncate">
+                                {adults + children.length} {adults + children.length === 1 ? 'Guest' : 'Guests'}
+                            </div>
+                        </div>
+                        <ChevronDown className={`text-gray-400 transition-transform ${showGuestsPopup ? 'rotate-180' : ''}`} size={18} />
+                    </div>
+
+                    {/* Guest Popup */}
+                    {showGuestsPopup && (
+                        <div className="absolute top-[calc(100%+8px)] right-0 w-full md:w-[360px] bg-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] border border-gray-100 p-7 z-[100] animate-slide-down text-left" onClick={(e) => e.stopPropagation()}>
+                            <div className="space-y-7">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <div className="text-[15px] font-semibold text-gray-800">Adults</div>
+                                        <div className="text-[13px] text-gray-500 font-medium mt-0.5">Age 18+</div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            className="w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition-all disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:text-gray-600"
+                                            onClick={() => handleGuestChange('adults', 'decrement')}
+                                            disabled={adults <= 1}
+                                        >
+                                            <Minus size={16} strokeWidth={2.5} />
+                                        </button>
+                                        <span className="w-8 text-center text-base font-semibold text-gray-800">{adults}</span>
+                                        <button
+                                            className="w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition-all disabled:opacity-30"
+                                            onClick={() => handleGuestChange('adults', 'increment')}
+                                            disabled={adults >= 6}
+                                        >
+                                            <Plus size={16} strokeWidth={2.5} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="h-[1px] bg-gray-100"></div>
+
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <div className="text-[15px] font-semibold text-gray-800">Children</div>
+                                        <div className="text-[13px] text-gray-500 font-medium mt-0.5">Age 0-17</div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            className="w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition-all disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:text-gray-600"
+                                            onClick={() => handleGuestChange('children', 'decrement')}
+                                            disabled={children.length === 0}
+                                        >
+                                            <Minus size={16} strokeWidth={2.5} />
+                                        </button>
+                                        <span className="w-8 text-center text-base font-semibold text-gray-800">{children.length}</span>
+                                        <button
+                                            className="w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition-all disabled:opacity-30"
+                                            onClick={() => handleGuestChange('children', 'increment')}
+                                            disabled={children.length >= 4}
+                                        >
+                                            <Plus size={16} strokeWidth={2.5} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {children.length > 0 && (
+                                    <>
+                                        <div className="h-[1px] bg-gray-100"></div>
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+                                                <Info size={14} className="text-blue-600" />
+                                                Children's Ages
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {children.map((age, idx) => (
+                                                    <div key={idx} className="relative group">
+                                                        <select
+                                                            className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all cursor-pointer appearance-none hover:border-gray-300"
+                                                            value={age}
+                                                            onChange={(e) => handleChildAgeChange(idx, e.target.value)}
+                                                        >
+                                                            {[...Array(18).keys()].map(a => (
+                                                                <option key={a} value={a}>Age {a}</option>
+                                                            ))}
+                                                        </select>
+                                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Search Button */}
+                <div className="flex items-center justify-center shrink-0">
+                    <button
+                        className="w-full md:w-14 lg:w-32 h-14 md:h-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-2xl flex items-center justify-center gap-2.5 font-semibold text-[15px] transition-all active:scale-95 shadow-lg shadow-blue-600/25 group disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleSearch}
+                        disabled={isSearchingLocation}
+                    >
+                        <Search size={20} className="group-hover:scale-110 transition-transform" strokeWidth={2.5} />
+                        <span className="md:hidden lg:inline">Search</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default SearchWidget;
