@@ -49,7 +49,7 @@ const Experiences = () => {
     ];
 
     return (
-        <div className="font-sans text-slate-800 bg-white selection:bg-emerald-200">
+        <div className="font-sans text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950 selection:bg-emerald-200 transition-colors duration-300">
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-24 bg-slate-900 overflow-hidden">
@@ -70,13 +70,13 @@ const Experiences = () => {
             </section>
 
             {/* Categories Bar */}
-            <div className="bg-white border-b border-slate-100 sticky top-20 z-40">
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-20 z-40 transition-colors">
                 <div className="container mx-auto px-6 overflow-x-auto">
                     <div className="flex items-center gap-8 py-4 whitespace-nowrap min-w-max">
                         {['All Experiences', 'Adventure', 'Nature', 'Wellness', 'Culture', 'Luxury'].map((cat, i) => (
                             <button
                                 key={i}
-                                className={`text-sm font-bold tracking-wide transition-colors ${i === 0 ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-900'}`}
+                                className={`text-sm font-bold tracking-wide transition-colors ${i === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
                             >
                                 {cat}
                             </button>
@@ -86,7 +86,7 @@ const Experiences = () => {
             </div>
 
             {/* Grid Section */}
-            <section className="py-20 bg-slate-50">
+            <section className="py-20 bg-slate-50 dark:bg-slate-900/50 transition-colors">
                 <div className="container mx-auto px-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                         {experiences.map((exp, i) => (
@@ -110,8 +110,8 @@ const Experiences = () => {
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center px-4">
-                                        <span className="text-slate-400 font-medium">Starting from <span className="text-slate-900 font-bold">{exp.price}</span>/person</span>
-                                        <button className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all transform group-hover:translate-x-1">
+                                        <span className="text-slate-400 dark:text-slate-500 font-medium transition-colors">Starting from <span className="text-slate-900 dark:text-white font-bold">{exp.price}</span>/person</span>
+                                        <button className="w-10 h-10 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 rounded-full flex items-center justify-center group-hover:bg-emerald-500 dark:group-hover:bg-emerald-500 group-hover:text-white transition-all transform group-hover:translate-x-1">
                                             →
                                         </button>
                                     </div>
@@ -123,17 +123,17 @@ const Experiences = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="py-24 bg-white">
+            <section className="py-24 bg-white dark:bg-slate-950 transition-colors">
                 <div className="container mx-auto px-6 text-center">
                     <FadeInSection>
-                        <div className="bg-emerald-50 rounded-[3rem] p-12 md:p-20 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-emerald-200/50 rounded-full blur-3xl" />
+                        <div className="bg-emerald-50 dark:bg-emerald-900/10 rounded-[3rem] p-12 md:p-20 relative overflow-hidden transition-colors">
+                            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-emerald-200/50 dark:bg-emerald-800/10 rounded-full blur-3xl" />
                             <div className="relative z-10">
-                                <h2 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 mb-6">Want a tailored <br /> discovery?</h2>
-                                <p className="text-slate-600 mb-10 text-lg max-w-xl mx-auto">
+                                <h2 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 dark:text-white mb-6">Want a tailored <br /> discovery?</h2>
+                                <p className="text-slate-600 dark:text-slate-400 mb-10 text-lg max-w-xl mx-auto">
                                     Our travel experts can create a custom itinerary of experiences just for you, based on your passions and pace.
                                 </p>
-                                <button className="bg-slate-900 text-white px-10 py-4 rounded-full font-bold hover:bg-emerald-600 transition-all shadow-xl shadow-slate-900/20">
+                                <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-10 py-4 rounded-full font-bold hover:bg-emerald-600 dark:hover:bg-emerald-400 transition-all shadow-xl shadow-slate-900/20 dark:shadow-none">
                                     Talk to a Specialist
                                 </button>
                             </div>

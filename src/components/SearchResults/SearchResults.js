@@ -29,7 +29,7 @@ import './SearchResults.css';
 // Helper function to get currency symbol
 const getCurrencySymbol = (code) => {
     const symbols = {
-        'USD': '$', 'EUR': '€', 'GBP': '£', 'PKR': '₨', 
+        'USD': '$', 'EUR': '€', 'GBP': '£', 'PKR': '₨',
         'AED': 'د.إ', 'SAR': '﷼', 'INR': '₹', 'JPY': '¥',
         'CNY': '¥', 'AUD': 'A$', 'CAD': 'C$'
     };
@@ -63,15 +63,15 @@ const SearchResults = () => {
             try {
                 const parsed = saved ? JSON.parse(saved) : null;
                 // Use URL currency code but try to get the symbol from localStorage
-                return { 
-                    code: urlCurrency.toUpperCase(), 
+                return {
+                    code: urlCurrency.toUpperCase(),
                     symbol: (parsed?.code === urlCurrency ? parsed.symbol : getCurrencySymbol(urlCurrency))
                 };
             } catch {
                 return { code: urlCurrency.toUpperCase(), symbol: getCurrencySymbol(urlCurrency) };
             }
         }
-        
+
         // Fallback to localStorage
         const saved = localStorage.getItem('user_currency');
         if (saved) {
@@ -84,7 +84,7 @@ const SearchResults = () => {
         }
         return { code: 'USD', symbol: '$' };
     });
-    
+
     const [currentResidency, setCurrentResidency] = useState(() => {
         const saved = localStorage.getItem('user_residency');
         return saved || searchParams.residency;
@@ -118,21 +118,21 @@ const SearchResults = () => {
         if (hotelsWithPricing.length === 0) {
             return { min: 0, max: 100000, hasData: false };
         }
-        
-        const prices = hotelsWithPricing.map(h => 
+
+        const prices = hotelsWithPricing.map(h =>
             h.rates[0]?.payment_options?.payment_types?.[0]?.show_amount || 0
         ).filter(p => p > 0);
-        
+
         if (prices.length === 0) {
             return { min: 0, max: 100000, hasData: false };
         }
-        
+
         const minPrice = Math.floor(Math.min(...prices));
         const maxPrice = Math.ceil(Math.max(...prices));
-        
+
         // Round max to nearest sensible value
         const roundedMax = maxPrice < 1000 ? Math.ceil(maxPrice / 100) * 100 : Math.ceil(maxPrice / 1000) * 1000;
-        
+
         return { min: minPrice, max: roundedMax, hasData: true };
     }, [allAvailableHotels]);
 
@@ -177,7 +177,7 @@ const SearchResults = () => {
                 const newResidency = e.detail.countryCode.toLowerCase();
                 console.log('🌍 Residency changed to:', newResidency);
                 setCurrentResidency(newResidency);
-                
+
                 // Re-fetch with new residency
                 if (searchParams.region_id && newResidency !== currentResidency) {
                     console.log('♻️ Re-fetching results with new residency...');
@@ -188,7 +188,7 @@ const SearchResults = () => {
                 }
             }
         };
-        
+
         const handleCurrencyChange = (e) => {
             if (e.detail?.currencyCode) {
                 console.log('💱 Currency changed to:', e.detail.currencyCode);
@@ -197,13 +197,13 @@ const SearchResults = () => {
                     try {
                         const parsed = JSON.parse(saved);
                         const newCurrencyCode = parsed.code || 'USD';
-                        
+
                         // Update currency state
-                        setCurrentCurrency({ 
-                            code: newCurrencyCode, 
-                            symbol: parsed.symbol || '$' 
+                        setCurrentCurrency({
+                            code: newCurrencyCode,
+                            symbol: parsed.symbol || '$'
                         });
-                        
+
                         // Re-fetch with new currency if it's different
                         if (searchParams.region_id && newCurrencyCode !== currentCurrency?.code) {
                             console.log('♻️ Re-fetching results with new currency:', newCurrencyCode);
@@ -218,10 +218,10 @@ const SearchResults = () => {
                 }
             }
         };
-        
+
         window.addEventListener('residencyChanged', handleResidencyChange);
         window.addEventListener('currencyChanged', handleCurrencyChange);
-        
+
         return () => {
             window.removeEventListener('residencyChanged', handleResidencyChange);
             window.removeEventListener('currencyChanged', handleCurrencyChange);
@@ -360,7 +360,7 @@ const SearchResults = () => {
         setAllAvailableHotels([]);
         setFirst10Hotels([]);
         hotelInfoCacheRef.current = {};
-        
+
         // Use current residency from state (may have changed from Navbar)
         const activeResidency = currentResidency || searchParams.residency;
         console.log('🔍 Starting search for region:', searchParams.region_id, 'with residency:', activeResidency);
@@ -379,7 +379,7 @@ const SearchResults = () => {
                 clearTimeout(timeoutId);
             }
         };
-        
+
         try {
             let rawCandidates = [];
             let candidateById = {};
@@ -574,11 +574,11 @@ const SearchResults = () => {
         console.log(`🔍 Filtering ${result.length} hotels, filters:`, filters, 'sortOrder:', sortOrder);
 
         // Check if user has applied any filters
-        const hasActiveFilters = 
-            filters.stars.length > 0 || 
-            filters.amenities.length > 0 || 
+        const hasActiveFilters =
+            filters.stars.length > 0 ||
+            filters.amenities.length > 0 ||
             filters.mealPlans.length > 0 ||
-            filters.priceRange[0] > 0 || 
+            filters.priceRange[0] > 0 ||
             (priceStats.hasData && filters.priceRange[1] < priceStats.max);
 
         console.log('Has active filters:', hasActiveFilters);
@@ -614,13 +614,13 @@ const SearchResults = () => {
             result = result.filter(h => {
                 const hotelAmenities = h.amenities || [];
                 const serpFilters = h.serp_filters || [];
-                
+
                 return filters.amenities.every(filterAmenity => {
                     // Check in amenities array
-                    const inAmenities = hotelAmenities.some(ha => 
+                    const inAmenities = hotelAmenities.some(ha =>
                         ha.toLowerCase().includes(filterAmenity.toLowerCase())
                     );
-                    
+
                     // Check in serp_filters
                     const amenityMap = {
                         'wifi': 'has_internet',
@@ -631,7 +631,7 @@ const SearchResults = () => {
                     };
                     const serpKey = amenityMap[filterAmenity.toLowerCase()] || filterAmenity;
                     const inSerpFilters = serpFilters.includes(serpKey);
-                    
+
                     return inAmenities || inSerpFilters;
                 });
             });
@@ -641,7 +641,7 @@ const SearchResults = () => {
         if (filters.mealPlans.length > 0) {
             result = result.filter(h => {
                 if (!h.meal_plans || !Array.isArray(h.meal_plans)) return false;
-                return filters.mealPlans.some(m => 
+                return filters.mealPlans.some(m =>
                     h.meal_plans.includes(m.toLowerCase().replace(' ', '_'))
                 );
             });
@@ -650,7 +650,7 @@ const SearchResults = () => {
         // Sort - only for hotels with pricing
         const hotelsWithPricing = result.filter(h => h.hasPricing && h.rates && h.rates[0]);
         const hotelsWithoutPricing = result.filter(h => !h.hasPricing || !h.rates || !h.rates[0]);
-        
+
         if (sortOrder === 'price-low') {
             hotelsWithPricing.sort((a, b) => {
                 const priceA = a.rates?.[0]?.payment_options?.payment_types?.[0]?.show_amount || 0;
@@ -672,11 +672,11 @@ const SearchResults = () => {
     }, [allAvailableHotels, filters, sortOrder]);
 
     // Special logic for page 1: Show first 10 hotels (including sold out) if no filters active
-    const hasActiveFilters = 
-        filters.stars.length > 0 || 
-        filters.amenities.length > 0 || 
+    const hasActiveFilters =
+        filters.stars.length > 0 ||
+        filters.amenities.length > 0 ||
         filters.mealPlans.length > 0 ||
-        filters.priceRange[0] > 0 || 
+        filters.priceRange[0] > 0 ||
         (priceStats.hasData && filters.priceRange[1] < priceStats.max);
 
     const remainingPricedHotelsAfterFirstPage = useMemo(() => {
@@ -698,7 +698,7 @@ const SearchResults = () => {
         if (currentPage === 1 && !hasActiveFilters && first10Hotels.length > 0) {
             return first10Hotels;
         }
-        
+
         // Other pages or with filters: Use filtered/sorted available hotels
         if (!hasActiveFilters && first10Hotels.length > 0) {
             // For pages 2+, show remaining priced hotels excluding those already shown on page 1
@@ -706,13 +706,13 @@ const SearchResults = () => {
             const endIndex = startIndex + resultsPerPage;
             return remainingPricedHotelsAfterFirstPage.slice(startIndex, endIndex);
         }
-        
+
         // With filters active: normal pagination
         const startIndex = (currentPage - 1) * resultsPerPage;
         const endIndex = currentPage * resultsPerPage;
         return sortedAndFilteredHotels.slice(startIndex, endIndex);
     })();
-    
+
     // Total pages calculation
     const totalPages = (() => {
         if (!hasActiveFilters && first10Hotels.length > 0) {
@@ -775,173 +775,173 @@ const SearchResults = () => {
     return (
         <div className="search-results-page">
             {/* Search Widget Section - Scrollable */}
-            <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 border-b border-slate-100 shadow-sm">
+            <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
                 <div className="container mx-auto px-4 py-6 pt-24">
                     <SearchWidget initialData={searchParams} />
                 </div>
             </div>
 
             {/* Main Results Container */}
-            <div className="bg-gradient-to-br from-slate-50/50 via-white to-slate-50/50 min-h-screen">
+            <div className="bg-gradient-to-br from-slate-50/50 via-white to-slate-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 min-h-screen transition-colors duration-300">
                 <div className="container mx-auto px-4 max-w-7xl py-6">
                     <div className="results-layout">
                         {/* Sidebar Filters */}
                         <aside className="filter-sidebar">
                             <div className="filter-header">
-                                <h3><SlidersHorizontal size={20} /> Filters</h3>
+                                <h3 className="dark:text-white"><SlidersHorizontal size={20} /> Filters</h3>
                             </div>
-                        <div className="filter-content">
-                            <div className="filter-section">
-                                <div className="filter-section-title"><Star size={16} /> Star Rating</div>
-                                {[5, 4, 3, 2, 1].map(star => (
-                                    <div key={star} className="filter-option" onClick={() => handleFilterChange('stars', star)}>
-                                        <input type="checkbox" checked={filters.stars.includes(star)} readOnly />
-                                        <label className="flex gap-1">
-                                            {[...Array(star)].map((_, i) => <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />)}
-                                        </label>
-                                    </div>
-                                ))}
-                            </div>
+                            <div className="filter-content">
+                                <div className="filter-section">
+                                    <div className="filter-section-title dark:text-slate-200"><Star size={16} /> Star Rating</div>
+                                    {[5, 4, 3, 2, 1].map(star => (
+                                        <div key={star} className="filter-option hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => handleFilterChange('stars', star)}>
+                                            <input type="checkbox" checked={filters.stars.includes(star)} readOnly className="dark:bg-slate-800 dark:border-slate-700" />
+                                            <label className="flex gap-1 dark:text-slate-300">
+                                                {[...Array(star)].map((_, i) => <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />)}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
 
-                            <div className="filter-section">
-                                <div className="filter-section-title"><CreditCard size={16} /> Price Range</div>
-                                <div className="px-2">
-                                    {priceStats.hasData ? (
-                                        <>
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max={priceStats.max}
-                                                step={priceStats.max > 10000 ? 1000 : 50}
-                                                value={filters.priceRange[1]}
-                                                onChange={(e) => handleFilterChange('priceRange', [0, parseInt(e.target.value)])}
-                                                className="w-full accent-blue-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <div className="flex justify-between mt-3 text-xs font-bold text-blue-600">
-                                                <span>{currentCurrency?.code || 'USD'} 0</span>
-                                                <span>Up to {currentCurrency?.code || 'USD'} {filters.priceRange[1].toLocaleString()}</span>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="text-xs text-slate-400 py-2">Loading prices...</div>
-                                    )}
+                                <div className="filter-section">
+                                    <div className="filter-section-title dark:text-slate-200"><CreditCard size={16} /> Price Range</div>
+                                    <div className="px-2">
+                                        {priceStats.hasData ? (
+                                            <>
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max={priceStats.max}
+                                                    step={priceStats.max > 10000 ? 1000 : 50}
+                                                    value={filters.priceRange[1]}
+                                                    onChange={(e) => handleFilterChange('priceRange', [0, parseInt(e.target.value)])}
+                                                    className="w-full accent-blue-600 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                                                />
+                                                <div className="flex justify-between mt-3 text-xs font-bold text-blue-600 dark:text-blue-400">
+                                                    <span>{currentCurrency?.code || 'USD'} 0</span>
+                                                    <span>Up to {currentCurrency?.code || 'USD'} {filters.priceRange[1].toLocaleString()}</span>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-xs text-slate-400 py-2">Loading prices...</div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="filter-section">
+                                    <div className="filter-section-title dark:text-slate-200"><Wifi size={16} /> Amenities</div>
+                                    {['WiFi', 'Parking', 'Pool', 'Gym', 'Spa'].map(a => (
+                                        <div key={a} className="filter-option hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => handleFilterChange('amenities', a)}>
+                                            <input type="checkbox" checked={filters.amenities.includes(a)} readOnly className="dark:bg-slate-800 dark:border-slate-700" />
+                                            <label className="dark:text-slate-300">{a}</label>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="filter-section">
+                                    <div className="filter-section-title dark:text-slate-200"><Utensils size={16} /> Meal Plan</div>
+                                    {['Breakfast', 'Half Board', 'All Inclusive'].map(m => (
+                                        <div key={m} className="filter-option hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => handleFilterChange('mealPlans', m)}>
+                                            <input type="checkbox" checked={filters.mealPlans.includes(m)} readOnly className="dark:bg-slate-800 dark:border-slate-700" />
+                                            <label className="dark:text-slate-300">{m}</label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </aside>
+
+                        {/* Results Main Section */}
+                        <div className="results-container">
+                            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 mb-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 transition-colors duration-300">
+                                <div>
+                                    <h1 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">
+                                        Hotels in <span className="text-blue-600 dark:text-blue-400 underline decoration-blue-100 dark:decoration-blue-900 underline-offset-4">{searchParams.location}</span>
+                                    </h1>
+                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
+                                        {loading
+                                            ? 'Loading prices...'
+                                            : allAvailableHotels.some(h => h.loadingPrice)
+                                                ? 'Loading prices...'
+                                                : `${sortedAndFilteredHotels.length} available properties found`
+                                        }
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sort:</span>
+                                    <select
+                                        className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer"
+                                        value={sortOrder}
+                                        onChange={(e) => setSortOrder(e.target.value)}
+                                    >
+                                        <option value="recommended">Recommended</option>
+                                        <option value="price-low">Price: Low to High</option>
+                                        <option value="price-high">Price: High to Low</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div className="filter-section">
-                                <div className="filter-section-title"><Wifi size={16} /> Amenities</div>
-                                {['WiFi', 'Parking', 'Pool', 'Gym', 'Spa'].map(a => (
-                                    <div key={a} className="filter-option" onClick={() => handleFilterChange('amenities', a)}>
-                                        <input type="checkbox" checked={filters.amenities.includes(a)} readOnly />
-                                        <label>{a}</label>
+                            <div className="space-y-4">
+                                {paginatedHotels.length > 0 ? (
+                                    paginatedHotels.map(hotel => (
+                                        <HotelResultCard
+                                            key={hotel.id}
+                                            hotel={hotel}
+                                            searchParams={searchParams}
+                                            currentCurrency={currentCurrency}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="text-center py-24 bg-white rounded-2xl border border-slate-100 shadow-sm animate-fade-in">
+                                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                            <Search className="text-slate-300" size={40} />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-800">No hotels match your filters</h3>
+                                        <p className="text-slate-500 mt-2">Try clearing your filters to see more available options.</p>
+                                        <button
+                                            className="mt-8 text-blue-600 font-black uppercase text-[10px] tracking-widest hover:underline"
+                                            onClick={() => setFilters({ stars: [], priceRange: [0, priceStats.max || 100000], amenities: [], mealPlans: [] })}
+                                        >
+                                            Clear All Filters
+                                        </button>
                                     </div>
-                                ))}
+                                )}
                             </div>
 
-                            <div className="filter-section">
-                                <div className="filter-section-title"><Utensils size={16} /> Meal Plan</div>
-                                {['Breakfast', 'Half Board', 'All Inclusive'].map(m => (
-                                    <div key={m} className="filter-option" onClick={() => handleFilterChange('mealPlans', m)}>
-                                        <input type="checkbox" checked={filters.mealPlans.includes(m)} readOnly />
-                                        <label>{m}</label>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </aside>
-
-                    {/* Results Main Section */}
-                    <div className="results-container">
-                        <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div>
-                                <h1 className="text-xl font-black text-slate-800 tracking-tight">
-                                    Hotels in <span className="text-blue-600 underline decoration-blue-100 underline-offset-4">{searchParams.location}</span>
-                                </h1>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                    {loading 
-                                        ? 'Loading prices...' 
-                                        : allAvailableHotels.some(h => h.loadingPrice)
-                                        ? 'Loading prices...'
-                                        : `${sortedAndFilteredHotels.length} available properties found`
-                                    }
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sort:</span>
-                                <select
-                                    className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer"
-                                    value={sortOrder}
-                                    onChange={(e) => setSortOrder(e.target.value)}
-                                >
-                                    <option value="recommended">Recommended</option>
-                                    <option value="price-low">Price: Low to High</option>
-                                    <option value="price-high">Price: High to Low</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            {paginatedHotels.length > 0 ? (
-                                paginatedHotels.map(hotel => (
-                                    <HotelResultCard
-                                        key={hotel.id}
-                                        hotel={hotel}
-                                        searchParams={searchParams}
-                                        currentCurrency={currentCurrency}
-                                    />
-                                ))
-                            ) : (
-                                <div className="text-center py-24 bg-white rounded-2xl border border-slate-100 shadow-sm animate-fade-in">
-                                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <Search className="text-slate-300" size={40} />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-slate-800">No hotels match your filters</h3>
-                                    <p className="text-slate-500 mt-2">Try clearing your filters to see more available options.</p>
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="pagination-container">
                                     <button
-                                        className="mt-8 text-blue-600 font-black uppercase text-[10px] tracking-widest hover:underline"
-                                        onClick={() => setFilters({ stars: [], priceRange: [0, priceStats.max || 100000], amenities: [], mealPlans: [] })}
+                                        className="page-btn"
+                                        disabled={currentPage === 1}
+                                        onClick={() => setCurrentPage(p => p - 1)}
                                     >
-                                        Clear All Filters
+                                        <ChevronLeft size={18} />
+                                    </button>
+                                    {paginationItems.map((item, i) => (
+                                        typeof item === 'number' ? (
+                                            <button
+                                                key={item}
+                                                className={`page-btn ${currentPage === item ? 'active' : ''}`}
+                                                onClick={() => setCurrentPage(item)}
+                                            >
+                                                {item}
+                                            </button>
+                                        ) : (
+                                            <span key={`${item}-${i}`} className="page-ellipsis" aria-hidden="true">...</span>
+                                        )
+                                    ))}
+                                    <button
+                                        className="page-btn"
+                                        disabled={currentPage >= totalPages}
+                                        onClick={() => setCurrentPage(p => p + 1)}
+                                    >
+                                        <ChevronRight size={18} />
                                     </button>
                                 </div>
                             )}
                         </div>
-
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                            <div className="pagination-container">
-                                <button
-                                    className="page-btn"
-                                    disabled={currentPage === 1}
-                                    onClick={() => setCurrentPage(p => p - 1)}
-                                >
-                                    <ChevronLeft size={18} />
-                                </button>
-                                {paginationItems.map((item, i) => (
-                                    typeof item === 'number' ? (
-                                        <button
-                                            key={item}
-                                            className={`page-btn ${currentPage === item ? 'active' : ''}`}
-                                            onClick={() => setCurrentPage(item)}
-                                        >
-                                            {item}
-                                        </button>
-                                    ) : (
-                                        <span key={`${item}-${i}`} className="page-ellipsis" aria-hidden="true">...</span>
-                                    )
-                                ))}
-                                <button
-                                    className="page-btn"
-                                    disabled={currentPage >= totalPages}
-                                    onClick={() => setCurrentPage(p => p + 1)}
-                                >
-                                    <ChevronRight size={18} />
-                                </button>
-                            </div>
-                        )}
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     );
@@ -963,7 +963,7 @@ const HotelResultCard = ({ hotel, searchParams, currentCurrency }) => {
     };
 
     const bestRate = hotel.rates?.[0] || null;
-    const price = bestRate?.payment_options.payment_types[0].show_amount || 0;
+    const price = bestRate?.payment_options?.payment_types?.[0]?.show_amount || 0;
     const currency = currentCurrency?.code || 'USD';
 
     return (
@@ -1008,10 +1008,10 @@ const HotelResultCard = ({ hotel, searchParams, currentCurrency }) => {
                         {/* Image Slider */}
                         <div className="slider" style={{ transform: `translateX(-${currentImg * 100}%)` }}>
                             {images.length > 0 ? images.map((img, i) => (
-                                <img 
-                                    key={i} 
-                                    src={img} 
-                                    alt={hotel.name} 
+                                <img
+                                    key={i}
+                                    src={img}
+                                    alt={hotel.name}
                                     className="hotel-image"
                                     loading="lazy"
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -1026,15 +1026,15 @@ const HotelResultCard = ({ hotel, searchParams, currentCurrency }) => {
                         {/* Slider Navigation */}
                         {images.length > 1 && (
                             <>
-                                <button 
-                                    className="slider-button prev-btn" 
+                                <button
+                                    className="slider-button prev-btn"
                                     onClick={() => setCurrentImg(p => Math.max(0, p - 1))}
                                     style={{ left: '12px' }}
                                 >
                                     <ChevronLeft size={18} />
                                 </button>
-                                <button 
-                                    className="slider-button next-btn" 
+                                <button
+                                    className="slider-button next-btn"
                                     onClick={() => setCurrentImg(p => Math.min(images.length - 1, p + 1))}
                                     style={{ right: '12px' }}
                                 >
@@ -1093,8 +1093,8 @@ const HotelResultCard = ({ hotel, searchParams, currentCurrency }) => {
                         </div>
 
                         {/* Footer - Price and Button */}
-                        <div 
-                            className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3 pt-3" 
+                        <div
+                            className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3 pt-3"
                             style={{ borderTop: '1px solid var(--border-color)' }}
                         >
                             {hotel.loadingPrice ? (

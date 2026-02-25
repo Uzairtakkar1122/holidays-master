@@ -41,15 +41,15 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
                 onClick={onClose}
             ></div>
 
-            <div className="bg-white rounded-[2rem] w-full max-w-4xl min-h-[500px] max-h-[90vh] overflow-hidden relative z-10 shadow-2xl flex flex-col animate-scale-in">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] w-full max-w-4xl min-h-[500px] max-h-[90vh] overflow-hidden relative z-10 shadow-2xl flex flex-col animate-scale-in transition-colors duration-300">
                 {/* Header */}
                 <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col gap-4">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
+                            <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 dark:text-white">
                                 {activeTab === 'currency' ? 'Select Currency' : 'Select Country'}
                             </h3>
-                            <p className="text-slate-500 text-[12px] sm:text-sm">
+                            <p className="text-slate-500 dark:text-slate-400 text-[12px] sm:text-sm">
                                 {activeTab === 'currency'
                                     ? 'Choose your preferred currency'
                                     : 'Select your country of residency'
@@ -58,7 +58,7 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
                         </div>
                         <button
                             onClick={onClose}
-                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all border border-slate-100 shadow-sm"
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all border border-slate-100 dark:border-slate-800 shadow-sm"
                         >
                             <X size={18} />
                         </button>
@@ -66,17 +66,17 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
 
                     {/* Tabs & Search */}
                     <div className="flex flex-col sm:flex-row gap-3 items-center">
-                        <div className="flex bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
+                        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full sm:w-auto transition-colors">
                             <button
                                 onClick={() => { setActiveTab('residency'); setSearchQuery(''); }}
-                                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'residency' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'residency' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                             >
                                 <Globe size={14} />
                                 Country
                             </button>
                             <button
                                 onClick={() => { setActiveTab('currency'); setSearchQuery(''); }}
-                                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'currency' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'currency' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                             >
                                 <CreditCard size={14} />
                                 Currency
@@ -84,20 +84,20 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
                         </div>
 
                         <div className="relative flex-1 w-full">
-                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
                             <input
                                 type="text"
                                 placeholder={`Search ${activeTab === 'currency' ? 'currencies' : 'countries'}...`}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-emerald-500 transition-all text-sm font-medium"
+                                className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-sm font-medium text-slate-900 dark:text-white"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/30">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/30 dark:bg-slate-950/20">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                         {filteredItems.map((item) => {
                             const isSelected = activeTab === 'currency'
@@ -109,8 +109,8 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
                                     key={item.code}
                                     onClick={() => onSelect(activeTab, item)}
                                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left group ${isSelected
-                                        ? 'border-emerald-500 bg-emerald-50/50 ring-1 ring-emerald-500 shadow-sm'
-                                        : 'border-white bg-white shadow-sm hover:border-slate-200 hover:shadow-md'
+                                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20 ring-1 ring-emerald-500 shadow-sm'
+                                        : 'border-white dark:border-slate-900 bg-white dark:bg-slate-900 shadow-sm hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-md'
                                         }`}
                                 >
                                     <div className="flex items-center gap-4">
@@ -123,10 +123,10 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
                                             />
                                         </div>
                                         <div className="min-w-0">
-                                            <div className="font-bold text-slate-900 truncate">
+                                            <div className="font-bold text-slate-900 dark:text-white truncate">
                                                 {item.code}
                                             </div>
-                                            <div className="text-[11px] text-slate-500 font-medium uppercase tracking-wider truncate">
+                                            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider truncate">
                                                 {item.name}
                                             </div>
                                         </div>
@@ -159,8 +159,8 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-slate-100 bg-slate-50 text-center">
-                    <p className="text-xs text-slate-400 font-medium tracking-wide">
+                <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-center transition-colors">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-medium tracking-wide">
                         Prices will be shown in {currentCurrency?.code}. Your residency is {currentResidency?.name}.
                     </p>
                 </div>

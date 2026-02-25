@@ -45,7 +45,7 @@ const SearchWidget = ({ initialData = null }) => {
         const saved = localStorage.getItem('user_residency');
         return saved || 'pk';
     });
-    
+
     const [currency, setCurrency] = useState(() => {
         const saved = localStorage.getItem('user_currency');
         if (saved) {
@@ -66,16 +66,16 @@ const SearchWidget = ({ initialData = null }) => {
                 setResidency(e.detail.countryCode.toLowerCase());
             }
         };
-        
+
         const handleCurrencyChange = (e) => {
             if (e.detail?.currencyCode) {
                 setCurrency(e.detail.currencyCode);
             }
         };
-        
+
         window.addEventListener('residencyChanged', handleResidencyChange);
         window.addEventListener('currencyChanged', handleCurrencyChange);
-        
+
         return () => {
             window.removeEventListener('residencyChanged', handleResidencyChange);
             window.removeEventListener('currencyChanged', handleCurrencyChange);
@@ -93,7 +93,7 @@ const SearchWidget = ({ initialData = null }) => {
             altInput: true,
             altFormat: 'd M Y',
             rangeSeparator: ' — ',
-            altInputClass: "w-full text-gray-900 font-semibold placeholder-gray-400 outline-none bg-transparent text-base cursor-pointer p-0",
+            altInputClass: "w-full text-gray-900 dark:text-slate-100 font-semibold placeholder-gray-400 dark:placeholder-slate-600 outline-none bg-transparent text-base cursor-pointer p-0",
             enableTime: false,
             showMonths: isDesktop ? 2 : 1,
             disableMobile: false,
@@ -254,21 +254,21 @@ const SearchWidget = ({ initialData = null }) => {
 
     return (
         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 relative z-[60] text-left">
-            <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-200/60 p-3 flex flex-col md:flex-row items-stretch gap-2 relative z-50">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] border border-gray-200/60 dark:border-slate-800 p-3 flex flex-col md:flex-row items-stretch gap-2 relative z-50 transition-colors duration-300">
 
                 {/* Destination Input Section */}
                 <div className="flex-1 min-w-0 relative" ref={locationRef}>
                     <div
-                        className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 transition-all duration-200 cursor-text group border border-transparent hover:border-gray-200"
+                        className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 dark:hover:bg-slate-800/50 transition-all duration-200 cursor-text group border border-transparent hover:border-gray-200 dark:hover:border-slate-700"
                         onClick={() => setShowLocationPopup(true)}
                     >
-                        <MapPin className="text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" size={22} />
+                        <MapPin className="text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors shrink-0" size={22} />
                         <div className="flex-1">
-                            <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Where</label>
+                            <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide mb-1">Where</label>
                             <input
                                 type="text"
                                 placeholder="Search destinations"
-                                className="w-full text-gray-900 font-semibold placeholder-gray-400 outline-none bg-transparent text-base p-0"
+                                className="w-full text-gray-900 dark:text-slate-100 font-semibold placeholder-gray-400 dark:placeholder-slate-600 outline-none bg-transparent text-base p-0"
                                 value={destination}
                                 onChange={handleLocationInput}
                                 onFocus={() => setShowLocationPopup(true)}
@@ -278,7 +278,7 @@ const SearchWidget = ({ initialData = null }) => {
 
                     {/* Results Dropdown */}
                     {showLocationPopup && (
-                        <div className="absolute top-[calc(100%+8px)] left-0 w-full md:w-[480px] bg-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] border border-gray-100 overflow-hidden z-[100] animate-slide-down text-left">
+                        <div className="absolute top-[calc(100%+8px)] left-0 w-full md:w-[480px] bg-white dark:bg-slate-900 rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-slate-800 overflow-hidden z-[100] animate-slide-down text-left transition-colors duration-300">
                             <div className="max-h-[420px] overflow-y-auto custom-scrollbar p-3">
                                 {isSearchingLocation && (
                                     <div className="flex items-center justify-center py-10 gap-3 text-gray-400">
@@ -308,17 +308,17 @@ const SearchWidget = ({ initialData = null }) => {
                                     const renderRegionRow = (region) => (
                                         <div
                                             key={region.id}
-                                            className="search-result-item flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl cursor-pointer transition-all group"
+                                            className="search-result-item flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-2xl cursor-pointer transition-all group"
                                             onClick={() => handleLocationSelect(region, 'region')}
                                         >
-                                            <div className="icon-box w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 transition-all shrink-0 group-hover:bg-blue-100">
+                                            <div className="icon-box w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all shrink-0 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50">
                                                 <MapPin size={20} />
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <div className="text-[15px] font-semibold text-gray-800 truncate group-hover:text-blue-600">{region.name}</div>
-                                                <div className="text-[13px] text-gray-500 font-medium flex items-center gap-2">
+                                                <div className="text-[15px] font-semibold text-gray-800 dark:text-slate-200 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">{region.name}</div>
+                                                <div className="text-[13px] text-gray-500 dark:text-slate-500 font-medium flex items-center gap-2">
                                                     <span>{region.type || 'Region'}</span>
-                                                    <span className="text-gray-300">•</span>
+                                                    <span className="text-gray-300 dark:text-slate-700">•</span>
                                                     <span>{region.country_code?.toUpperCase()}</span>
                                                 </div>
                                             </div>
@@ -329,21 +329,21 @@ const SearchWidget = ({ initialData = null }) => {
                                         <>
                                             {cities.length > 0 && (
                                                 <div className="mb-3">
-                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Cities</div>
+                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Cities</div>
                                                     {cities.map(renderRegionRow)}
                                                 </div>
                                             )}
 
                                             {states.length > 0 && (
                                                 <div className="mb-3">
-                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">States / Provinces</div>
+                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">States / Provinces</div>
                                                     {states.map(renderRegionRow)}
                                                 </div>
                                             )}
 
                                             {otherRegions.length > 0 && (
                                                 <div className="mb-3">
-                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Regions</div>
+                                                    <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Regions</div>
                                                     {otherRegions.map(renderRegionRow)}
                                                 </div>
                                             )}
@@ -353,18 +353,18 @@ const SearchWidget = ({ initialData = null }) => {
 
                                 {suggestions.hotels?.length > 0 && (
                                     <div className="mb-3 mt-4">
-                                        <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Hotels</div>
+                                        <div className="px-4 py-2.5 text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Hotels</div>
                                         {suggestions.hotels.map(hotel => (
                                             <div
                                                 key={hotel.id}
-                                                className="search-result-item flex items-center gap-4 p-4 hover:bg-gray-50 rounded-2xl cursor-pointer transition-all group"
+                                                className="search-result-item flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-2xl cursor-pointer transition-all group"
                                                 onClick={() => handleLocationSelect(hotel, 'hotel')}
                                             >
-                                                <div className="icon-box w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 transition-all shrink-0 group-hover:bg-blue-100">
+                                                <div className="icon-box w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all shrink-0 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50">
                                                     <Bed size={20} />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="text-[15px] font-semibold text-gray-800 truncate group-hover:text-blue-600">{hotel.name}</div>
+                                                    <div className="text-[15px] font-semibold text-gray-800 dark:text-slate-200 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">{hotel.name}</div>
                                                     <div className="text-[13px] text-gray-500 font-medium">{hotel.region_name}</div>
                                                 </div>
                                             </div>
@@ -376,14 +376,14 @@ const SearchWidget = ({ initialData = null }) => {
                     )}
                 </div>
 
-                <div className="hidden md:block w-[1px] bg-gray-200/60 my-3"></div>
+                <div className="hidden md:block w-[1px] bg-gray-200/60 dark:bg-slate-800/60 my-3"></div>
 
                 {/* Dates Section */}
                 <div className="flex-1 relative">
-                    <div className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 transition-all duration-200 cursor-pointer group border border-transparent hover:border-gray-200">
-                        <Calendar className="text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" size={22} />
+                    <div className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 dark:hover:bg-slate-800/50 transition-all duration-200 cursor-pointer group border border-transparent hover:border-gray-200 dark:hover:border-slate-700">
+                        <Calendar className="text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors shrink-0" size={22} />
                         <div className="flex-1 text-left overflow-hidden">
-                            <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Check in - Check out</label>
+                            <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide mb-1">Check in - Check out</label>
                             <Flatpickr
                                 ref={flatpickrRef}
                                 className="hidden"
@@ -400,37 +400,37 @@ const SearchWidget = ({ initialData = null }) => {
                 {/* Guests Selection Section */}
                 <div className="flex-1 relative" ref={guestsRef}>
                     <div
-                        className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 transition-all duration-200 cursor-pointer group border border-transparent hover:border-gray-200"
+                        className="h-full flex items-center gap-3 px-5 py-4 rounded-2xl hover:bg-gray-50/70 dark:hover:bg-slate-800/50 transition-all duration-200 cursor-pointer group border border-transparent hover:border-gray-200 dark:hover:border-slate-700"
                         onClick={() => setShowGuestsPopup(!showGuestsPopup)}
                     >
-                        <Users className="text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" size={22} />
+                        <Users className="text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors shrink-0" size={22} />
                         <div className="flex-1 text-left">
-                            <label className="block text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Who</label>
-                            <div className="text-gray-900 font-semibold text-base truncate">
+                            <label className="block text-[11px] font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide mb-1">Who</label>
+                            <div className="text-gray-900 dark:text-slate-100 font-semibold text-base truncate">
                                 {adults + children.length} {adults + children.length === 1 ? 'Guest' : 'Guests'}
                             </div>
                         </div>
-                        <ChevronDown className={`text-gray-400 transition-transform ${showGuestsPopup ? 'rotate-180' : ''}`} size={18} />
+                        <ChevronDown className={`text-gray-400 dark:text-slate-500 transition-transform ${showGuestsPopup ? 'rotate-180' : ''}`} size={18} />
                     </div>
 
                     {/* Guest Popup */}
                     {showGuestsPopup && (
-                        <div className="absolute top-[calc(100%+8px)] right-0 w-full md:w-[360px] bg-white rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] border border-gray-100 p-7 z-[100] animate-slide-down text-left" onClick={(e) => e.stopPropagation()}>
+                        <div className="absolute top-[calc(100%+8px)] right-0 w-full md:w-[360px] bg-white dark:bg-slate-900 rounded-3xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-slate-800 p-7 z-[100] animate-slide-down text-left transition-colors duration-300" onClick={(e) => e.stopPropagation()}>
                             <div className="space-y-7">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <div className="text-[15px] font-semibold text-gray-800">Adults</div>
-                                        <div className="text-[13px] text-gray-500 font-medium mt-0.5">Age 18+</div>
+                                        <div className="text-[15px] font-semibold text-gray-800 dark:text-slate-100">Adults</div>
+                                        <div className="text-[13px] text-gray-500 dark:text-slate-400 font-medium mt-0.5">Age 18+</div>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <button
-                                            className="w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition-all disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:text-gray-600"
+                                            className="w-9 h-9 rounded-full border-2 border-gray-300 dark:border-slate-700 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:border-blue-600 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all disabled:opacity-30 disabled:hover:border-gray-300 disabled:hover:text-gray-600"
                                             onClick={() => handleGuestChange('adults', 'decrement')}
                                             disabled={adults <= 1}
                                         >
                                             <Minus size={16} strokeWidth={2.5} />
                                         </button>
-                                        <span className="w-8 text-center text-base font-semibold text-gray-800">{adults}</span>
+                                        <span className="w-8 text-center text-base font-semibold text-gray-800 dark:text-slate-100">{adults}</span>
                                         <button
                                             className="w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition-all disabled:opacity-30"
                                             onClick={() => handleGuestChange('adults', 'increment')}
@@ -441,12 +441,12 @@ const SearchWidget = ({ initialData = null }) => {
                                     </div>
                                 </div>
 
-                                <div className="h-[1px] bg-gray-100"></div>
+                                <div className="h-[1px] bg-gray-100 dark:bg-slate-800"></div>
 
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <div className="text-[15px] font-semibold text-gray-800">Children</div>
-                                        <div className="text-[13px] text-gray-500 font-medium mt-0.5">Age 0-17</div>
+                                        <div className="text-[15px] font-semibold text-gray-800 dark:text-slate-100">Children</div>
+                                        <div className="text-[13px] text-gray-500 dark:text-slate-400 font-medium mt-0.5">Age 0-17</div>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <button
@@ -456,9 +456,9 @@ const SearchWidget = ({ initialData = null }) => {
                                         >
                                             <Minus size={16} strokeWidth={2.5} />
                                         </button>
-                                        <span className="w-8 text-center text-base font-semibold text-gray-800">{children.length}</span>
+                                        <span className="w-8 text-center text-base font-semibold text-gray-800 dark:text-slate-100">{children.length}</span>
                                         <button
-                                            className="w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-600 hover:border-blue-600 hover:text-blue-600 transition-all disabled:opacity-30"
+                                            className="w-9 h-9 rounded-full border-2 border-gray-300 dark:border-slate-700 flex items-center justify-center text-gray-600 dark:text-slate-400 hover:border-blue-600 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all disabled:opacity-30"
                                             onClick={() => handleGuestChange('children', 'increment')}
                                             disabled={children.length >= 4}
                                         >
@@ -469,9 +469,9 @@ const SearchWidget = ({ initialData = null }) => {
 
                                 {children.length > 0 && (
                                     <>
-                                        <div className="h-[1px] bg-gray-100"></div>
+                                        <div className="h-[1px] bg-gray-100 dark:bg-slate-800"></div>
                                         <div className="space-y-4">
-                                            <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+                                            <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide">
                                                 <Info size={14} className="text-blue-600" />
                                                 Children's Ages
                                             </div>
@@ -479,7 +479,7 @@ const SearchWidget = ({ initialData = null }) => {
                                                 {children.map((age, idx) => (
                                                     <div key={idx} className="relative group">
                                                         <select
-                                                            className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all cursor-pointer appearance-none hover:border-gray-300"
+                                                            className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all cursor-pointer appearance-none hover:border-gray-300 dark:hover:border-slate-600"
                                                             value={age}
                                                             onChange={(e) => handleChildAgeChange(idx, e.target.value)}
                                                         >

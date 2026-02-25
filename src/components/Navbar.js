@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Globe, ChevronDown, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Globe, ChevronDown, Check, Moon, Sun } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { currencies, countries } from '../data/geoData';
+import { useTheme } from '../context/ThemeContext';
 import GlobalSelectorModal from './GlobalSelectorModal';
 
 const Navbar = () => {
+    const { isDark, toggleTheme } = useTheme();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -86,23 +88,22 @@ const Navbar = () => {
     return (
         <>
             <nav
-                className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-                    isSearchPage || isScrolled
-                        ? 'bg-white/95 backdrop-blur-md shadow-lg py-4'
-                        : 'bg-transparent py-6'
+                className={`fixed top-0 w-full z-50 transition-all duration-300 ${isSearchPage || isScrolled
+                    ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg py-4'
+                    : 'bg-transparent py-6'
                     }`}
             >
                 <div className="container mx-auto px-6 flex justify-between items-center">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className={`w-8 h-8 rounded-tr-xl rounded-bl-xl flex items-center justify-center transition-colors ${
-                            isSearchPage || isScrolled ? 'bg-slate-900 text-white' : 'bg-white text-slate-900 group-hover:bg-emerald-400'
-                        }`}>
+                        <div className={`w-8 h-8 rounded-tr-xl rounded-bl-xl flex items-center justify-center transition-colors ${isSearchPage || isScrolled
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                            : 'bg-white text-slate-900 group-hover:bg-emerald-400'
+                            }`}>
                             <span className="font-bold text-lg">L</span>
                         </div>
-                        <span className={`text-2xl font-serif font-bold tracking-tight ${
-                            isSearchPage || isScrolled ? 'text-slate-900' : 'text-white'
-                        }`}>
+                        <span className={`text-2xl font-serif font-bold tracking-tight ${isSearchPage || isScrolled ? 'text-slate-900 dark:text-white' : 'text-white'
+                            }`}>
                             LuxStay
                         </span>
                     </Link>
@@ -112,10 +113,9 @@ const Navbar = () => {
                         {/* Currency Chip */}
                         <button
                             onClick={() => setSelectorModal({ isOpen: true, type: 'currency' })}
-                            className={`flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full text-xs font-bold transition-all border shadow-sm ${
-                                isSearchPage || isScrolled
-                                    ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                    : 'bg-white/10 border-white/10 text-white hover:bg-white/20'
+                            className={`flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full text-xs font-bold transition-all border shadow-sm ${isSearchPage || isScrolled
+                                ? 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                : 'bg-white/10 border-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-white/20 bg-slate-800 flex items-center justify-center">
@@ -135,10 +135,9 @@ const Navbar = () => {
                         {/* Residency Chip */}
                         <button
                             onClick={() => setSelectorModal({ isOpen: true, type: 'residency' })}
-                            className={`flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full text-xs font-bold transition-all border shadow-sm ${
-                                isSearchPage || isScrolled
-                                    ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                                    : 'bg-white/10 border-white/10 text-white hover:bg-white/20'
+                            className={`flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full text-xs font-bold transition-all border shadow-sm ${isSearchPage || isScrolled
+                                ? 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                : 'bg-white/10 border-white/10 text-white hover:bg-white/20'
                                 }`}
                         >
                             <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-white/20 bg-slate-800 flex items-center justify-center">
@@ -165,28 +164,54 @@ const Navbar = () => {
                             <Link
                                 key={item.name}
                                 to={item.path}
-                                className={`text-sm font-semibold tracking-wide hover:opacity-70 transition-opacity ${isScrolled ? 'text-slate-800' : 'text-white/90'}`}
+                                className={`text-sm font-semibold tracking-wide hover:opacity-70 transition-opacity ${isScrolled || isSearchPage ? 'text-slate-800 dark:text-slate-200' : 'text-white/90'}`}
                             >
                                 {item.name}
                             </Link>
                         ))}
+
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            className={`p-2 rounded-full transition-all ${isSearchPage || isScrolled
+                                ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-yellow-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                : 'bg-white/10 text-white hover:bg-white/20'
+                                }`}
+                        >
+                            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/30">
                             Sign In
                         </button>
                     </div>
 
                     {/* Mobile Toggle */}
-                    <button
-                        className="md:hidden text-2xl"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    >
-                        {isMobileMenuOpen ? <X className={isScrolled ? 'text-slate-900' : 'text-white'} /> : <Menu className={isScrolled ? 'text-slate-900' : 'text-white'} />}
-                    </button>
+                    <div className="flex items-center gap-4 md:hidden">
+                        <button
+                            onClick={toggleTheme}
+                            className={`p-2 rounded-full ${isSearchPage || isScrolled
+                                ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-yellow-400'
+                                : 'bg-white/10 text-white'
+                                }`}
+                        >
+                            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
+                        <button
+                            className="text-2xl"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        >
+                            {isMobileMenuOpen ? (
+                                <X className={isScrolled || isSearchPage ? 'text-slate-900 dark:text-white' : 'text-white'} />
+                            ) : (
+                                <Menu className={isScrolled || isSearchPage ? 'text-slate-900 dark:text-white' : 'text-white'} />
+                            )}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
-                    <div className="absolute top-full left-0 w-full bg-white shadow-xl py-6 px-6 flex flex-col gap-4 md:hidden animate-fade-in-down">
+                    <div className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl py-6 px-6 flex flex-col gap-4 md:hidden animate-fade-in-down border-t dark:border-slate-800 transition-colors duration-300">
                         {[
                             { name: 'Destinations', path: '/destinations' },
                             { name: 'Hotels', path: '/hotels' },
@@ -196,7 +221,7 @@ const Navbar = () => {
                             <Link
                                 key={item.name}
                                 to={item.path}
-                                className="text-slate-800 font-medium text-lg"
+                                className="text-slate-800 dark:text-slate-200 font-medium text-lg"
                             >
                                 {item.name}
                             </Link>

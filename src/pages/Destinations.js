@@ -19,7 +19,7 @@ const Destinations = () => {
     ];
 
     return (
-        <div className="font-sans text-slate-800 bg-white selection:bg-emerald-200">
+        <div className="font-sans text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950 selection:bg-emerald-200 transition-colors duration-300">
 
             {/* Destinations Hero */}
             <section className="relative pt-32 pb-20 bg-slate-900 overflow-hidden">
@@ -46,19 +46,19 @@ const Destinations = () => {
             </section>
 
             {/* Travel Inspiration Section */}
-            <section className="py-20 bg-slate-50">
+            <section className="py-20 bg-slate-50 dark:bg-slate-900/50 transition-colors">
                 <div className="container mx-auto px-6 text-center">
                     <FadeInSection>
-                        <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-8">Need inspiration?</h2>
+                        <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 dark:text-white mb-8">Need inspiration?</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
                             {[
                                 { title: 'Honeymoon Escapes', desc: 'The most romantic spots for your special journey.' },
                                 { title: 'Adventure seeker', desc: 'Thrill-seeking destinations for the brave.' },
                                 { title: 'Family Fun', desc: 'Places that both kids and parents will love.' }
                             ].map((item, idx) => (
-                                <div key={idx} className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 hover:shadow-xl transition-shadow">
-                                    <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                                    <p className="text-slate-500 mb-4">{item.desc}</p>
+                                <div key={idx} className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-all">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{item.title}</h3>
+                                    <p className="text-slate-500 dark:text-slate-400 mb-4">{item.desc}</p>
                                     <button className="text-emerald-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
                                         Explore Guide <span className="text-lg">→</span>
                                     </button>
