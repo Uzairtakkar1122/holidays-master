@@ -1,25 +1,37 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import DestinationCard from '../components/DestinationCard';
 import FadeInSection from '../components/FadeInSection';
+import { buildSearchUrl } from '../utils/buildSearchUrl';
 
 const Destinations = () => {
+    const navigate = useNavigate();
     const allDestinations = [
-        { title: 'Santorini, Greece', count: 42, image: 'https://images.unsplash.com/photo-1613395877344-13d4c79e42d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { title: 'Santorini, Greece', count: 42, image: 'https://images.unsplash.com/photo-1504814532849-cff240bbc503?auto=format&fit=crop&w=800&q=80' },
         { title: 'Bali, Indonesia', count: 68, image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
         { title: 'Kyoto, Japan', count: 35, image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
         { title: 'Paris, France', count: 51, image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-        { title: 'Amalfi Coast, Italy', count: 29, image: 'https://images.unsplash.com/photo-1633321088392-892f38d56baa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { title: 'Amalfi Coast, Italy', count: 29, image: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=800&q=80' },
         { title: 'Swiss Alps, Switzerland', count: 47, image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
         { title: 'Maldives', count: 54, image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
         { title: 'Maui, Hawaii', count: 38, image: 'https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
         { title: 'Bora Bora, French Polynesia', count: 22, image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
         { title: 'Cape Town, South Africa', count: 31, image: 'https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-        { title: 'Tulum, Mexico', count: 27, image: 'https://images.unsplash.com/photo-1512100356956-c1c47ce1002c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-        { title: 'Dubrovnik, Croatia', count: 19, image: 'https://images.unsplash.com/photo-1555990539-78648831032b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+        { title: 'Tulum, Mexico', count: 27, image: 'https://images.unsplash.com/photo-1510097467424-192d713fd8b2?auto=format&fit=crop&w=800&q=80' },
+        { title: 'Dubrovnik, Croatia', count: 19, image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80' },
     ];
 
+    const handleDestinationClick = (dest) => {
+        const url = buildSearchUrl({ title: dest.title, regionId: dest.region_id });
+        if (!url) {
+            alert('Region ID is missing for this destination. Please add it to the mapping.');
+            return;
+        }
+        navigate(url);
+    };
+
     return (
-        <div className="font-sans text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950 selection:bg-emerald-200 transition-colors duration-300">
+        <div className="font-sans text-slate-800 bg-white selection:bg-emerald-200">
 
             {/* Destinations Hero */}
             <section className="relative pt-32 pb-20 bg-slate-900 overflow-hidden">
@@ -39,26 +51,26 @@ const Destinations = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {allDestinations.map((dest, i) => (
                         <FadeInSection key={i} delay={`${(i % 4) * 100}ms`}>
-                            <DestinationCard {...dest} />
+                            <DestinationCard {...dest} onClick={() => handleDestinationClick(dest)} />
                         </FadeInSection>
                     ))}
                 </div>
             </section>
 
             {/* Travel Inspiration Section */}
-            <section className="py-20 bg-slate-50 dark:bg-slate-900/50 transition-colors">
+            <section className="py-20 bg-slate-50">
                 <div className="container mx-auto px-6 text-center">
                     <FadeInSection>
-                        <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 dark:text-white mb-8">Need inspiration?</h2>
+                        <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-8">Need inspiration?</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
                             {[
                                 { title: 'Honeymoon Escapes', desc: 'The most romantic spots for your special journey.' },
                                 { title: 'Adventure seeker', desc: 'Thrill-seeking destinations for the brave.' },
                                 { title: 'Family Fun', desc: 'Places that both kids and parents will love.' }
                             ].map((item, idx) => (
-                                <div key={idx} className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-all">
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{item.title}</h3>
-                                    <p className="text-slate-500 dark:text-slate-400 mb-4">{item.desc}</p>
+                                <div key={idx} className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 hover:shadow-xl transition-shadow">
+                                    <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                                    <p className="text-slate-500 mb-4">{item.desc}</p>
                                     <button className="text-emerald-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
                                         Explore Guide <span className="text-lg">→</span>
                                     </button>
