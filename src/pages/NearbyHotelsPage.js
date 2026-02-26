@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import Flatpickr from 'react-flatpickr';
+import { Calendar } from 'lucide-react';
+import 'flatpickr/dist/themes/light.css';
 import HotelCard from '../components/HotelCard';
 import FadeInSection from '../components/FadeInSection';
 
@@ -17,12 +19,16 @@ const getTodayTomorrow = () => {
     tomorrow.setDate(today.getDate() + 1);
     return { checkin: fmtDate(today), checkout: fmtDate(tomorrow) };
 };
-const getCurrencySymbol = () => {
+const getUserPrefs = () => {
     try {
         const s = localStorage.getItem('user_currency');
-        if (s) { const p = JSON.parse(s); if (p?.symbol) return p.symbol; }
+        const r = localStorage.getItem('user_residency');
+        if (s) {
+            const p = JSON.parse(s);
+            return { currency: p.code || 'USD', currencySymbol: p.symbol || '$', residency: r || 'gb' };
+        }
     } catch (_) {}
-    return '$';
+    return { currency: 'USD', currencySymbol: '$', residency: 'gb' };
 };
 
 const normalizeInfoResponse = (data) => {
@@ -53,33 +59,95 @@ const CardSkeleton = () => (
 
 const NearbyHotelsPage = () => {
     const location = useLocation();
-    const navigate = useNavigate();
     const params = new URLSearchParams(location.search);
 
     const lat = parseFloat(params.get('lat'));
     const lon = parseFloat(params.get('lon'));
     const locationName = params.get('location') || 'Nearby';
-    const currency = params.get('currency') || 'USD';
-    const residency = params.get('residency') || 'gb';
-    const checkin = params.get('checkin') || getTodayTomorrow().checkin;
-    const checkout = params.get('checkout') || getTodayTomorrow().checkout;
+
+    const initCheckin = params.get('checkin') || getTodayTomorrow().checkin;
+    const initCheckout = params.get('checkout') || getTodayTomorrow().checkout;
+
+    // dateRange drives the calendar display; datesRef is the source of truth for API calls
+    const [dateRange, setDateRange] = useState([new Date(initCheckin), new Date(initCheckout)]);
+    const datesRef = useRef({ checkin: initCheckin, checkout: initCheckout });
+
+    // Live currency/residency — initialised from localStorage (Navbar selections override URL params)
+    const userPrefsRef = useRef(getUserPrefs());
+    const [currencySymbol, setCurrencySymbol] = useState(() => userPrefsRef.current.currencySymbol);
 
     const [hotels, setHotels] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [pricesLoading, setPricesLoading] = useState(false);
     const [error, setError] = useState(null);
     const [visible, setVisible] = useState(PER_PAGE);
-    const [currencySymbol, setCurrencySymbol] = useState(() => getCurrencySymbol());
+    const [sortBy, setSortBy] = useState('stars');
 
+    // Keep a ref to hotel IDs so refreshPrices can re-use them without a full re-fetch
+    const hotelIdsRef = useRef([]);
+
+    // Sync prefs ref whenever Navbar fires events, then refresh prices
     useEffect(() => {
-        const sync = () => setCurrencySymbol(getCurrencySymbol());
-        window.addEventListener('currencyChanged', sync);
-        return () => window.removeEventListener('currencyChanged', sync);
-    }, []);
+        const onCurrency = () => {
+            const p = getUserPrefs();
+            userPrefsRef.current = p;
+            setCurrencySymbol(p.currencySymbol);
+            refreshPrices();
+        };
+        const onResidency = () => {
+            userPrefsRef.current = getUserPrefs();
+            refreshPrices();
+        };
+        window.addEventListener('currencyChanged', onCurrency);
+        window.addEventListener('residencyChanged', onResidency);
+        return () => {
+            window.removeEventListener('currencyChanged', onCurrency);
+            window.removeEventListener('residencyChanged', onResidency);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lat, lon]);
 
+    // Re-fetch only prices for already-loaded hotels with the current currency/residency/dates
+    const refreshPrices = useCallback(async () => {
+        if (!hotelIdsRef.current.length) return;
+        const { currency, residency } = userPrefsRef.current;
+        const { checkin, checkout } = datesRef.current;
+        setPricesLoading(true);
+        try {
+            const geoRes = await fetch('/api/geo-search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    latitude: lat, longitude: lon,
+                    checkin, checkout, currency, residency,
+                    language: 'en',
+                    guests: [{ adults: 2, children: [] }],
+                    radius: 6000, limit: 50
+                })
+            });
+            if (!geoRes.ok) return;
+            const geoData = await geoRes.json();
+            const serpHotels = geoData?.data?.hotels || [];
+            setHotels(prev => prev.map(h => {
+                const serp = serpHotels.find(s => String(s.id) === h.id);
+                const rate = serp?.rates?.[0]?.payment_options?.payment_types?.[0];
+                const price = rate?.show_amount ? Math.round(parseFloat(rate.show_amount)) : null;
+                return { ...h, price };
+            }));
+        } catch (err) {
+            console.error('[NearbyHotelsPage] refreshPrices', err);
+        } finally {
+            setPricesLoading(false);
+        }
+    }, [lat, lon]);
+
+    // Full initial load: geo-search + hotel metadata
     const fetchAll = useCallback(async () => {
         if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
             setError('Invalid coordinates'); setLoading(false); return;
         }
+        const { currency, residency } = userPrefsRef.current;
+        const { checkin, checkout } = datesRef.current;
         setLoading(true); setError(null);
         try {
             const geoRes = await fetch('/api/geo-search', {
@@ -97,6 +165,7 @@ const NearbyHotelsPage = () => {
             const geoData = await geoRes.json();
             const hotelIds = (geoData?.data?.hotels || []).map(h => String(h.id)).filter(Boolean);
             if (!hotelIds.length) { setError('No hotels found near this location'); setLoading(false); return; }
+            hotelIdsRef.current = hotelIds;
 
             const infoRes = await fetch(FASTAPI_BASE + '/get-hotels-info', {
                 method: 'POST',
@@ -135,31 +204,90 @@ const NearbyHotelsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [lat, lon, checkin, checkout, currency, residency]);
+    }, [lat, lon]);
 
     useEffect(() => { fetchAll(); }, [fetchAll]);
 
-    const shown = hotels.slice(0, visible);
+    const dateOptions = useMemo(() => ({
+        mode: 'range',
+        minDate: 'today',
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd M Y',
+        rangeSeparator: ' — ',
+        altInputClass: 'bg-transparent outline-none text-white text-sm font-semibold cursor-pointer w-full placeholder-slate-400 min-w-[160px]',
+        showMonths: typeof window !== 'undefined' && window.innerWidth >= 768 ? 2 : 1,
+        closeOnSelect: false,
+        onChange: (dates, _, instance) => { if (dates.length === 2) instance.close(); },
+        onClose: (dates, _, instance) => { if (dates.length === 1) setTimeout(() => instance.open(), 0); }
+    }), []);
+
+    const handleDateChange = (dates) => {
+        if (dates.length === 2) {
+            const c = fmtDate(dates[0]);
+            const co = fmtDate(dates[1]);
+            datesRef.current = { checkin: c, checkout: co };
+            setDateRange(dates);
+            refreshPrices();
+        }
+    };
+
+    const sortedHotels = [...hotels].sort((a, b) => {
+        if (sortBy === 'price-asc') return (a.price ?? Infinity) - (b.price ?? Infinity);
+        if (sortBy === 'price-desc') return (b.price ?? -1) - (a.price ?? -1);
+        if (sortBy === 'name') return a.name.localeCompare(b.name);
+        return (b.rating || 0) - (a.rating || 0); // default: stars
+    });
+    const shown = sortedHotels.slice(0, visible);
     const hasMore = visible < hotels.length;
 
     return (
         <div className="font-sans text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950 transition-colors duration-300 min-h-screen">
-            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-24 pb-10 px-6">
-                <div className="container mx-auto max-w-6xl">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center gap-2 text-slate-400 hover:text-white mb-5 text-sm font-semibold transition-colors"
-                    >
-                        <ChevronLeft size={16} /> Back
-                    </button>
-                    <h1 className="text-3xl md:text-5xl font-serif font-bold text-white mb-2">
-                        Hotels near <span className="text-blue-400">{locationName}</span>
+            <section className="relative pt-32 pb-12 bg-slate-900 overflow-hidden px-6">
+                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
+                <div className="container mx-auto max-w-6xl relative z-10">
+                    <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">Nearby Hotels</p>
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-white mb-1">
+                        Hotels near <span className="italic text-emerald-400">{locationName}</span>
                     </h1>
-                    <p className="text-slate-400 text-base">
-                        {loading ? 'Loading properties...' : hotels.length + ' properties found, sorted by star rating'}
+                    <p className="text-slate-400 text-sm mb-5">
+                        {loading
+                            ? 'Loading properties...'
+                            : pricesLoading
+                                ? <span>{hotels.length} properties &mdash; <span className="text-emerald-400 animate-pulse">refreshing prices…</span></span>
+                                : hotels.length + ' properties found'
+                        }
                     </p>
+                    <div className="flex flex-wrap items-center gap-3">
+                        {/* Date picker pill */}
+                        <label className="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 cursor-pointer hover:border-emerald-500 transition-colors">
+                            <Calendar size={15} className="text-slate-400 flex-shrink-0" />
+                            <Flatpickr
+                                options={dateOptions}
+                                value={dateRange}
+                                onChange={handleDateChange}
+                                className="hidden"
+                            />
+                        </label>
+                        {/* Sort */}
+                        {!loading && !error && hotels.length > 0 && (
+                            <div className="flex items-center gap-2">
+                                <span className="text-slate-400 text-sm font-medium whitespace-nowrap">Sort by:</span>
+                                <select
+                                    value={sortBy}
+                                    onChange={e => setSortBy(e.target.value)}
+                                    className="bg-slate-800 border border-slate-700 text-white text-sm rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                                >
+                                    <option value="stars">Stars (High to Low)</option>
+                                    <option value="price-asc">Price (Low to High)</option>
+                                    <option value="price-desc">Price (High to Low)</option>
+                                    <option value="name">Name (A–Z)</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
+            </section>
 
             <div className="container mx-auto max-w-6xl px-6 py-12">
                 {loading ? (
@@ -178,7 +306,9 @@ const NearbyHotelsPage = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {shown.map((hotel, i) => (
                                 <FadeInSection key={hotel.id} delay={(i % PER_PAGE * 80) + 'ms'}>
-                                    <HotelCard {...hotel} currencySymbol={currencySymbol} />
+                                    <div className="h-[500px]">
+                                        <HotelCard {...hotel} currencySymbol={currencySymbol} />
+                                    </div>
                                 </FadeInSection>
                             ))}
                         </div>

@@ -2,8 +2,8 @@ import React from 'react';
 import { Heart, MapPin, Star, ArrowRight } from 'lucide-react';
 
 const HotelCard = ({ name, location, price, rating, image, tags = [], currencySymbol = '$' }) => (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-transparent dark:border-slate-800">
-        <div className="relative h-64 overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-transparent dark:border-slate-800 flex flex-col h-full">
+        <div className="relative h-64 overflow-hidden flex-shrink-0">
             <img
                 src={image}
                 alt={name}
@@ -20,13 +20,13 @@ const HotelCard = ({ name, location, price, rating, image, tags = [], currencySy
                 ))}
             </div>
         </div>
-        <div className="p-6">
+        <div className="p-6 flex flex-col flex-1">
             <div className="flex justify-between items-start mb-2">
-                <div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{name}</h3>
+                <div className="min-w-0 flex-1 mr-2">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1 group-hover:text-emerald-600 transition-colors uppercase tracking-tight line-clamp-2">{name}</h3>
                     <div className="flex items-center text-slate-500 dark:text-slate-400 text-sm gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {location}
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                        <span className="line-clamp-1">{location}</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-lg">
@@ -35,7 +35,7 @@ const HotelCard = ({ name, location, price, rating, image, tags = [], currencySy
                 </div>
             </div>
             <div className="w-full h-px bg-slate-100 dark:bg-slate-800 my-4" />
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mt-auto">
                 <div>
                     <span className="text-sm text-slate-400 dark:text-slate-500 block">Start from</span>
                     {price != null ? (
