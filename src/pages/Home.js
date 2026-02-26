@@ -6,6 +6,7 @@ import DestinationCard from '../components/DestinationCard';
 import HotelCard from '../components/HotelCard';
 import FeatureSection from '../components/FeatureSection';
 import FadeInSection from '../components/FadeInSection';
+import NearbyHotels from '../components/NearbyHotels';
 import { buildSearchUrl } from '../utils/buildSearchUrl';
 
 const Home = () => {
@@ -80,6 +81,9 @@ const Home = () => {
                     ))}
                 </div>
             </section>
+
+            {/* Nearby Hotels Carousel */}
+            <NearbyHotels />
 
             {/* Featured Hotels */}
             <section className="py-12 bg-slate-50 dark:bg-slate-900/50 relative overflow-hidden transition-colors" id="hotels">

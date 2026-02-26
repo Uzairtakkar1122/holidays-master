@@ -1,20 +1,15 @@
 import React from 'react';
 import SearchWidget from './SearchWidget/SearchWidget';
 import FadeInSection from './FadeInSection';
+import HeroParticlesBackground from './HeroParticlesBackground';
 
 const Hero = () => {
     return (
         <div className="relative h-[50vh] min-h-[450px] flex items-center justify-center">
-            {/* Background Image with Zoom Effect */}
-            <div
-                className="absolute inset-0 z-0 overflow-hidden"
-                style={{
-                    backgroundImage: "url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                }}
-            >
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-slate-900/90" />
+            {/* Animated Background (mouse-reactive particles) */}
+            <div className="absolute inset-0 z-0 overflow-hidden bg-slate-900 dark:bg-slate-950">
+                <HeroParticlesBackground />
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-900/25 via-slate-900/55 to-slate-950/95 pointer-events-none" />
             </div>
 
             {/* Content */}

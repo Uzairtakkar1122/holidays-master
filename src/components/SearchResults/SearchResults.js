@@ -11,6 +11,17 @@ import {
     Waves,
     Dumbbell,
     Utensils,
+    Coffee,
+    GlassWater,
+    Sparkles,
+    Flame,
+    Bell,
+    Plane,
+    Accessibility,
+    BriefcaseBusiness,
+    Presentation,
+    Droplets,
+    PawPrint,
     ChevronLeft,
     ChevronRight,
     Search,
@@ -25,6 +36,84 @@ import {
     Zap
 } from 'lucide-react';
 import './SearchResults.css';
+
+const normalizeAmenityText = (value) => {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '');
+};
+
+const AMENITY_FILTER_OPTIONS = [
+    { label: 'WiFi', icon: <Wifi size={16} /> },
+    { label: 'Parking', icon: <ParkingCircle size={16} /> },
+    { label: 'Pool', icon: <Waves size={16} /> },
+    { label: 'Gym', icon: <Dumbbell size={16} /> },
+    { label: 'Breakfast', icon: <Coffee size={16} /> },
+    { label: 'Restaurant', icon: <Utensils size={16} /> },
+    { label: 'Bar', icon: <GlassWater size={16} /> },
+    { label: 'Spa', icon: <Sparkles size={16} /> },
+    { label: 'Sauna', icon: <Flame size={16} /> },
+    { label: 'Room Service', icon: <Bell size={16} /> },
+    { label: 'Airport Transfer', icon: <Plane size={16} /> },
+    { label: 'Wheelchair Accessible', icon: <Accessibility size={16} /> },
+    { label: 'Family Room', icon: <Users size={16} /> },
+    { label: 'Business Center', icon: <BriefcaseBusiness size={16} /> },
+    { label: 'Conference Hall', icon: <Presentation size={16} /> },
+    { label: 'Laundry', icon: <Droplets size={16} /> },
+    { label: 'Pets Allowed', icon: <PawPrint size={16} /> }
+];
+
+const mapAmenityToIcon = (amenity) => {
+    const a = normalizeAmenityText(amenity);
+
+    if (a.includes('wifi') || a.includes('internet')) return <Wifi size={16} />;
+    if (a.includes('parking')) return <ParkingCircle size={16} />;
+    if (a.includes('pool')) return <Waves size={16} />;
+    if (a.includes('gym') || a.includes('fitness')) return <Dumbbell size={16} />;
+    if (a.includes('breakfast')) return <Coffee size={16} />;
+    if (a.includes('restaurant') || a.includes('dining') || a.includes('snackbar')) return <Utensils size={16} />;
+    if (a === 'bar' || a.includes('barbeque') || a.includes('barbecue') || a.includes('coffee') || a.includes('tea')) return <GlassWater size={16} />;
+    if (a.includes('spa') || a.includes('steamroom') || a.includes('spatub')) return <Sparkles size={16} />;
+    if (a.includes('sauna')) return <Flame size={16} />;
+    if (a.includes('roomservice') || a.includes('wakeupservice') || a.includes('concierge')) return <Bell size={16} />;
+    if (a.includes('airport') || a.includes('transfer')) return <Plane size={16} />;
+    if (a.includes('wheelchair') || a.includes('accessible')) return <Accessibility size={16} />;
+    if (a.includes('familyroom') || a.includes('familykidfriendly')) return <Users size={16} />;
+    if (a.includes('businesscenter')) return <BriefcaseBusiness size={16} />;
+    if (a.includes('conference') || a.includes('meeting') || a.includes('presentation') || a.includes('event')) return <Presentation size={16} />;
+    if (a.includes('laundry') || a.includes('drycleaning') || a.includes('ironing')) return <Droplets size={16} />;
+    if (a.includes('petsallowed')) return <PawPrint size={16} />;
+
+    return <Zap size={16} />;
+};
+
+const getAmenityCategoryForDisplay = (amenity) => {
+    const raw = String(amenity || '').trim();
+    const a = normalizeAmenityText(raw);
+
+    if (!a) return null;
+
+    if (a.includes('wifi') || a.includes('internet')) return { key: 'wifi', label: 'Free Wi-Fi', title: raw };
+    if (a.includes('parking')) return { key: 'parking', label: 'Parking', title: raw };
+    if (a.includes('pool')) return { key: 'pool', label: 'Pool', title: raw };
+    if (a.includes('gym') || a.includes('fitness')) return { key: 'gym', label: 'Gym', title: raw };
+    if (a.includes('breakfast')) return { key: 'breakfast', label: 'Breakfast', title: raw };
+    if (a.includes('restaurant') || a.includes('dining') || a.includes('snackbar')) return { key: 'restaurant', label: 'Restaurant', title: raw };
+    if (a === 'bar' || a.includes('barbeque') || a.includes('barbecue') || a.includes('coffee') || a.includes('tea')) return { key: 'bar', label: 'Bar', title: raw };
+    if (a.includes('spa') || a.includes('steamroom') || a.includes('spatub')) return { key: 'spa', label: 'Spa', title: raw };
+    if (a.includes('sauna')) return { key: 'sauna', label: 'Sauna', title: raw };
+    if (a.includes('roomservice') || a.includes('wakeupservice') || a.includes('concierge')) return { key: 'roomservice', label: 'Room Service', title: raw };
+    if (a.includes('airport') || a.includes('transfer')) return { key: 'airporttransfer', label: 'Airport Transfer', title: raw };
+    if (a.includes('wheelchair') || a.includes('accessible')) return { key: 'accessible', label: 'Accessible', title: raw };
+    if (a.includes('familyroom') || a.includes('familykidfriendly')) return { key: 'family', label: 'Family Room', title: raw };
+    if (a.includes('businesscenter')) return { key: 'business', label: 'Business Center', title: raw };
+    if (a.includes('conference') || a.includes('meeting') || a.includes('presentation') || a.includes('event')) return { key: 'conference', label: 'Conference Hall', title: raw };
+    if (a.includes('laundry') || a.includes('drycleaning') || a.includes('ironing')) return { key: 'laundry', label: 'Laundry', title: raw };
+    if (a.includes('petsallowed')) return { key: 'pets', label: 'Pets Allowed', title: raw };
+
+    // Fallback: de-dupe by normalized string, but display original text.
+    return { key: a, label: raw, title: raw };
+};
 
 // Helper function to get currency symbol
 const getCurrencySymbol = (code) => {
@@ -612,28 +701,50 @@ const SearchResults = () => {
         // Amenity Filter
         if (filters.amenities.length > 0) {
             result = result.filter(h => {
-                const hotelAmenities = h.amenities || [];
-                const serpFilters = h.serp_filters || [];
+                const hotelAmenities = Array.isArray(h.amenities) ? h.amenities : [];
+                const serpFilters = Array.isArray(h.serp_filters) ? h.serp_filters : [];
+                const normalizedAmenities = hotelAmenities.map(normalizeAmenityText);
 
-                return filters.amenities.every(filterAmenity => {
-                    // Check in amenities array
-                    const inAmenities = hotelAmenities.some(ha =>
-                        ha.toLowerCase().includes(filterAmenity.toLowerCase())
-                    );
+                const matchesAmenity = (filterLabel) => {
+                    const f = normalizeAmenityText(filterLabel);
 
-                    // Check in serp_filters
-                    const amenityMap = {
-                        'wifi': 'has_internet',
-                        'parking': 'has_parking',
-                        'pool': 'has_pool',
-                        'gym': 'has_fitness',
-                        'spa': 'has_spa'
+                    // Special cases where a straight "includes" is too strict.
+                    if (f === 'wifi') {
+                        const inAmenities = normalizedAmenities.some(a => a.includes('wifi') || a.includes('internet'));
+                        const inSerp = serpFilters.includes('has_internet');
+                        return inAmenities || inSerp;
+                    }
+
+                    if (f === 'airporttransfer') {
+                        const inAmenities = normalizedAmenities.some(a => a.includes('airport') && (a.includes('transfer') || a.includes('transport')));
+                        const inSerp = serpFilters.includes('has_transfer') || serpFilters.includes('has_airport_transfer');
+                        return inAmenities || inSerp;
+                    }
+
+                    if (f === 'petsallowed') {
+                        const inAmenities = normalizedAmenities.some(a => a.includes('petsallowed') || (a.includes('pets') && a.includes('allowed') && !a.includes('notallowed')));
+                        const inSerp = serpFilters.includes('pets_allowed') || serpFilters.includes('has_pets');
+                        return inAmenities || inSerp;
+                    }
+
+                    // Generic matching for the rest.
+                    const inAmenities = normalizedAmenities.some(a => a.includes(f));
+
+                    // Known serp_filters keys for popular amenities
+                    const serpKeyMap = {
+                        parking: 'has_parking',
+                        pool: 'has_pool',
+                        gym: 'has_fitness',
+                        spa: 'has_spa',
+                        breakfast: 'has_breakfast'
                     };
-                    const serpKey = amenityMap[filterAmenity.toLowerCase()] || filterAmenity;
-                    const inSerpFilters = serpFilters.includes(serpKey);
+                    const serpKey = serpKeyMap[f];
+                    const inSerp = serpKey ? serpFilters.includes(serpKey) : false;
 
-                    return inAmenities || inSerpFilters;
-                });
+                    return inAmenities || inSerp;
+                };
+
+                return filters.amenities.every(matchesAmenity);
             });
         }
 
@@ -830,10 +941,13 @@ const SearchResults = () => {
 
                                 <div className="filter-section">
                                     <div className="filter-section-title dark:text-slate-200"><Wifi size={16} /> Amenities</div>
-                                    {['WiFi', 'Parking', 'Pool', 'Gym', 'Spa'].map(a => (
-                                        <div key={a} className="filter-option hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => handleFilterChange('amenities', a)}>
-                                            <input type="checkbox" checked={filters.amenities.includes(a)} readOnly className="dark:bg-slate-800 dark:border-slate-700" />
-                                            <label className="dark:text-slate-300">{a}</label>
+                                    {AMENITY_FILTER_OPTIONS.map(({ label, icon }) => (
+                                        <div key={label} className="filter-option hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => handleFilterChange('amenities', label)}>
+                                            <input type="checkbox" checked={filters.amenities.includes(label)} readOnly className="dark:bg-slate-800 dark:border-slate-700" />
+                                            <label className="dark:text-slate-300 flex items-center gap-2">
+                                                <span className="text-slate-500 dark:text-slate-300">{icon}</span>
+                                                <span>{label}</span>
+                                            </label>
                                         </div>
                                     ))}
                                 </div>
@@ -882,10 +996,11 @@ const SearchResults = () => {
 
                             <div className="space-y-4">
                                 {paginatedHotels.length > 0 ? (
-                                    paginatedHotels.map(hotel => (
+                                    paginatedHotels.map((hotel, index) => (
                                         <HotelResultCard
                                             key={hotel.id}
                                             hotel={hotel}
+                                            index={index}
                                             searchParams={searchParams}
                                             currentCurrency={currentCurrency}
                                         />
@@ -947,27 +1062,42 @@ const SearchResults = () => {
     );
 };
 
-const HotelResultCard = ({ hotel, searchParams, currentCurrency }) => {
+const HotelResultCard = ({ hotel, searchParams, currentCurrency, index = 0 }) => {
     const [currentImg, setCurrentImg] = useState(0);
-    const images = hotel.images || [];
 
-    const mapAmenityToIcon = (amenity) => {
-        const a = amenity.toLowerCase();
-        if (a.includes('wi-fi') || a.includes('internet')) return <Wifi size={16} />;
-        if (a.includes('parking')) return <ParkingCircle size={16} />;
-        if (a.includes('pool')) return <Waves size={16} />;
-        if (a.includes('gym') || a.includes('fitness')) return <Dumbbell size={16} />;
-        if (a.includes('restaurant') || a.includes('dining')) return <Utensils size={16} />;
-        if (a.includes('air conditioning') || a.includes('ac')) return <Snowflake size={16} />;
-        return <Zap size={16} />;
-    };
+    const displayAmenities = useMemo(() => {
+        const rawAmenities = Array.isArray(hotel.amenities) ? hotel.amenities : [];
+        const map = new Map();
+
+        for (const a of rawAmenities) {
+            const categorized = getAmenityCategoryForDisplay(a);
+            if (!categorized) continue;
+
+            const existing = map.get(categorized.key);
+            if (!existing) {
+                map.set(categorized.key, {
+                    key: categorized.key,
+                    label: categorized.label,
+                    titles: [categorized.title]
+                });
+            } else {
+                existing.titles.push(categorized.title);
+            }
+        }
+
+        return Array.from(map.values()).slice(0, 4);
+    }, [hotel.amenities]);
+    const images = hotel.images || [];
 
     const bestRate = hotel.rates?.[0] || null;
     const price = bestRate?.payment_options?.payment_types?.[0]?.show_amount || 0;
     const currency = currentCurrency?.code || 'USD';
 
     return (
-        <div className="hotel-card" style={{ display: 'flex', flexDirection: 'column' }}>
+        <div
+            className="hotel-card card-enter"
+            style={{ display: 'flex', flexDirection: 'column', animationDelay: `${index * 0.07}s` }}
+        >
             {/* Favorite Icon */}
             <div className="favorite-icon" onClick={(e) => {
                 e.stopPropagation();
@@ -995,8 +1125,8 @@ const HotelResultCard = ({ hotel, searchParams, currentCurrency }) => {
 
             <div className="row g-0" style={{ flex: 1, height: '100%' }}>
                 {/* Image Section - 30% width */}
-                <div className="col-md-4" style={{ flex: '0 0 30%', maxWidth: '30%' }}>
-                    <div className="image-slider" style={{ height: '100%' }}>
+                <div className="col-md-4" style={{ flex: '0 0 30%', maxWidth: '30%', padding: 0 }}>
+                    <div className="image-slider" style={{ height: '100%', minHeight: '220px' }}>
                         {/* Room Type Badge */}
                         {bestRate?.room_data_trans?.main_room_type && (
                             <div className="room-type-badge">
@@ -1084,10 +1214,14 @@ const HotelResultCard = ({ hotel, searchParams, currentCurrency }) => {
 
                         {/* Amenities List */}
                         <div className="amenities-list">
-                            {hotel.amenities?.slice(0, 4).map((amenity, i) => (
-                                <div key={i} className="amenity-item" title={amenity}>
-                                    {mapAmenityToIcon(amenity)}
-                                    <span>{amenity}</span>
+                            {displayAmenities.map((amenity) => (
+                                <div
+                                    key={amenity.key}
+                                    className="amenity-item"
+                                    title={amenity.titles.length > 1 ? amenity.titles.join(' / ') : amenity.titles[0]}
+                                >
+                                    {mapAmenityToIcon(amenity.label)}
+                                    <span>{amenity.label}</span>
                                 </div>
                             ))}
                         </div>

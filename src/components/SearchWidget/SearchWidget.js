@@ -189,8 +189,24 @@ const SearchWidget = ({ initialData = null }) => {
 
     const handleLocationSelect = (item, type) => {
         setDestination(item.name);
-        // Keep RateHawk's region.type (City / Province (State) / etc). Store our selection kind separately.
-        setSelectedLocation({ ...item, selectionType: type });
+
+        // IMPORTANT:
+        // RateHawk pricing search is REGION-based and requires a numeric region_id.
+        // Hotel suggestions from multicomplete have a string hotel id (e.g. "best_western_...")
+        // and usually also include a numeric region_id. If the user selects a hotel, we must
+        // navigate/search by its region_id, not the hotel id.
+        if (type === 'hotel') {
+            const regionId = item?.region_id ?? item?.regionId ?? item?.region?.id;
+            setSelectedLocation({
+                ...item,
+                id: regionId ?? item?.id,
+                selectionType: type
+            });
+        } else {
+            // Keep RateHawk's region.type (City / Province (State) / etc). Store our selection kind separately.
+            setSelectedLocation({ ...item, selectionType: type });
+        }
+
         setShowLocationPopup(false);
     };
 
@@ -238,9 +254,16 @@ const SearchWidget = ({ initialData = null }) => {
             return;
         }
 
+        const regionId = selectedLocation?.region_id ?? selectedLocation?.regionId ?? selectedLocation?.id;
+        const regionIdNumber = parseInt(String(regionId), 10);
+        if (!Number.isFinite(regionIdNumber)) {
+            alert('Please select a destination region (City/State) from the list.');
+            return;
+        }
+
         const params = new URLSearchParams({
             location: destination,
-            region_id: selectedLocation.id,
+            region_id: String(regionIdNumber),
             checkin: dateRange[0] ? dateRange[0].toISOString().split('T')[0] : '',
             checkout: dateRange[1] ? dateRange[1].toISOString().split('T')[0] : '',
             adults: adults.toString(),

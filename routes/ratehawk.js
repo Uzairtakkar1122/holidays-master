@@ -62,6 +62,67 @@ router.post('/autocomplete', (req, res) => {
     apiReq.end();
 });
 
+// Geo Search Endpoint (nearby hotels by lat/lon)
+router.post('/geo-search', handleGeoSearch);
+
+async function handleGeoSearch(req, res) {
+    if (!assertRateHawkConfig(res)) return;
+    const {
+        checkin, checkout,
+        residency = 'gb', language = 'en', currency = 'USD',
+        guests, latitude, longitude,
+        radius = 5000, limit = 25
+    } = req.body;
+
+    if (!checkin || !checkout || latitude == null || longitude == null) {
+        return res.status(400).json({ error: 'Missing required params: checkin, checkout, latitude, longitude' });
+    }
+
+    const payload = {
+        checkin, checkout,
+        residency, language, currency,
+        guests: guests || [{ adults: 2, children: [] }],
+        latitude: Number(latitude),
+        longitude: Number(longitude),
+        radius: Number(radius),
+        limit: Number(limit)
+    };
+
+    console.log('📍 Geo Search payload:', JSON.stringify(payload, null, 2));
+
+    const data = JSON.stringify(payload);
+    const auth = Buffer.from(`${API_ID}:${API_KEY}`).toString('base64');
+
+    const options = {
+        hostname: API_HOST,
+        path: '/api/b2b/v3/search/serp/geo/',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(data),
+            'Authorization': `Basic ${auth}`
+        }
+    };
+
+    const apiReq = https.request(options, (apiRes) => {
+        let body = '';
+        apiRes.on('data', (chunk) => body += chunk);
+        apiRes.on('end', () => {
+            try {
+                const jsonData = JSON.parse(body);
+                console.log('✅ Geo Search - Hotels found:', jsonData?.data?.hotels?.length || 0);
+                res.status(apiRes.statusCode).json(jsonData);
+            } catch (e) {
+                res.status(500).json({ error: 'Invalid response from API' });
+            }
+        });
+    });
+
+    apiReq.on('error', (e) => res.status(500).json({ error: 'Failed to connect to RateHawk API' }));
+    apiReq.write(data);
+    apiReq.end();
+}
+
 // Region Search (Pricing) Endpoint
 router.post('/search', handleRegionSearch);
 

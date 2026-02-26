@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart, MapPin, Star, ArrowRight } from 'lucide-react';
 
-const HotelCard = ({ name, location, price, rating, image, tags = [] }) => (
+const HotelCard = ({ name, location, price, rating, image, tags = [], currencySymbol = '$' }) => (
     <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-transparent dark:border-slate-800">
         <div className="relative h-64 overflow-hidden">
             <img
@@ -38,10 +38,14 @@ const HotelCard = ({ name, location, price, rating, image, tags = [] }) => (
             <div className="flex justify-between items-center">
                 <div>
                     <span className="text-sm text-slate-400 dark:text-slate-500 block">Start from</span>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-2xl font-bold text-slate-900 dark:text-white">${price}</span>
-                        <span className="text-slate-500 dark:text-slate-400">/night</span>
-                    </div>
+                    {price != null ? (
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-bold text-slate-900 dark:text-white">{currencySymbol} {price}</span>
+                            <span className="text-slate-500 dark:text-slate-400">/night</span>
+                        </div>
+                    ) : (
+                        <span className="text-base font-semibold text-slate-500 dark:text-slate-400">Check availability</span>
+                    )}
                 </div>
                 <button className="text-emerald-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
                     View Details <ArrowRight className="w-4 h-4" />
