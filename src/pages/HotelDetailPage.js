@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+﻿import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import Flatpickr from 'react-flatpickr';
 import { Calendar, Users, Minus, Plus, ChevronDown, ChevronLeft, ChevronRight, Info, Check, X, Utensils, Bed, Search, MapPin, Lock, Wifi, Tv, Wind, Coffee, ShieldCheck } from 'lucide-react';
@@ -152,6 +152,9 @@ const AMENITY_MAP = {
     business: 'Business Center',
     air_conditioning: 'Air Conditioning',
     accessibility: 'Wheelchair Access',
+    elevator: 'Elevator',
+    concierge: 'Concierge',
+    luggage: 'Luggage Storage',
 };
 
 const CATEGORY_LABELS = {
@@ -258,11 +261,100 @@ const AmenityIcon = ({ type }) => {
                 <path d="M10.5 14.5L9 19l5-1 3 3" /><path d="M14 8h5" />
             </svg>
         ),
+        elevator: (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                <rect x="3" y="2" width="18" height="20" rx="2"/>
+                <path d="M9 10l3-3 3 3"/><path d="M9 14l3 3 3-3"/>
+            </svg>
+        ),
+        concierge: (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                <path d="M22 17H2a5 5 0 0 1 10 0"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+        ),
+        luggage: (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                <rect x="6" y="7" width="12" height="14" rx="2"/>
+                <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+                <line x1="12" y1="11" x2="12" y2="17"/>
+                <line x1="9" y1="14" x2="15" y2="14"/>
+            </svg>
+        ),
     };
     const iconKey = Object.keys(icons).find(k => type && type.toLowerCase().includes(k));
     return icons[iconKey] || (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
             <circle cx="12" cy="12" r="10" /><path d="M12 8v4m0 4h.01" />
+        </svg>
+    );
+};
+
+const NearbyPlaceIcon = ({ type }) => {
+    const t = (type || '').toLowerCase();
+    if (/restaurant|cafe|fast_food|food/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+        </svg>
+    );
+    if (/bar|pub/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M8 22V12L3 3h18l-5 9v10"/><path d="M8 22h8"/>
+        </svg>
+    );
+    if (/hospital|pharmacy|clinic|medical/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M12 8v8"/><path d="M8 12h8"/>
+        </svg>
+    );
+    if (/mosque|church|temple|worship|religious/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M12 2L2 10h3v10h14V10h3L12 2z"/>
+            <rect x="9" y="14" width="6" height="6"/>
+        </svg>
+    );
+    if (/bank|atm/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <rect x="3" y="10" width="18" height="11" rx="1"/>
+            <path d="M3 10l9-7 9 7"/>
+            <line x1="9" y1="10" x2="9" y2="21"/><line x1="15" y1="10" x2="15" y2="21"/>
+        </svg>
+    );
+    if (/museum|attraction|artwork|gallery/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M3 10l9-7 9 7v2H3v-2z"/>
+            <rect x="5" y="12" width="4" height="9"/><rect x="10" y="12" width="4" height="9"/><rect x="15" y="12" width="4" height="9"/>
+            <line x1="3" y1="21" x2="21" y2="21"/>
+        </svg>
+    );
+    if (/park|garden|nature/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M12 22V11"/>
+            <path d="M5 9a7 7 0 0 1 14 0c0 3.87-3.13 7-7 7s-7-3.13-7-7z" fill="none"/>
+        </svg>
+    );
+    if (/school|university|college|education/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M22 10v6m-10 4V10"/><path d="M2 10l10-5 10 5-10 5-10-5z"/>
+            <path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/>
+        </svg>
+    );
+    if (/cinema|theatre|theater/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M16 12l-6 4V8l6 4z" fill="currentColor" stroke="none"/>
+        </svg>
+    );
+    if (/mall|supermarket|convenience|shop|store/.test(t)) return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+    );
+    return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>
         </svg>
     );
 };
@@ -298,11 +390,19 @@ export default function HotelDetailPage() {
 
     /* map */
     const [showMap, setShowMap] = useState(false);
-    const mapRef     = useRef(null);
+    const mapRef = useRef(null);
+    const miniMapRef = useRef(null);
     const leafletRef = useRef(null);
+    const [nearbyPlaces, setNearbyPlaces] = useState([]);
 
     /* accordion */
     const [accordionOpen, setAccordionOpen] = useState(false);
+    const [aboutExpanded, setAboutExpanded] = useState(false);
+    const [aboutOverflows, setAboutOverflows] = useState(false);
+    const aboutInnerRef = useRef(null);
+    const [infoExpanded, setInfoExpanded] = useState(false);
+    const [activeTab, setActiveTab] = useState('sec-overview');
+    const clickLockRef = useRef(false);
 
     /* date filter */
     const [filterCheckin,  setFilterCheckin]  = useState(bookingParams.current.checkin);
@@ -362,7 +462,7 @@ export default function HotelDetailPage() {
                     check_in_time: null, check_out_time: null,
                     phone: fastHotel.phone || null,
                     email: fastHotel.email || null,
-                    payment_methods: [], hotel_chain: null, facts: {}, amenity_groups: [],
+                    payment_methods: [], hotel_chain: null, facts: {}, amenity_groups: [], serp_filters: [],
                 };
                 setHotel(hotelObj);
                 setLoading(false);
@@ -389,7 +489,10 @@ export default function HotelDetailPage() {
                             hotel_chain: rh.hotel_chain || null,
                             facts: rh.facts || {},
                             amenity_groups: rh.amenity_groups || [],
+                            serp_filters: rh.serp_filters || [],
                             images_ext: (rh.images_ext && rh.images_ext.length) ? rh.images_ext : prev.images_ext,
+                            metapolicy_extra_info: rh.metapolicy_extra_info || null,
+                            metapolicy_struct: rh.metapolicy_struct || null,
                         }));
                     })
                     .catch(() => {});
@@ -513,7 +616,7 @@ export default function HotelDetailPage() {
     })();
 
     /* A-"----A-"---- hotel amenities A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
-    const EXTRA_MAP = { internet: 'wifi', 'free internet': 'wifi', gym: 'fitness', conference: 'business', swimming: 'pool', shuttle: 'airport' };
+    const EXTRA_MAP = { internet: 'wifi', 'free internet': 'wifi', gym: 'fitness', conference: 'business', swimming: 'pool', shuttle: 'airport', elevator: 'elevator', lift: 'elevator', 'front desk': 'concierge', '24-hour': 'concierge', concierge: 'concierge', luggage: 'luggage', 'luggage storage': 'luggage', 'baggage storage': 'luggage' };
     const amenitySearchStr = [
         ...(hotel?.amenities_list || []),
         ...(hotel?.amenity_groups || []).flatMap(g => {
@@ -525,7 +628,7 @@ export default function HotelDetailPage() {
     const namedAmenities = Object.keys(AMENITY_MAP).filter(k => {
         const aliases = Object.entries(EXTRA_MAP).filter(([, v]) => v === k).map(([ak]) => ak);
         return [k, ...aliases].some(term => amenitySearchStr.includes(term));
-    }).map(k => ({ key: k, label: AMENITY_MAP[k] }));
+    }).map(k => ({ key: k, label: AMENITY_MAP[k] })).slice(0, 12);
 
     /* A-"----A-"---- hotel facts A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
     const facts = hotel ? (hotel.facts || {}) : {};
@@ -810,7 +913,7 @@ export default function HotelDetailPage() {
             });
 
         return (
-            <div className="hdp-rooms-section">
+            <div className="hdp-rooms-section" id="sec-rooms">
                 <div className="hdp-rooms-header">
                     <h2 className="hdp-section-title" style={{ margin: 0 }}>Available Rooms</h2>
                     {bp.checkin && bp.checkout && (
@@ -1425,6 +1528,65 @@ export default function HotelDetailPage() {
     };
 
     /* A-"----A-"---- map modal A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
+    /* fetch real nearby POIs from Overpass */
+    useEffect(() => {
+        if (!hotel?.latitude || !hotel?.longitude) return;
+        const lat = parseFloat(hotel.latitude);
+        const lng = parseFloat(hotel.longitude);
+        if (isNaN(lat) || isNaN(lng)) return;
+        const query = `[out:json][timeout:15];(node(around:1000,${lat},${lng})[amenity~"restaurant|cafe|hospital|bank|pharmacy|mosque|church|school|museum|park|cinema|library|fast_food|bar|supermarket"];node(around:1000,${lat},${lng})[tourism~"attraction|museum|artwork"];node(around:1000,${lat},${lng})[shop~"mall|supermarket|convenience"];);out 12;`;
+        fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
+            .then(r => r.json())
+            .then(data => {
+                const haversine = (lat1, lon1, lat2, lon2) => {
+                    const R = 6371000;
+                    const dLat = (lat2 - lat1) * Math.PI / 180;
+                    const dLon = (lon2 - lon1) * Math.PI / 180;
+                    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+                    return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+                };
+                const seen = new Set();
+                const places = (data.elements || [])
+                    .filter(e => e.tags?.name)
+                    .map(e => ({
+                        name: e.tags.name,
+                        dist: haversine(lat, lng, e.lat, e.lon),
+                        type: e.tags.amenity || e.tags.tourism || e.tags.shop || '',
+                    }))
+                    .filter(p => { if (seen.has(p.name)) return false; seen.add(p.name); return true; })
+                    .sort((a, b) => a.dist - b.dist)
+                    .slice(0, 4)
+                    .map(p => ({
+                        ...p,
+                        distLabel: p.dist < 1000 ? `${p.dist} m` : `${(p.dist/1000).toFixed(1)} km`,
+                    }));
+                setNearbyPlaces(places);
+            })
+            .catch(() => {});
+    }, [hotel?.latitude, hotel?.longitude]);
+
+    useEffect(() => {
+        if (aboutInnerRef.current) {
+            // 370px is the CSS max-height for .hdp-about
+            setAboutOverflows(aboutInnerRef.current.scrollHeight > 370);
+        }
+    }, [hotel?.description_struct]);
+
+    useEffect(() => {
+        const sectionIds = ['sec-overview','sec-about','sec-rooms','sec-policies','sec-amenities'];
+        const onScroll = () => {
+            if (clickLockRef.current) return;
+            let active = 'sec-overview';
+            for (const id of sectionIds) {
+                const el = document.getElementById(id);
+                if (el && el.getBoundingClientRect().top <= 100) active = id;
+            }
+            setActiveTab(active);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
     const loadLeaflet = useCallback(() => {
         return new Promise((resolve) => {
             if (window.L) { resolve(window.L); return; }
@@ -1438,32 +1600,250 @@ export default function HotelDetailPage() {
         });
     }, []);
 
-    useEffect(() => {
-        if (!showMap || !hotel) return;
-        const lat = parseFloat(hotel.latitude);
-        const lng = parseFloat(hotel.longitude);
-        if (isNaN(lat) || isNaN(lng)) return;
-        loadLeaflet().then(L => {
-            if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null; }
-            const map = L.map('hdp-leaflet-map', { zoomControl: true }).setView([lat, lng], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'A‚Â© OpenStreetMap contributors' }).addTo(map);
-            const icon = L.divIcon({ className: '', html: `<div style="width:32px;height:32px;background:#1a6ef5;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div>`, iconSize: [32, 32], iconAnchor: [16, 32] });
-            L.marker([lat, lng], { icon }).addTo(map).bindPopup(`<b>${hotel.name || ''}</b>`).openPopup();
-            leafletRef.current = map;
-        });
-        return () => { if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null; } };
-    }, [showMap, hotel, loadLeaflet]);
+    const renderAllAmenities = () => {
+        if (!hotel) return null;
+
+        // Popular chips – all AMENITY_MAP matches (no 12-cap)
+        const popularChips = Object.keys(AMENITY_MAP).filter(k => {
+            const aliases = Object.entries(EXTRA_MAP).filter(([, v]) => v === k).map(([ak]) => ak);
+            return [k, ...aliases].some(term => amenitySearchStr.includes(term));
+        }).map(k => ({ key: k, label: AMENITY_MAP[k] }));
+
+        // Raw amenity groups
+        const rawGroups = (hotel.amenity_groups || []).filter(
+            g => Array.isArray(g.amenities) && g.amenities.length > 0
+        );
+
+        if (popularChips.length === 0 && rawGroups.length === 0) return null;
+
+        // Map group_name → SVG icon
+        const groupIconMap = (name) => {
+            const n = (name || '').toLowerCase();
+            if (n.includes('bathroom') || n.includes('bath'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6 6 3 3 6"/><path d="M3 6v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6"/><path d="M3 10h18"/></svg>;
+            if (n.includes('kitchen') || n.includes('cooking') || n.includes('kitchenette'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg>;
+            if (n.includes('outdoor') || n.includes('garden') || n.includes('terrace') || n.includes('pool'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20A14.5 14.5 0 0 0 12 2"/><path d="M2 12h20"/></svg>;
+            if (n.includes('media') || n.includes('technology') || n.includes('entertainment') || n.includes('tv'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>;
+            if (n.includes('food') || n.includes('drink') || n.includes('dining') || n.includes('meal') || n.includes('restaurant'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg>;
+            if (n.includes('internet') || n.includes('wifi') || n.includes('wi-fi'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>;
+            if (n.includes('parking'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>;
+            if (n.includes('front desk') || n.includes('reception') || n.includes('concierge') || n.includes('service'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>;
+            if (n.includes('family') || n.includes('child') || n.includes('kid'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+            if (n.includes('cleaning') || n.includes('housekeep') || n.includes('laundry'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+            if (n.includes('safety') || n.includes('security'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+            if (n.includes('accessibility') || n.includes('wheelchair') || n.includes('disabled'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="4" r="2"/><path d="M9 9h6l-1 7-2 4-2-4"/><path d="M7 21a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4"/></svg>;
+            if (n.includes('language') || n.includes('spoken'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>;
+            if (n.includes('room') || n.includes('general') || n.includes('ameniti'))
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+            // default
+            return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>;
+        };
+
+        // Detect surcharge/additional-charge in item string
+        const parseAmenityItem = (a) => {
+            const lower = (a || '').toLowerCase();
+            const isExtra = lower.includes('additional charge') || lower.includes('surcharge') || lower.includes('extra charge');
+            const clean = formatAmenityName(a.replace(/\s*[–-]?\s*(additional charge|surcharge|extra charge)/gi, '').trim());
+            return { label: clean, isExtra };
+        };
+
+        return (
+            <>
+                <hr className="hdp-divider" />
+                <div className="hdp-section" id="sec-amenities">
+                    <h2 className="hdp-section-title">Most popular facilities</h2>
+
+                    {/* Grouped amenities Booking.com style */}
+                    {(popularChips.length > 0 || rawGroups.length > 0) && (
+                        <div className="hdp-amen2-groups">
+
+                            {/* Popular as first group card */}
+                            {popularChips.length > 0 && (
+                                <div className="hdp-amen2-group-card">
+                                    <div className="hdp-amen2-group-header">
+                                        <span className="hdp-amen2-group-icon">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                        </span>
+                                        <span className="hdp-amen2-group-title">Great for your stay</span>
+                                    </div>
+                                    <ul className="hdp-amen2-list">
+                                        {popularChips.map(a => (
+                                            <li key={a.key} className="hdp-amen2-item">
+                                                <svg className="hdp-amen2-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                <span className="hdp-amen2-item-label">{a.label}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {rawGroups.map((g, gi) => (
+                                <div key={gi} className="hdp-amen2-group-card">
+                                    <div className="hdp-amen2-group-header">
+                                        <span className="hdp-amen2-group-icon">
+                                            {groupIconMap(g.group_name)}
+                                        </span>
+                                        <span className="hdp-amen2-group-title">{g.group_name || 'Amenities'}</span>
+                                    </div>
+                                    <ul className="hdp-amen2-list">
+                                        {g.amenities.map((a, ai) => {
+                                            const { label, isExtra } = parseAmenityItem(a);
+                                            return (
+                                                <li key={ai} className="hdp-amen2-item">
+                                                    <svg className="hdp-amen2-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    <span className="hdp-amen2-item-label">{label}</span>
+                                                    {isExtra && <span className="hdp-amen2-badge">Additional charge</span>}
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </>
+        );
+    };
+
+    const renderHotelInfoPolicies = () => {
+        if (!hotel) return null;
+        const extraInfo = hotel.metapolicy_extra_info;
+        const policyStruct = hotel.metapolicy_struct;
+        if (!extraInfo && !policyStruct) return null;
+
+        const policyMeta = {
+            internet:  { title: 'Internet & Wi-Fi', color: '#3b82f6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg> },
+            meal:      { title: 'Dining & Meals',    color: '#f59e0b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg> },
+            parking:   { title: 'Parking',           color: '#8b5cf6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg> },
+            pets:      { title: 'Pet Policy',        color: '#10b981', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg> },
+            extra_bed: { title: 'Extra Bed',         color: '#ec4899', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 9V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z"/><path d="M4 18v2"/><path d="M20 18v2"/></svg> },
+            children:  { title: 'Children Policy',  color: '#f97316', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 3"/></svg> },
+            shuttle:   { title: 'Airport Shuttle',  color: '#06b6d4', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-4.3c.3-2.7.2-6.7-.8-8.3H2"/><path d="M9 18H5.2L5 10H2.8c-.8 0-.8 0-.8.8V18h2"/><circle cx="7" cy="18" r="2"/><circle cx="15" cy="18" r="2"/></svg> },
+            visa:      { title: 'Visa Info',         color: '#64748b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> },
+            deposit:   { title: 'Deposit',           color: '#14b8a6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> },
+        };
+
+        const buildPolicyItems = (struct) => {
+            if (!struct || typeof struct !== 'object') return [];
+            const items = [];
+            const fmt = (v) => v ? String(v).replace(/_/g, ' ') : '';
+            const fmtMoney = (amount, currency) => amount ? `${currency || ''} ${parseFloat(amount).toFixed(2)}`.trim() : null;
+            Object.entries(struct).forEach(([key, arr]) => {
+                if (!Array.isArray(arr) || arr.length === 0) return;
+                const meta = policyMeta[key] || { title: fmt(key), color: '#64748b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> };
+                arr.forEach(item => {
+                    if (!item || typeof item !== 'object') return;
+                    const parts = [];
+                    const type = item.type || item.territory_type || item.pets_type;
+                    const inclusion = item.inclusion;
+                    const price = item.price != null ? fmtMoney(item.price, item.currency) : null;
+                    const priceUnit = item.price_unit ? fmt(item.price_unit) : null;
+                    const amount = item.amount;
+                    if (type) parts.push(fmt(type));
+                    if (inclusion) {
+                        const inc = fmt(inclusion);
+                        const incLabels = { included: 'Included in rate', excluded: 'Not included', 'for free': 'Free of charge', surcharge: 'Additional charge applies' };
+                        parts.push(incLabels[inc] || inc.charAt(0).toUpperCase() + inc.slice(1));
+                    }
+                    if (price) parts.push(`${price}${priceUnit ? ' / ' + priceUnit : ''}`);
+                    if (amount && key === 'extra_bed') parts.push(`${amount} bed${amount > 1 ? 's' : ''}`);
+                    items.push({ ...meta, desc: parts.join(' · ') || 'See hotel for details' });
+                });
+            });
+            return items;
+        };
+
+        const policyItems = buildPolicyItems(policyStruct);
+
+        return (
+            <>
+                <hr className="hdp-divider" />
+                <div className="hdp-info-policies-wrap" id="sec-policies">
+
+                    {extraInfo && (
+                        <div className="hdp-hotel-info-banner">
+                            <div className="hdp-hib-header">
+                                <span className="hdp-hib-icon-wrap">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                                </span>
+                                <span className="hdp-hib-title">Important Hotel Information</span>
+                            </div>
+                            <div className="hdp-hib-body">
+                                <p className="hdp-hib-text">{extraInfo}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {policyItems.length > 0 && (
+                        <div className="hdp-policies-card">
+                            <div className="hdp-policies-header">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>
+                                <span className="hdp-policies-header-title">Hotel Policies</span>
+                                <span className="hdp-policies-count">{policyItems.length}</span>
+                            </div>
+                            <div className="hdp-policies-grid">
+                                {policyItems.map((p, i) => (
+                                    <div key={i} className="hdp-policy-item">
+                                        <span className="hdp-policy-icon-wrap" style={{ background: p.color + '18', color: p.color }}>
+                                            {p.svg}
+                                        </span>
+                                        <div className="hdp-policy-content">
+                                            <div className="hdp-policy-title">{p.title}</div>
+                                            <div className="hdp-policy-desc">{p.desc}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+            </>
+        );
+    };
+
+    // Mini-map now uses Google Maps iframe — no Leaflet useEffect needed
 
     const renderMap = () => {
-        if (!showMap) return null;
+        if (!showMap || !hotel) return null;
+        const lat = parseFloat(hotel.latitude);
+        const lng = parseFloat(hotel.longitude);
+        if (isNaN(lat) || isNaN(lng)) return null;
+        const gmSrc = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
         return (
             <div className="hdp-map-overlay" onClick={() => setShowMap(false)}>
                 <div className="hdp-map-box" onClick={e => e.stopPropagation()}>
                     <div className="hdp-map-header">
-                        <span className="hdp-map-title">{hotel ? hotel.name : 'Location'}</span>
-                        <button className="hdp-close-btn" onClick={() => setShowMap(false)}>A¢Å“"¢ Close</button>
+                        <span className="hdp-map-title">{hotel.name || 'Location'}</span>
+                        <button className="hdp-close-btn" onClick={() => setShowMap(false)}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                            Close
+                        </button>
                     </div>
-                    <div id="hdp-leaflet-map"/>
+                    <iframe
+                        title="Hotel map"
+                        src={gmSrc}
+                        style={{ flex: 1, border: 0, width: '100%', minHeight: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                    />
                 </div>
             </div>
         );
@@ -1497,7 +1877,7 @@ export default function HotelDetailPage() {
                 <div className="hdp-container">
 
                     {/* 1. name + stars + address */}
-                    <div className="hdp-header">
+                    <div className="hdp-header" id="sec-overview">
                         <div className="hdp-title-row">
                             <h1 className="hdp-hotel-name">{hotel.name}</h1>
                             {hotel.star_rating > 0 && (
@@ -1531,47 +1911,144 @@ export default function HotelDetailPage() {
                     {/* 2. gallery */}
                     {renderGallery()}
 
+                    {/* sticky section tabs */}
+                    <div className="hdp-tabs-bar">
+                        {[
+                            { id: 'sec-overview',      label: 'Overview' },
+                            { id: 'sec-about',         label: 'About' },
+                            { id: 'sec-rooms',         label: 'Rooms' },
+                            { id: 'sec-policies',      label: 'Policies' },
+                            { id: 'sec-amenities',    label: 'Amenities' },
+                        ].map(t => (
+                            <button
+                                key={t.id}
+                                className={`hdp-tab-btn${activeTab === t.id ? ' hdp-tab-btn--active' : ''}`}
+                                onClick={() => {
+                                    const el = document.getElementById(t.id);
+                                    if (el) {
+                                        const y = el.getBoundingClientRect().top + window.scrollY - 80;
+                                        window.scrollTo({ top: y, behavior: 'smooth' });
+                                    }
+                                    setActiveTab(t.id);
+                                    clickLockRef.current = true;
+                                    setTimeout(() => { clickLockRef.current = false; }, 1000);
+                                }}
+                            >
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
+
                     <hr className="hdp-divider"/>
 
-                    {/* 3. date filter + rooms */}
+                    {/* 3+4. about + explore area — two-column layout */}
+                    <div className="hdp-about-area-row">
+                        {/* Left column: About + Amenities */}
+                        <div className="hdp-about-area-left">
+                            {hotel.description_struct?.length > 0 && (
+                                <div className="hdp-section" id="sec-about">
+                                    <h2 className="hdp-section-title">About the Property</h2>
+                                    <div className={`hdp-about${aboutExpanded ? ' hdp-about--expanded' : ''}`}>
+                                        <div className="hdp-about-inner" ref={aboutInnerRef}>
+                                            {hotel.description_struct.map((section, si) => (
+                                                <div key={si} className="hdp-about-section">
+                                                    {section.title && <h4>{section.title}</h4>}
+                                                    {(Array.isArray(section.paragraphs) ? section.paragraphs : [section.paragraphs]).filter(Boolean).map((p, pi) => {
+                                                        const colonIdx = p.indexOf(':');
+                                                        if (colonIdx > 0 && colonIdx < 50) return <p key={pi}><strong>{p.slice(0, colonIdx)}</strong>{p.slice(colonIdx)}</p>;
+                                                        return <p key={pi}>{p}</p>;
+                                                    })}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {aboutOverflows && !aboutExpanded && <div className="hdp-about-fade"/>}
+                                    </div>
+                                    {aboutOverflows && (
+                                        <button className="hdp-about-toggle" onClick={() => setAboutExpanded(e => !e)}>
+                                            {aboutExpanded ? 'Show less ↑' : 'Read more ↓'}
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
+                            {namedAmenities.length > 0 && (
+                                <div className="hdp-section">
+                                    <h2 className="hdp-section-title">Amenities</h2>
+                                    <div className="hdp-amenities-grid">
+                                        {namedAmenities.map(a => (
+                                            <div key={a.key} className="hdp-amenity-chip">
+                                                <AmenityIcon type={a.key}/>
+                                                <span>{a.label}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Right column: Explore the Area */}
+                        {hotel.latitude && hotel.longitude && (() => {
+                            const locationSection = (hotel.description_struct || []).find(s => s.title?.toLowerCase() === 'location');
+                            const locationBlurb = locationSection?.paragraphs?.[0] || null;
+                            return (
+                                <div className="hdp-about-area-right">
+                                    <div className="hdp-explore-card">
+                                        <h3 className="hdp-explore-title">Explore the area</h3>
+                                        <div className="hdp-explore-map-thumb">
+                                            {hotel.latitude && hotel.longitude && (
+                                                <iframe
+                                                    title="Hotel location preview"
+                                                    src={`https://maps.google.com/maps?q=${parseFloat(hotel.latitude)},${parseFloat(hotel.longitude)}&z=15&output=embed`}
+                                                    style={{ width: '100%', height: '100%', border: 0, display: 'block' }}
+                                                    loading="lazy"
+                                                    allowFullScreen
+                                                    referrerPolicy="no-referrer-when-downgrade"
+                                                />
+                                            )}
+                                        </div>
+                                        <div className="hdp-explore-addr-row">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="hdp-explore-pin-icon"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            <span className="hdp-explore-addr-text">
+                                                {[hotel.address, hotel.region?.name].filter(Boolean).join(', ')}
+                                            </span>
+                                        </div>
+                                        <button className="hdp-explore-view-btn" onClick={() => setShowMap(true)}>
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            View in a map
+                                        </button>
+                                        {locationBlurb && (
+                                            <p className="hdp-explore-location-blurb">{locationBlurb}</p>
+                                        )}
+                                        {nearbyPlaces.length > 0 && (
+                                            <div className="hdp-explore-highlights">
+                                                <p className="hdp-explore-highlights-label">What's nearby</p>
+                                                <div className="hdp-explore-nearby-list">
+                                                    {nearbyPlaces.map((p, i) => (
+                                                        <div key={i} className="hdp-explore-nearby-item">
+                                                            <span className="hdp-explore-nearby-icon"><NearbyPlaceIcon type={p.type} /></span>
+                                                            <span className="hdp-explore-nearby-name">{p.name}</span>
+                                                            <span className="hdp-explore-nearby-dist">{p.distLabel}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </div>
+
+                    <hr className="hdp-divider"/>
+
+                    {/* 5. date filter + rooms */}
                     {renderDateFilter()}
                     {renderRoomCards()}
 
+                    {renderHotelInfoPolicies()}
+                    {renderAllAmenities()}
+
                     <hr className="hdp-divider"/>
-
-                    {/* 4. amenities */}
-                    {namedAmenities.length > 0 && (
-                        <div className="hdp-section">
-                            <h2 className="hdp-section-title">Amenities</h2>
-                            <div className="hdp-amenities-grid">
-                                {namedAmenities.map(a => (
-                                    <div key={a.key} className="hdp-amenity-chip">
-                                        <AmenityIcon type={a.key}/>
-                                        <span>{a.label}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 5. about */}
-                    {hotel.description_struct?.length > 0 && (
-                        <div className="hdp-section">
-                            <h2 className="hdp-section-title">About the Property</h2>
-                            <div className="hdp-about">
-                                {hotel.description_struct.map((section, si) => (
-                                    <div key={si} className="hdp-about-section">
-                                        {section.title && <h4>{section.title}</h4>}
-                                        {(Array.isArray(section.paragraphs) ? section.paragraphs : [section.paragraphs]).filter(Boolean).map((p, pi) => {
-                                            const colonIdx = p.indexOf(':');
-                                            if (colonIdx > 0 && colonIdx < 50) return <p key={pi}><strong>{p.slice(0, colonIdx)}</strong>{p.slice(colonIdx)}</p>;
-                                            return <p key={pi}>{p}</p>;
-                                        })}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
 
                     {/* 6. details accordion */}
                     {detailRows.length > 0 && (
@@ -1607,3 +2084,4 @@ export default function HotelDetailPage() {
         </div>
     );
 }
+
