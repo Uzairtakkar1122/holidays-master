@@ -214,11 +214,20 @@ const NearbyHotels = () => {
                     </p>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {hotels.map((hotel, i) => (
-                            <FadeInSection key={hotel.id} delay={`${i * 150}ms`}>
-                                <HotelCard {...hotel} />
-                            </FadeInSection>
-                        ))}
+                        {hotels.map((hotel, i) => {
+                            const { checkin, checkout } = getTodayTomorrow();
+                            const { currency, residency } = userPrefsRef.current;
+                            const guests = JSON.stringify([{ adults: 2, children: [] }]);
+                            const p = new URLSearchParams({ hotel_id: hotel.id, checkin, checkout, guests, currency, residency });
+                            return (
+                                <FadeInSection key={hotel.id} delay={`${i * 150}ms`}>
+                                    <HotelCard
+                                        {...hotel}
+                                        onViewDetails={() => window.open(`/hotel-detail-data/?${p.toString()}`, '_blank')}
+                                    />
+                                </FadeInSection>
+                            );
+                        })}
                     </div>
                 )}
 

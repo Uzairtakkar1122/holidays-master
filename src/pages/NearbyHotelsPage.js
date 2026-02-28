@@ -304,13 +304,24 @@ const NearbyHotelsPage = () => {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {shown.map((hotel, i) => (
-                                <FadeInSection key={hotel.id} delay={(i % PER_PAGE * 80) + 'ms'}>
-                                    <div className="h-[500px]">
-                                        <HotelCard {...hotel} currencySymbol={currencySymbol} />
-                                    </div>
-                                </FadeInSection>
-                            ))}
+                            {shown.map((hotel, i) => {
+                                const { checkin, checkout } = datesRef.current;
+                                const { currency, residency } = userPrefsRef.current;
+                                const guests = JSON.stringify([{ adults: 2, children: [] }]);
+                                const p = new URLSearchParams({ hotel_id: hotel.id, checkin, checkout, guests, currency, residency });
+                                const detailUrl = `/hotel-detail-data/?${p.toString()}`;
+                                return (
+                                    <FadeInSection key={hotel.id} delay={(i % PER_PAGE * 80) + 'ms'}>
+                                        <div className="h-[500px]">
+                                            <HotelCard
+                                                {...hotel}
+                                                currencySymbol={currencySymbol}
+                                                onViewDetails={() => window.open(detailUrl, '_blank')}
+                                            />
+                                        </div>
+                                    </FadeInSection>
+                                );
+                            })}
                         </div>
 
                         {hasMore && (

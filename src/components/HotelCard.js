@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart, MapPin, Star, ArrowRight } from 'lucide-react';
 
-const HotelCard = ({ name, location, price, rating, image, tags = [], currencySymbol = '$' }) => (
+const HotelCard = ({ name, location, price, rating, image, tags = [], currencySymbol = '$', onViewDetails }) => (
     <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-transparent dark:border-slate-800 flex flex-col h-full">
         <div className="relative h-64 overflow-hidden flex-shrink-0">
             <img
@@ -47,7 +47,11 @@ const HotelCard = ({ name, location, price, rating, image, tags = [], currencySy
                         <span className="text-base font-semibold text-slate-500 dark:text-slate-400">Check availability</span>
                     )}
                 </div>
-                <button className="text-emerald-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+                <button
+                    onClick={onViewDetails}
+                    className="text-emerald-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all disabled:opacity-40"
+                    disabled={!onViewDetails}
+                >
                     View Details <ArrowRight className="w-4 h-4" />
                 </button>
             </div>

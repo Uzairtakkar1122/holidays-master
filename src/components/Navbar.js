@@ -55,7 +55,7 @@ const Navbar = () => {
     };
 
     const location = useLocation();
-    const isSearchPage = location.pathname.includes('/search');
+    const isSearchPage = location.pathname.includes('/search') || location.pathname.includes('/hotel-detail');
 
     // IP-based Detection
     useEffect(() => {

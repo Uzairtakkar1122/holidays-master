@@ -1003,6 +1003,7 @@ const SearchResults = () => {
                                             index={index}
                                             searchParams={searchParams}
                                             currentCurrency={currentCurrency}
+                                            currentResidency={currentResidency}
                                         />
                                     ))
                                 ) : (
@@ -1062,7 +1063,8 @@ const SearchResults = () => {
     );
 };
 
-const HotelResultCard = ({ hotel, searchParams, currentCurrency, index = 0 }) => {
+const HotelResultCard = ({ hotel, searchParams, currentCurrency, currentResidency, index = 0 }) => {
+    const navigate = useNavigate();
     const [currentImg, setCurrentImg] = useState(0);
 
     const displayAmenities = useMemo(() => {
@@ -1288,7 +1290,18 @@ const HotelResultCard = ({ hotel, searchParams, currentCurrency, index = 0 }) =>
 
                             <button
                                 className="btn-view-details"
-                                onClick={() => window.open(`/hotel/${hotel.id}?checkin=${searchParams.checkin}&checkout=${searchParams.checkout}&residency=${searchParams.residency}&adults=${searchParams.adults}&children_ages=${JSON.stringify(searchParams.children_ages)}`, '_blank')}
+                                onClick={() => {
+                                    const guests = JSON.stringify([{ adults: searchParams.adults, children: searchParams.children_ages }]);
+                                    const p = new URLSearchParams({
+                                        hotel_id: hotel.id,
+                                        checkin: searchParams.checkin,
+                                        checkout: searchParams.checkout,
+                                        guests,
+                                        currency: currentCurrency?.code || searchParams.currency,
+                                        residency: currentResidency || searchParams.residency
+                                    });
+                                    navigate(`/hotel-detail-data/?${p.toString()}`);
+                                }}
                             >
                                 View Details
                             </button>

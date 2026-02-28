@@ -189,4 +189,97 @@ async function handleRegionSearch(req, res) {
     apiReq.end();
 }
 
+// Hotel Info Endpoint → /api/b2b/v3/hotel/info/
+router.post('/hotel-info', (req, res) => {
+    if (!assertRateHawkConfig(res)) return;
+    const { id, language = 'en' } = req.body;
+    if (!id) return res.status(400).json({ error: 'hotel id is required' });
+
+    const data = JSON.stringify({ id, language });
+    const auth = Buffer.from(`${API_ID}:${API_KEY}`).toString('base64');
+    const options = {
+        hostname: API_HOST,
+        path: '/api/b2b/v3/hotel/info/',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(data),
+            'Authorization': `Basic ${auth}`
+        }
+    };
+    const apiReq = https.request(options, (apiRes) => {
+        let body = '';
+        apiRes.on('data', chunk => body += chunk);
+        apiRes.on('end', () => {
+            try { res.status(apiRes.statusCode).json(JSON.parse(body)); }
+            catch (e) { res.status(500).json({ error: 'Invalid response from API' }); }
+        });
+    });
+    apiReq.on('error', () => res.status(500).json({ error: 'Failed to connect to RateHawk API' }));
+    apiReq.write(data);
+    apiReq.end();
+});
+
+// Hotel Page Pricing Endpoint → /api/b2b/v3/search/hp/
+router.post('/hotel-hp', (req, res) => {
+    if (!assertRateHawkConfig(res)) return;
+    const { id, checkin, checkout, guests, residency = 'gb', language = 'en', currency = 'USD' } = req.body;
+    if (!id || !checkin || !checkout) return res.status(400).json({ error: 'id, checkin and checkout are required' });
+
+    const data = JSON.stringify({ id, checkin, checkout, guests: guests || [{ adults: 2, children: [] }], residency, language, currency });
+    const auth = Buffer.from(`${API_ID}:${API_KEY}`).toString('base64');
+    const options = {
+        hostname: API_HOST,
+        path: '/api/b2b/v3/search/hp/',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(data),
+            'Authorization': `Basic ${auth}`
+        }
+    };
+    const apiReq = https.request(options, (apiRes) => {
+        let body = '';
+        apiRes.on('data', chunk => body += chunk);
+        apiRes.on('end', () => {
+            try { res.status(apiRes.statusCode).json(JSON.parse(body)); }
+            catch (e) { res.status(500).json({ error: 'Invalid response from API' }); }
+        });
+    });
+    apiReq.on('error', () => res.status(500).json({ error: 'Failed to connect to RateHawk API' }));
+    apiReq.write(data);
+    apiReq.end();
+});
+
+// Hotel Prebook Endpoint → /api/b2b/v3/hotel/prebook/
+router.post('/hotel-prebook', (req, res) => {
+    if (!assertRateHawkConfig(res)) return;
+    const { hash, price_increase_percent = 20 } = req.body;
+    if (!hash) return res.status(400).json({ error: 'hash is required' });
+
+    const data = JSON.stringify({ hash, price_increase_percent });
+    const auth = Buffer.from(`${API_ID}:${API_KEY}`).toString('base64');
+    const options = {
+        hostname: API_HOST,
+        path: '/api/b2b/v3/hotel/prebook/',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(data),
+            'Authorization': `Basic ${auth}`
+        }
+    };
+    const apiReq = https.request(options, (apiRes) => {
+        let body = '';
+        apiRes.on('data', chunk => body += chunk);
+        apiRes.on('end', () => {
+            try { res.status(apiRes.statusCode).json(JSON.parse(body)); }
+            catch (e) { res.status(500).json({ error: 'Invalid response from API' }); }
+        });
+    });
+    apiReq.on('error', () => res.status(500).json({ error: 'Failed to connect to RateHawk API' }));
+    apiReq.write(data);
+    apiReq.end();
+});
+
 module.exports = router;

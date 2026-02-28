@@ -7,6 +7,7 @@ import Destinations from './pages/Destinations';
 import Experiences from './pages/Experiences';
 import SearchResults from './components/SearchResults/SearchResults';
 import NearbyHotelsPage from './pages/NearbyHotelsPage';
+import HotelDetailPage from './pages/HotelDetailPage';
 import Footer from './components/Footer';
 import './index.css';
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/experiences" element={<Experiences />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/nearby" element={<NearbyHotelsPage />} />
+          <Route path="/hotel-detail-data" element={<HotelDetailPage />} />
           {/* Placeholder routes for future expansion */}
           <Route path="/flights" element={<div className="container" style={{ padding: '2rem' }}>Flights page coming soon...</div>} />
           <Route path="/deals" element={<div className="container" style={{ padding: '2rem' }}>Deals page coming soon...</div>} />
