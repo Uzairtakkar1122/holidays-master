@@ -84,11 +84,26 @@
   text-transform: uppercase;
 }
 
+/* Professional inline stars in meta row */
+.hdp-stars-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.hdp-stars-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #92400e;
+  margin-left: 5px;
+  letter-spacing: 0.1px;
+}
+
 .hdp-meta-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
+  gap: 8px 14px;
 }
 .hdp-address {
   display: flex;
@@ -137,21 +152,28 @@
   transition: filter 0.2s, transform 0.2s;
   display: block;
 }
-.hdp-gallery img:hover { filter: brightness(0.82); }
+.hdp-gallery img:hover { filter: none; }
 .hdp-more-tile { position: relative; overflow: hidden; }
 .hdp-more-overlay {
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,.58);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  color: #fff; gap: 2px;
-  backdrop-filter: blur(1px);
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0,0,0,.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 5px 14px;
+  display: inline-flex;
+  align-items: center;
+  pointer-events: none;
 }
 .hdp-more-overlay .hdp-more-count  { font-size: 30px; font-weight: 800; }
-.hdp-more-overlay .hdp-more-label  { font-size: 12px; opacity: 0.85; letter-spacing: 0.3px; }
+.hdp-more-overlay .hdp-more-label  { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.92); letter-spacing: 0.3px; white-space: nowrap; }
 .hdp-show-all-btn {
   position: absolute;
-  bottom: 14px; right: 14px;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(255,255,255,.95);
   border: none;
   border-radius: 10px;
@@ -160,9 +182,11 @@
   cursor: pointer;
   box-shadow: 0 2px 12px rgba(0,0,0,.18);
   color: #1a1a2e;
+  white-space: nowrap;
   transition: background 0.15s, transform 0.1s;
 }
-.hdp-show-all-btn:hover { background: #fff; transform: translateY(-1px); }
+.hdp-show-all-btn:hover { background: #fff; transform: translateX(-50%) translateY(-1px); }
+.hdp-more-tile img { filter: blur(2px) brightness(0.88); }
 
 @media (max-width: 1024px) {
   .hdp-gallery { grid-template-columns: 2fr 1fr 1fr; }

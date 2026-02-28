@@ -1337,17 +1337,16 @@ export default function HotelDetailPage() {
                         return (
                             <div key={idx} className={isHero ? 'hdp-hero' : isLast ? 'hdp-more-tile' : ''} onClick={() => setLightboxIdx(idx)}>
                                 <img src={url} alt=""/>
-                                {isLast && (
-                                    <div className="hdp-more-overlay">
-                                        <span className="hdp-more-count">+{remaining}</span>
-                                        <span className="hdp-more-label">more photos</span>
-                                    </div>
+                                {isLast && images.length > 1 && (
+                                    <button className="hdp-show-all-btn" onClick={e => { e.stopPropagation(); setShowAllPhotos(true); }}>
+                                        Show all {images.length} photos
+                                    </button>
                                 )}
                             </div>
                         );
                     })}
                 </div>
-                {images.length > 1 && (
+                {images.length > 1 && remaining <= 0 && (
                     <button className="hdp-show-all-btn" onClick={() => setShowAllPhotos(true)}>
                         Show all {images.length} photos
                     </button>
@@ -1502,15 +1501,15 @@ export default function HotelDetailPage() {
                         <div className="hdp-title-row">
                             <h1 className="hdp-hotel-name">{hotel.name}</h1>
                             {hotel.star_rating > 0 && (
-                                <div className="hdp-stars-badge">
+                                <span className="hdp-stars-inline">
                                     {Array.from({ length: hotel.star_rating }).map((_, i) => (
-                                        <svg key={i} width="13" height="13" viewBox="0 0 24 24">
+                                        <svg key={i} width="14" height="14" viewBox="0 0 24 24">
                                             <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
-                                                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+                                                fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"/>
                                         </svg>
                                     ))}
-                                    <span>{hotel.star_rating} Stars</span>
-                                </div>
+                                    <span className="hdp-stars-label">{hotel.star_rating}-Star Hotel</span>
+                                </span>
                             )}
                         </div>
                         <div className="hdp-meta-row">
