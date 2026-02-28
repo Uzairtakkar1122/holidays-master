@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Hotels from './pages/Hotels';
@@ -9,10 +10,17 @@ import SearchResults from './components/SearchResults/SearchResults';
 import NearbyHotelsPage from './pages/NearbyHotelsPage';
 import HotelDetailPage from './pages/HotelDetailPage';
 import Footer from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
 import './index.css';
+
+// To enable Google Sign-In, create a .env file in the project root and add:
+// REACT_APP_GOOGLE_CLIENT_ID=your_google_client_id_here
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
 function App() {
   return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <AuthProvider>
     <div className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
       <Navbar />
       <main className="flex-grow">
@@ -31,6 +39,8 @@ function App() {
       </main>
       <Footer />
     </div>
+    </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 
