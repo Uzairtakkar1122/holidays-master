@@ -1567,8 +1567,8 @@ export default function HotelDetailPage() {
 
     useEffect(() => {
         if (aboutInnerRef.current) {
-            // 370px is the CSS max-height for .hdp-about
-            setAboutOverflows(aboutInnerRef.current.scrollHeight > 370);
+            // 340px is the CSS max-height for .hdp-about
+            setAboutOverflows(aboutInnerRef.current.scrollHeight > 340);
         }
     }, [hotel?.description_struct]);
 
@@ -1782,7 +1782,7 @@ export default function HotelDetailPage() {
                                 <span className="hdp-hib-title">Important Hotel Information</span>
                             </div>
                             <div className="hdp-hib-body">
-                                <p className="hdp-hib-text">{extraInfo}</p>
+                                <div className="hdp-hib-text" dangerouslySetInnerHTML={{ __html: extraInfo }} />
                             </div>
                         </div>
                     )}

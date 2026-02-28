@@ -357,13 +357,13 @@
 /* ── About section ─────────────────────────────────────── */
 .hdp-about {
   position: relative;
-  max-height: 3460px;
+  max-height: 340px;
   overflow: hidden;
   margin-bottom: 6px;
-  transition: max-height 0.35s ease;
+  transition: max-height 0.45s ease;
 }
 .hdp-about--expanded {
-  max-height: 2000px;
+  max-height: 4000px;
 }
 .hdp-about-inner { padding-bottom: 4px; }
 .hdp-about-fade {
@@ -644,10 +644,15 @@
   font-size: 14px;
   line-height: 1.75;
   color: var(--muted-foreground, #64748b);
-  white-space: pre-line;
   margin: 0;
 }
 .dark .hdp-hib-text { color: var(--muted-foreground, #94a3b8); }
+.hdp-hib-text p { margin: 0 0 10px 0; }
+.hdp-hib-text p:last-child { margin-bottom: 0; }
+.hdp-hib-text b, .hdp-hib-text strong { font-weight: 700; color: var(--foreground); }
+.hdp-hib-text ul, .hdp-hib-text ol { margin: 6px 0 10px 20px; padding: 0; }
+.hdp-hib-text li { margin-bottom: 4px; }
+.hdp-hib-text br { display: block; content: ''; margin-bottom: 4px; }
 
 /* Policies card */
 .hdp-policies-card {
