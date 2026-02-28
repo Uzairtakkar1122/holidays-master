@@ -1,0 +1,1163 @@
+/* ConfirmBookingPage.css */
+
+/* ─── CSS custom properties (light defaults) ──────────────────── */
+.cbp-page, .cbp-status-wrap {
+  --cbp-bg:             #f3f4f6;
+  --cbp-surface:        #ffffff;
+  --cbp-surface-2:      #f9fafb;
+  --cbp-border:         #e5e7eb;
+  --cbp-border-focus:   #0a7c72;
+  --cbp-text-primary:   #111827;
+  --cbp-text-secondary: #374151;
+  --cbp-text-muted:     #6b7280;
+  --cbp-text-faint:     #9ca3af;
+  --cbp-accent:         #0a7c72;
+  --cbp-accent-dark:    #065f46;
+  --cbp-accent-bg:      #ecfdf5;
+  --cbp-accent-border:  #a7f3d0;
+  --cbp-error:          #ef4444;
+  --cbp-error-bg:       #fef2f2;
+  --cbp-error-border:   #fecaca;
+  --cbp-input-bg:       #ffffff;
+  --cbp-input-text:     #111827;
+  --cbp-shadow:         0 1px 4px rgba(0,0,0,.07);
+  --cbp-shadow-card:    0 2px 12px rgba(0,0,0,.09);
+  --cbp-pm-bg:          #ffffff;
+  --cbp-pm-hover:       #f0fdf9;
+}
+
+/* ─── dark theme overrides ─────────────────────────────────────── */
+.cbp-page.cbp-dark, .cbp-status-wrap.cbp-dark {
+  --cbp-bg:             #0f172a;
+  --cbp-surface:        #1e293b;
+  --cbp-surface-2:      #162032;
+  --cbp-border:         #334155;
+  --cbp-border-focus:   #34d399;
+  --cbp-text-primary:   #f1f5f9;
+  --cbp-text-secondary: #cbd5e1;
+  --cbp-text-muted:     #94a3b8;
+  --cbp-text-faint:     #64748b;
+  --cbp-accent:         #34d399;
+  --cbp-accent-dark:    #10b981;
+  --cbp-accent-bg:      #0d2e22;
+  --cbp-accent-border:  #065f46;
+  --cbp-error:          #f87171;
+  --cbp-error-bg:       #2d1515;
+  --cbp-error-border:   #7f1d1d;
+  --cbp-input-bg:       #1e293b;
+  --cbp-input-text:     #f1f5f9;
+  --cbp-shadow:         0 1px 6px rgba(0,0,0,.4);
+  --cbp-shadow-card:    0 4px 20px rgba(0,0,0,.5);
+  --cbp-pm-bg:          #1e293b;
+  --cbp-pm-hover:       #163028;
+}
+
+/* ─── page layout ─────────────────────────────────────────────── */
+.cbp-page {
+  background: var(--cbp-bg);
+  min-height: 100vh;
+  transition: background .25s;
+  padding: 32px 16px 64px;
+}
+
+.cbp-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .cbp-container {
+    grid-template-columns: 1fr;
+  }
+  .cbp-right {
+    order: -1;
+  }
+}
+
+/* ─── sections ────────────────────────────────────────────────── */
+.cbp-section {
+  background: var(--cbp-surface);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--cbp-shadow);
+  border: 1px solid var(--cbp-border);
+  transition: background .25s, border-color .25s;
+}
+
+.cbp-section-borderless {
+  background: var(--cbp-surface);
+  border: 1px solid var(--cbp-border);
+  border-radius: 12px;
+  padding: 16px 24px;
+  margin-bottom: 16px;
+  transition: background .25s, border-color .25s;
+}
+
+.cbp-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cbp-text-primary);
+  margin: 0 0 4px;
+}
+
+.cbp-section-sub {
+  font-size: 0.8rem;
+  color: var(--cbp-text-faint);
+  margin: 0 0 18px;
+}
+
+/* ─── refund banner ────────────────────────────────────────────── */
+.cbp-refund-banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--cbp-accent-bg);
+  border: 1px solid var(--cbp-accent-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.cbp-refund-banner svg { flex-shrink: 0; margin-top: 2px; }
+.cbp-refund-banner strong { display: block; font-size: 0.9rem; color: var(--cbp-accent-dark); margin-bottom: 3px; }
+.cbp-refund-banner p { font-size: 0.8rem; color: var(--cbp-accent); margin: 0; }
+
+/* ─── form inputs ─────────────────────────────────────────────── */
+.cbp-field { display: flex; flex-direction: column; gap: 5px; }
+.cbp-field label { font-size: 0.82rem; font-weight: 600; color: var(--cbp-text-secondary); }
+
+.cbp-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--cbp-border);
+  border-radius: 8px;
+  font-size: 0.93rem;
+  color: var(--cbp-input-text);
+  background: var(--cbp-input-bg);
+  transition: border-color .2s, box-shadow .2s, background .25s, color .25s;
+  box-sizing: border-box;
+  outline: none;
+}
+.cbp-input:focus {
+  border-color: var(--cbp-border-focus);
+  box-shadow: 0 0 0 3px rgba(10,124,114,.1);
+}
+.cbp-dark .cbp-input:focus { box-shadow: 0 0 0 3px rgba(52,211,153,.12); }
+.cbp-input.cbp-error { border-color: var(--cbp-error); }
+.cbp-err-msg { font-size: 0.77rem; color: var(--cbp-error); margin-top: 1px; }
+
+.cbp-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.cbp-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 500px) {
+  .cbp-row-2, .cbp-row-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cbp-row-2-tight {
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+/* ─── phone row ────────────────────────────────────────────────── */
+.cbp-phone-row {
+  display: flex;
+  gap: 10px;
+}
+
+.cbp-phone-code {
+  flex: 0 0 auto;
+  padding: 10px;
+  border: 1.5px solid var(--cbp-border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--cbp-surface-2);
+  color: var(--cbp-text-secondary);
+  outline: none;
+  transition: border-color .2s, background .25s;
+}
+.cbp-phone-code:focus { border-color: var(--cbp-border-focus); }
+
+.cbp-phone-num { flex: 1; }
+
+/* ─── guest block ─────────────────────────────────────────────── */
+.cbp-guest-block {
+  border: 1px solid var(--cbp-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: var(--cbp-surface-2);
+  transition: background .25s, border-color .25s;
+}
+.cbp-guest-block-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cbp-text-muted);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cbp-guest-entry { margin-bottom: 10px; }
+.cbp-guest-label { font-size: 0.8rem; color: var(--cbp-text-faint); margin-bottom: 6px; }
+
+/* ─── payment methods ─────────────────────────────────────────── */
+.cbp-secure-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--cbp-text-muted);
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  background: var(--cbp-surface-2);
+  border-radius: 8px;
+  border: 1px solid var(--cbp-border);
+}
+
+.cbp-pay-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.cbp-pay-method {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--cbp-border);
+  border-radius: 12px;
+  cursor: pointer;
+  background: var(--cbp-pm-bg);
+  transition: border-color .18s, box-shadow .18s, background .18s;
+  user-select: none;
+}
+.cbp-pay-method input[type=radio] { display: none; }
+.cbp-pay-method:hover { border-color: var(--cbp-accent); background: var(--cbp-pm-hover); }
+.cbp-pay-active {
+  border-color: var(--cbp-accent);
+  background: var(--cbp-accent-bg);
+  box-shadow: 0 0 0 3px rgba(10,124,114,.1);
+}
+.cbp-dark .cbp-pay-active { box-shadow: 0 0 0 3px rgba(52,211,153,.12); }
+
+/* custom radio dot */
+.cbp-pm-radio {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--cbp-border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: border-color .15s;
+  background: var(--cbp-surface);
+}
+.cbp-pay-active .cbp-pm-radio { border-color: var(--cbp-accent); }
+.cbp-pm-radio-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: transparent;
+  transition: background .15s;
+}
+.cbp-pay-active .cbp-pm-radio-dot { background: var(--cbp-accent); }
+.cbp-pm-icon {
+  width: 22px; height: 22px; flex-shrink: 0;
+  color: var(--cbp-text-muted);
+  transition: color .15s;
+}
+.cbp-pay-active .cbp-pm-icon { color: var(--cbp-accent); }
+.cbp-pm-info { display: flex; flex-direction: column; gap: 4px; }
+.cbp-pm-label { font-size: 0.9rem; font-weight: 600; color: var(--cbp-text-primary); }
+.cbp-pm-brands { display: flex; gap: 6px; flex-wrap: wrap; }
+.cbp-pm-brand-chip {
+  font-size: 0.7rem; font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--cbp-surface-2);
+  border: 1px solid var(--cbp-border);
+  color: var(--cbp-text-muted);
+}
+
+/* ─── card form ───────────────────────────────────────────────── */
+.cbp-card-form { display: flex; flex-direction: column; gap: 14px; }
+
+.cbp-card-brands {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.cbp-brand-chip {
+  padding: 3px 9px;
+  border: 1px solid var(--cbp-border);
+  border-radius: 5px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: var(--cbp-text-faint);
+  background: var(--cbp-surface-2);
+  transition: all .15s;
+}
+.cbp-brand-active {
+  border-color: var(--cbp-accent);
+  color: var(--cbp-accent);
+  background: var(--cbp-accent-bg);
+}
+.cbp-input-icon-wrap { position: relative; }
+.cbp-input-icon-wrap .cbp-input { padding-right: 38px; }
+.cbp-lock-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--cbp-text-faint);
+}
+
+/* ─── alt pay note ────────────────────────────────────────────── */
+.cbp-alt-pay-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cbp-surface-2);
+  border: 1px solid var(--cbp-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: var(--cbp-text-muted);
+}
+
+/* ─── special requests ────────────────────────────────────────── */
+.cbp-special-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--cbp-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color .15s;
+}
+.cbp-special-btn:hover { color: var(--cbp-accent-dark); }
+
+.cbp-chevron-up { transform: rotate(180deg); }
+
+.cbp-textarea {
+  margin-top: 12px;
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ─── submit area ─────────────────────────────────────────────── */
+.cbp-submit-wrap { text-align: center; margin-top: 22px; }
+
+.cbp-recommended-badge {
+  display: inline-block;
+  background: #fbbf24;
+  color: #92400e;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 2px 10px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}
+
+.cbp-submit-btn {
+  width: 100%;
+  padding: 15px 24px;
+  background: linear-gradient(135deg, #0a7c72, #0d9084);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s, transform .1s, box-shadow .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(10,124,114,.3);
+}
+
+.cbp-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #065f46, #0a7c72);
+  box-shadow: 0 6px 20px rgba(10,124,114,.4);
+  transform: translateY(-1px);
+}
+
+.cbp-submit-btn:disabled {
+  opacity: .7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cbp-btn-spinner {
+  width: 18px;
+  height: 18px;
+  animation: cbp-spin 1s linear infinite;
+}
+
+.cbp-btn-spinner circle {
+  stroke: #fff;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 20;
+  stroke-linecap: round;
+}
+
+.cbp-terms { font-size: 0.76rem; color: var(--cbp-text-faint); margin-top: 10px; }
+.cbp-terms a { color: var(--cbp-accent); text-decoration: none; }
+.cbp-terms a:hover { text-decoration: underline; }
+
+.cbp-submit-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cbp-error-bg);
+  border: 1px solid var(--cbp-error-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: var(--cbp-error);
+  margin-top: 12px;
+}
+
+/* ─── right summary card ──────────────────────────────────────── */
+.cbp-right { position: sticky; top: 24px; }
+
+.cbp-summary-card {
+  background: var(--cbp-surface);
+  border-radius: 14px;
+  box-shadow: var(--cbp-shadow-card);
+  border: 1px solid var(--cbp-border);
+  overflow: hidden;
+  transition: background .25s, border-color .25s;
+}
+
+/* hotel image */
+.cbp-hotel-img-wrap {
+  position: relative;
+  height: 215px;
+  overflow: hidden;
+  background: var(--cbp-surface-2);
+}
+.cbp-hotel-img { width: 100%; height: 100%; object-fit: cover; transition: opacity .3s; }
+.cbp-hotel-img-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cbp-surface-2);
+}
+
+.cbp-img-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,.45);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s;
+  padding: 0;
+  line-height: 1;
+}
+
+.cbp-img-arrow:hover { background: rgba(0,0,0,.7); }
+.cbp-img-prev { left: 10px; }
+.cbp-img-next { right: 10px; }
+
+.cbp-img-counter {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  background: rgba(0,0,0,.5);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* summary body */
+.cbp-summary-body { padding: 20px; }
+.cbp-hotel-name { font-size: 1.05rem; font-weight: 700; color: var(--cbp-text-primary); margin: 0 0 4px; }
+.cbp-room-name  { font-size: 0.82rem; color: var(--cbp-text-muted); margin: 0 0 16px; }
+
+/* dates */
+.cbp-dates-table {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--cbp-surface-2);
+  border: 1px solid var(--cbp-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  transition: background .25s, border-color .25s;
+}
+.cbp-dates-col { flex: 1; }
+.cbp-dates-label { font-size: 0.72rem; font-weight: 700; color: var(--cbp-text-faint); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+.cbp-dates-val   { font-size: 0.88rem; font-weight: 700; color: var(--cbp-text-primary); }
+.cbp-dates-sub   { font-size: 0.74rem; color: var(--cbp-text-faint); margin-top: 1px; }
+.cbp-dates-divider { flex: 0 0 48px; text-align: center; font-size: 1.2rem; font-weight: 800; color: var(--cbp-accent); line-height: 1.1; }
+.cbp-dates-divider span { display: block; font-size: 0.7rem; font-weight: 500; color: var(--cbp-text-faint); }
+
+/* good taste banner */
+.cbp-taste-banner {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--cbp-accent-bg);
+  border: 1px solid var(--cbp-accent-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: var(--cbp-accent-dark);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.cbp-dark .cbp-taste-banner { color: var(--cbp-accent); }
+
+/* price */
+.cbp-price-section { border-top: 1px solid var(--cbp-border); padding-top: 14px; }
+.cbp-price-header { font-size: 0.78rem; font-weight: 700; color: var(--cbp-text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+.cbp-price-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.86rem; color: var(--cbp-text-secondary); margin-bottom: 6px; }
+.cbp-price-divider { border: none; border-top: 1px solid var(--cbp-border); margin: 10px 0; }
+.cbp-price-total { font-size: 0.95rem; font-weight: 700; color: var(--cbp-text-primary); }
+.cbp-price-pay-today {
+  background: var(--cbp-accent-bg);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--cbp-accent-dark);
+}
+.cbp-dark .cbp-price-pay-today { color: var(--cbp-accent); }
+.cbp-price-pay-today strong { color: var(--cbp-accent); }
+
+/* guests */
+.cbp-guests-row { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--cbp-text-muted); margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--cbp-border); }
+
+/* support */
+.cbp-support-row { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--cbp-text-faint); margin-top: 10px; }
+.cbp-support-row a { color: var(--cbp-accent); text-decoration: none; }
+.cbp-support-row a:hover { text-decoration: underline; }
+
+/* ─── status / loading / error screens ───────────────────────── */
+.cbp-status-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cbp-bg);
+  padding: 24px;
+  transition: background .25s;
+}
+.cbp-status-card {
+  max-width: 480px;
+  width: 100%;
+  background: var(--cbp-surface);
+  border-radius: 16px;
+  box-shadow: var(--cbp-shadow-card);
+  border: 1px solid var(--cbp-border);
+  padding: 40px 36px;
+  text-align: center;
+  transition: background .25s, border-color .25s;
+}
+.cbp-spinner-ring { width: 64px; height: 64px; margin: 0 auto 20px; animation: cbp-spin 1s linear infinite; }
+.cbp-spinner-ring svg circle { stroke: var(--cbp-accent); stroke-dasharray: 100; stroke-dashoffset: 30; stroke-linecap: round; }
+@keyframes cbp-spin { to { transform: rotate(360deg); } }
+.cbp-status-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; margin: 0 auto 20px; }
+.cbp-success-icon { background: var(--cbp-accent-bg); color: var(--cbp-accent); border: 2px solid var(--cbp-accent-border); }
+.cbp-error-icon   { background: var(--cbp-error-bg); color: var(--cbp-error); border: 2px solid var(--cbp-error-border); }
+.cbp-status-title { font-size: 1.3rem; font-weight: 800; color: var(--cbp-text-primary); margin: 0 0 10px; }
+.cbp-status-text  { font-size: 0.92rem; color: var(--cbp-text-muted); line-height: 1.6; margin: 0 0 24px; }
+
+.cbp-status-success { border-top: 4px solid #10b981; }
+.cbp-status-error   { border-top: 4px solid #ef4444; }
+
+/* success details */
+.cbp-success-details { background: var(--cbp-surface-2); border: 1px solid var(--cbp-border); border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; text-align: left; }
+.cbp-success-row { display: flex; justify-content: space-between; font-size: 0.86rem; color: var(--cbp-text-secondary); padding: 5px 0; }
+.cbp-success-row span { color: var(--cbp-text-faint); }
+.cbp-ref { font-family: monospace; background: var(--cbp-accent-bg); color: var(--cbp-accent); padding: 1px 8px; border-radius: 4px; }
+
+.cbp-home-btn, .cbp-retry-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .2s;
+  border: none;
+}
+
+.cbp-home-btn {
+  background: linear-gradient(135deg, #0a7c72, #0d9084);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(10,124,114,.3);
+}
+
+.cbp-home-btn:hover { box-shadow: 0 6px 18px rgba(10,124,114,.4); transform: translateY(-1px); }
+
+.cbp-retry-btn { background: var(--cbp-surface-2); color: var(--cbp-text-secondary); border: 1px solid var(--cbp-border); }
+.cbp-retry-btn:hover { background: var(--cbp-border); }
+
+/* ─── required / optional labels ──────────────────────────────── */
+.cbp-required { color: #ef4444; }
+.cbp-optional { color: var(--cbp-text-faint); font-weight: 400; font-size: 0.78rem; }
+
+/* ─── progress indicator ──────────────────────────────────────── */
+.cbp-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1120px;
+  margin: 0 auto 32px;
+  padding: 0 16px;
+}
+.cbp-prog-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.cbp-prog-indicator {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: background .3s, color .3s, box-shadow .3s;
+  border: 2px solid transparent;
+}
+.cbp-prog-active .cbp-prog-indicator {
+  background: var(--cbp-accent);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(10,124,114,.15);
+}
+.cbp-dark .cbp-prog-active .cbp-prog-indicator { box-shadow: 0 0 0 4px rgba(52,211,153,.15); }
+.cbp-prog-done .cbp-prog-indicator {
+  background: #10b981;
+  color: #fff;
+}
+.cbp-prog-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--cbp-text-faint);
+}
+.cbp-prog-active .cbp-prog-label { color: var(--cbp-accent); font-weight: 700; }
+.cbp-prog-done .cbp-prog-label { color: #10b981; }
+.cbp-prog-line {
+  flex: 1;
+  height: 2px;
+  background: #e5e7eb;
+  max-width: 80px;
+  margin: 0 12px;
+  position: relative;
+  top: -14px;
+  transition: background .3s;
+}
+.cbp-prog-line-done { background: #10b981; }
+
+/* ─── section header (icon + meta) ───────────────────────────── */
+.cbp-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.cbp-section-icon {
+  width: 46px;
+  height: 46px;
+  background: var(--cbp-accent-bg);
+  color: var(--cbp-accent);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cbp-section-meta { flex: 1; }
+.cbp-section-title { font-size: 1.05rem; font-weight: 700; color: var(--cbp-text-primary); margin: 0 0 3px; }
+.cbp-section-subtitle { font-size: 0.8rem; color: var(--cbp-text-muted); margin: 0; }
+
+/* ─── form grid (2-col with wide slots) ───────────────────────── */
+.cbp-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.cbp-field-wide {
+  grid-column: 1 / -1;
+}
+@media (max-width: 520px) {
+  .cbp-form-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── guest block renamed ─────────────────────────────────────── */
+.cbp-guest-forms { display: flex; flex-direction: column; gap: 16px; }
+.cbp-guest-room-block {
+  border: 1px solid var(--cbp-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--cbp-surface-2);
+  transition: background .25s, border-color .25s;
+}
+.cbp-guest-room-header {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cbp-text-muted);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── live card visual ────────────────────────────────────────── */
+.cbp-card-visual {
+  margin-bottom: 22px;
+  perspective: 1000px;
+}
+.cbp-card-preview {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  border-radius: 14px;
+  padding: 22px 24px;
+  height: 196px;
+  position: relative;
+  color: #fff;
+  box-shadow: 0 20px 40px rgba(30,58,138,.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.cbp-card-preview::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -40%;
+  width: 80%; height: 80%;
+  background: radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cbp-card-chip {
+  width: 44px;
+  height: 32px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+.cbp-chip-line {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: rgba(0,0,0,.12);
+  left: 0;
+}
+.cbp-chip-line:nth-child(1) { top: 10px; }
+.cbp-chip-line:nth-child(2) { top: 16px; }
+.cbp-chip-line:nth-child(3) { top: 22px; }
+.cbp-card-type-icon {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 36px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cbp-ct-icon { max-width: 100%; max-height: 100%; }
+.cbp-card-number-display {
+  font-size: 1.25rem;
+  letter-spacing: 3px;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 2px 4px rgba(0,0,0,.2);
+  margin-top: 8px;
+  margin-bottom: 2px;
+}
+.cbp-card-details-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.cbp-card-holder-display {
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: .88;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cbp-card-expiry-display {
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  opacity: .88;
+}
+
+/* ─── security badges ─────────────────────────────────────────── */
+.cbp-security-badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.cbp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  background: var(--cbp-surface-2);
+  border: 1px solid var(--cbp-border);
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--cbp-text-muted);
+}
+.cbp-badge svg { color: #10b981; flex-shrink: 0; }
+
+/* ─── new sidebar structure ───────────────────────────────────── */
+
+/* header */
+.cbp-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  background: var(--cbp-surface-2);
+  border-bottom: 1px solid var(--cbp-border);
+}
+.cbp-summary-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--cbp-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.cbp-booking-ref {
+  font-family: 'Courier New', monospace;
+  font-size: 0.73rem;
+  font-weight: 700;
+  background: var(--cbp-accent-bg);
+  color: var(--cbp-accent);
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: 1px solid var(--cbp-accent-border);
+}
+
+/* hotel preview */
+.cbp-hotel-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cbp-border);
+}
+.cbp-hotel-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--cbp-accent-bg), #bfdbfe 120%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cbp-accent);
+  flex-shrink: 0;
+}
+.cbp-hotel-info { flex: 1; min-width: 0; }
+.cbp-hotel-name-sm { font-size: 0.92rem; font-weight: 700; color: var(--cbp-text-primary); margin: 0 0 3px; line-height: 1.3; }
+.cbp-room-name-sm  { font-size: 0.78rem; color: var(--cbp-text-muted); margin: 0; }
+
+/* 4-image grid */
+.cbp-room-images-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 100px 100px;
+  gap: 3px;
+  overflow: hidden;
+}
+.cbp-room-img-slot {
+  overflow: hidden;
+  position: relative;
+  background: var(--cbp-surface-2);
+}
+.cbp-room-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s;
+}
+.cbp-room-img-slot:hover .cbp-room-img { transform: scale(1.04); }
+.cbp-room-img-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--cbp-surface-2);
+  color: var(--cbp-text-faint);
+}
+
+/* booking details */
+.cbp-booking-details {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cbp-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cbp-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cbp-detail-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--cbp-surface-2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cbp-text-muted);
+  flex-shrink: 0;
+}
+.cbp-detail-content { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+.cbp-detail-label { font-size: 0.72rem; color: var(--cbp-text-faint); }
+.cbp-detail-value { font-size: 0.86rem; font-weight: 700; color: var(--cbp-text-primary); }
+.cbp-detail-sub   { font-size: 0.72rem; color: var(--cbp-text-faint); }
+
+/* price breakdown */
+.cbp-price-breakdown {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cbp-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* (reuse .cbp-price-row) */
+
+/* total section */
+.cbp-total-section {
+  padding: 18px 20px;
+  background: var(--cbp-surface-2);
+  border-bottom: 1px solid var(--cbp-border);
+}
+.cbp-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cbp-total-label {
+  display: flex;
+  flex-direction: column;
+}
+.cbp-total-label span { font-size: 0.95rem; font-weight: 700; color: var(--cbp-text-primary); }
+.cbp-total-label small { font-size: 0.74rem; color: var(--cbp-text-faint); margin-top: 2px; }
+.cbp-total-amount {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--cbp-accent);
+  letter-spacing: -0.5px;
+}
+
+/* support */
+.cbp-support-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+}
+.cbp-support-avatar {
+  width: 38px;
+  height: 38px;
+  background: var(--cbp-accent-bg);
+  color: var(--cbp-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cbp-support-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.cbp-support-title { font-size: 0.82rem; font-weight: 700; color: var(--cbp-text-primary); }
+.cbp-support-text  { font-size: 0.74rem; color: var(--cbp-text-muted); }
+.cbp-support-link {
+  width: 34px;
+  height: 34px;
+  background: var(--cbp-surface-2);
+  color: var(--cbp-text-muted);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background .2s, color .2s;
+  flex-shrink: 0;
+}
+.cbp-support-link:hover { background: var(--cbp-accent); color: #fff; }
+
+/* ─── card visual – updated structure ────────────────────────── */
+.cbp-card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cbp-card-brand {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 46px;
+}
+.cbp-card-field-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  opacity: .65;
+  margin-bottom: 3px;
+  color: #fff;
+}
+/* card type gradient variants */
+.cbp-card-mastercard { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+.cbp-card-visa       { background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #1565c0 100%); }
+.cbp-card-amex       { background: linear-gradient(135deg, #006064 0%, #00838f 60%, #26c6da 100%); }
+.cbp-card-discover   { background: linear-gradient(135deg, #e65100 0%, #f57c00 60%, #ffb300 100%); }
+.cbp-card-default    { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+
+/* ─── image carousel ──────────────────────────────────────────── */
+.cbp-carousel {
+  position: relative;
+  overflow: hidden;
+  background: var(--cbp-surface-2);
+  line-height: 0;
+}
+.cbp-carousel-track {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111;
+}
+.cbp-carousel-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity .25s;
+}
+/* prev / next arrow buttons */
+.cbp-car-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background .2s, transform .2s;
+  line-height: 0;
+}
+.cbp-car-btn:hover { background: rgba(0,0,0,.82); transform: translateY(-50%) scale(1.08); }
+.cbp-car-btn-prev { left: 8px; }
+.cbp-car-btn-next { right: 8px; }
+/* dot indicators */
+.cbp-carousel-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 2;
+}
+.cbp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.45);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background .2s, transform .2s;
+}
+.cbp-dot:hover { background: rgba(255,255,255,.75); }
+.cbp-dot-active { background: #fff; transform: scale(1.3); }
+/* counter overlay */
+.cbp-carousel-counter {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,.85);
+  background: rgba(0,0,0,.45);
+  padding: 2px 7px;
+  border-radius: 10px;
+  line-height: 1.6;
+  z-index: 2;
+}
+/* empty state */
+.cbp-carousel-empty {
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  color: var(--cbp-text-faint);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .cbp-progress { margin-bottom: 20px; }
+  .cbp-prog-line { max-width: 40px; margin: 0 8px; }
+  .cbp-card-number-display { font-size: 1rem; letter-spacing: 2px; }
+  .cbp-card-preview { height: 172px; padding: 18px 18px; }
+  .cbp-carousel-track { height: 180px; }
+}
+

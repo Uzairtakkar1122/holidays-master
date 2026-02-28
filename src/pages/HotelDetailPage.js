@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Flatpickr from 'react-flatpickr';
 import { Calendar, Users, Minus, Plus, ChevronDown, ChevronLeft, ChevronRight, Info, Check, X, Utensils, Bed, Search, MapPin, Lock, Wifi, Tv, Wind, Coffee, ShieldCheck } from 'lucide-react';
 import "flatpickr/dist/themes/light.css";
@@ -645,7 +645,9 @@ export default function HotelDetailPage() {
     /* A¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢Â
        PREBOOK FLOW
     A¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢Â */
-    const proceedToBooking = useCallback((bookHash, selectedRate) => {
+    const navigate = useNavigate();
+
+    const proceedToBooking = useCallback((bookHash, selectedRate, roomData = null) => {
         const hotelName = hotel?.name || 'Hotel Booking';
         const roomName  = selectedRate?.room_name || 'Room';
         const priceInfo = getDisplayPriceObj(selectedRate);
@@ -662,9 +664,26 @@ export default function HotelDetailPage() {
         };
         try {
             localStorage.setItem('hm_booking_data', JSON.stringify({ ...payload, hotel_name: hotelName, room_name: roomName, guests: JSON.stringify(bp.guests) }));
+            // Save room-specific images (fallback to hotel images)
+            let roomImgUrls = [];
+            const roomImagesRaw = roomData?.images || [];
+            if (roomImagesRaw.length) {
+                roomImgUrls = roomImagesRaw.slice(0, 8).map(url => {
+                    if (!url) return null;
+                    return url.includes('{size}') ? url.replace('{size}', '640x400') : url;
+                }).filter(Boolean);
+            }
+            if (!roomImgUrls.length) {
+                const rawImgs = hotel?.images_ext?.length
+                    ? hotel.images_ext
+                    : (hotel?.images || []).map(u => ({ url: u }));
+                roomImgUrls = rawImgs.slice(0, 8).map(img => imgUrl(img.url, '640x400')).filter(Boolean);
+            }
+            localStorage.setItem('hm_room_images', JSON.stringify(roomImgUrls));
+            localStorage.setItem('hm_hotel_images', JSON.stringify(roomImgUrls)); // backward compat
         } catch (_) {}
-        window.location.href = `https://holidaysmaster.com/conform-booking/?${new URLSearchParams(payload).toString()}`;
-    }, [hotel, hotelId, bp, nights]);
+        navigate(`/confirm-booking?${new URLSearchParams(payload).toString()}`);
+    }, [hotel, hotelId, bp, nights, navigate]);
 
     const handleBookRoom = useCallback((bookHash, originalRate) => {
         setPrebookLoading(true);
@@ -684,16 +703,16 @@ export default function HotelDetailPage() {
                         setPriceChangeData({ original: originalRate, updated });
                         setPendingBookHash(updated.book_hash);
                     } else {
-                        proceedToBooking(updated.book_hash, updated);
+                        proceedToBooking(updated.book_hash, updated, modalRoom);
                     }
                 } else if (data.error === 'prebook_disabled') {
-                    proceedToBooking(bookHash, originalRate);
+                    proceedToBooking(bookHash, originalRate, modalRoom);
                 } else {
                     setPrebookError(data.error || 'Availability check failed. Please try again.');
                 }
             })
             .catch(() => { setPrebookLoading(false); setPrebookError('Unable to check availability. Please try again.'); });
-    }, [proceedToBooking]);
+    }, [proceedToBooking, modalRoom]);
 
     const openRoomModal = (room, rate) => {
         setModalRoom(room);

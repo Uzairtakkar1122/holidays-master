@@ -9,6 +9,7 @@ import Experiences from './pages/Experiences';
 import SearchResults from './components/SearchResults/SearchResults';
 import NearbyHotelsPage from './pages/NearbyHotelsPage';
 import HotelDetailPage from './pages/HotelDetailPage';
+import ConfirmBookingPage from './pages/ConfirmBookingPage';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
@@ -32,6 +33,7 @@ function App() {
           <Route path="/search" element={<SearchResults />} />
           <Route path="/nearby" element={<NearbyHotelsPage />} />
           <Route path="/hotel-detail-data" element={<HotelDetailPage />} />
+          <Route path="/confirm-booking" element={<ConfirmBookingPage />} />
           {/* Placeholder routes for future expansion */}
           <Route path="/flights" element={<div className="container" style={{ padding: '2rem' }}>Flights page coming soon...</div>} />
           <Route path="/deals" element={<div className="container" style={{ padding: '2rem' }}>Deals page coming soon...</div>} />
