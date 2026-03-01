@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { REGION_ID_MAPPING } from '../../data/regionIdMapping';
 import {
     LayoutDashboard, MousePointerClick, BookOpen, Megaphone,
     MapPin, Menu, Check, Eye, EyeOff, Save,
@@ -13,6 +14,19 @@ const load = (key, fallback) => {
 };
 const persist = (key, value) => {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch { }
+};
+
+// ─── Region ID auto-resolve ───────────────────────────────────────────────────
+const slugify = (v) => String(v || '').toLowerCase().trim()
+    .split(',')[0].trim()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+
+const resolveRegion = (title) => {
+    const key = slugify(title);
+    return REGION_ID_MAPPING[key] || null;
 };
 
 // ─── Sidebar sections config ──────────────────────────────────────────────────
@@ -292,16 +306,65 @@ const HeroSection = () => {
 
 // ─── Featured Destinations ────────────────────────────────────────────────────
 const DEFAULT_DESTS = [
-    { title: 'Santorini, Greece', image: 'https://images.unsplash.com/photo-1504814532849-cff240bbc503?auto=format&fit=crop&w=800&q=80', region_id: '' },
-    { title: 'Bali, Indonesia',   image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80', region_id: '' },
-    { title: 'Kyoto, Japan',      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80', region_id: '' },
-    { title: 'Paris, France',     image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80', region_id: '' },
+    // ── Iconic World Destinations ──────────────────────────────────────────────
+    { title: 'Santorini, Greece',           image: 'https://images.unsplash.com/photo-1504814532849-cff240bbc503?auto=format&fit=crop&w=800&q=80',          region_id: '1735' },
+    { title: 'Bali, Indonesia',              image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', region_id: '602651' },
+    { title: 'Kyoto, Japan',                image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', region_id: '10323' },
+    { title: 'Paris, France',               image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', region_id: '2734' },
+    { title: 'Amalfi Coast, Italy',         image: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=800&q=80',          region_id: '4922' },
+    { title: 'Swiss Alps, Switzerland',     image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', region_id: '' },
+    { title: 'Maldives',                    image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', region_id: '2343' },
+    { title: 'Maui, Hawaii',               image: 'https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', region_id: '180073' },
+    { title: 'Bora Bora, French Polynesia', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', region_id: '602862' },
+    { title: 'Cape Town, South Africa',     image: 'https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', region_id: '910' },
+    { title: 'Tulum, Mexico',               image: 'https://images.unsplash.com/photo-1510097467424-192d713fd8b2?auto=format&fit=crop&w=800&q=80',          region_id: '182189' },
+    { title: 'Dubrovnik, Croatia',          image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',          region_id: '986' },
+    // ── Middle East & UAE ──────────────────────────────────────────────────────
+    { title: 'Dubai, UAE',                  image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80',          region_id: '6053839' },
+    { title: 'Makkah, Saudi Arabia',        image: 'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=800&q=80',          region_id: '178043' },
+    { title: 'Medina, Saudi Arabia',        image: 'https://images.unsplash.com/photo-1564769625647-fbd7d8d5b6d8?auto=format&fit=crop&w=800&q=80',          region_id: '602705' },
+    // ── Turkey ────────────────────────────────────────────────────────────────
+    { title: 'Istanbul, Turkey',            image: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=800&q=80',          region_id: '1639' },
+    { title: 'Cappadocia, Turkey',          image: 'https://images.unsplash.com/photo-1570939274717-7eda259b50ed?auto=format&fit=crop&w=800&q=80',          region_id: '602183' },
+    { title: 'Antalya, Turkey',             image: 'https://images.unsplash.com/photo-1600804340584-c7db2eacf0bf?auto=format&fit=crop&w=800&q=80',          region_id: '481' },
+    { title: 'Pamukkale, Turkey',           image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=800&q=80',          region_id: '6054844' },
+    // ── United Kingdom ────────────────────────────────────────────────────────
+    { title: 'London, UK',                  image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80',          region_id: '2114' },
+    { title: 'Edinburgh, Scotland',         image: 'https://images.unsplash.com/photo-1559561853-08451507cbe7?auto=format&fit=crop&w=800&q=80',            region_id: '966238332' },
+    { title: 'Manchester, UK',              image: 'https://images.unsplash.com/photo-1574108816803-22c5e9b2b4f0?auto=format&fit=crop&w=800&q=80',          region_id: '2205' },
+    { title: 'Liverpool, UK',               image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=800&q=80',          region_id: '2122' },
+    // ── Global Cities ─────────────────────────────────────────────────────────
+    { title: 'New York, USA',               image: 'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?auto=format&fit=crop&w=800&q=80',          region_id: '5128' },
+    { title: 'Tokyo, Japan',                image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',          region_id: '3593' },
+    { title: 'Sydney, Australia',           image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80',          region_id: '3341' },
+    // ── Pakistan ──────────────────────────────────────────────────────────────
+    { title: 'Islamabad, Pakistan',         image: 'https://images.unsplash.com/photo-1586348943529-beaae6c28db9?auto=format&fit=crop&w=800&q=80',          region_id: '1633' },
+    { title: 'Lahore, Pakistan',            image: 'https://images.unsplash.com/photo-1567767292278-a1aababd2b69?auto=format&fit=crop&w=800&q=80',          region_id: '2068' },
+    { title: 'Karachi, Pakistan',           image: 'https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=800&q=80',          region_id: '1809' },
 ];
 const DestinationsSection = () => {
-    const [items, setItems] = useState(() => load('hm_featured_destinations', DEFAULT_DESTS));
+    const [items, setItems] = useState(() => {
+        const stored = load('hm_featured_destinations', []);
+        if (!stored.length) return DEFAULT_DESTS;
+        // Merge: add any DEFAULT_DESTS entries not already present by title
+        const storedTitles = new Set(stored.map(d => d.title?.toLowerCase()));
+        const missing = DEFAULT_DESTS.filter(d => !storedTitles.has(d.title.toLowerCase()));
+        return [...stored, ...missing];
+    });
     const [saved, setSaved] = useState(false);
     const handleSave = () => { persist('hm_featured_destinations', items); setSaved(true); setTimeout(() => setSaved(false), 2500); };
-    const setItem = (i, k, v) => { const a = [...items]; a[i] = { ...a[i], [k]: v }; setItems(a); };
+
+    const setItem = (i, k, v) => {
+        const a = [...items];
+        // When title changes, auto-resolve region_id from mapping
+        if (k === 'title') {
+            const resolved = resolveRegion(v);
+            a[i] = { ...a[i], title: v, region_id: resolved ? String(resolved.id) : a[i].region_id };
+        } else {
+            a[i] = { ...a[i], [k]: v };
+        }
+        setItems(a);
+    };
     return (
         <div>
             <SaveBar onSave={handleSave} saved={saved} />
@@ -312,7 +375,14 @@ const DestinationsSection = () => {
                         <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <Field label="Name"><Input value={it.title} onChange={e => setItem(i, 'title', e.target.value)} /></Field>
                             <Field label="Image URL"><Input value={it.image} onChange={e => setItem(i, 'image', e.target.value)} /></Field>
-                            <Field label="Region ID" hint="Numeric RateHawk region ID"><Input value={it.region_id} onChange={e => setItem(i, 'region_id', e.target.value)} /></Field>
+                            <Field label="Region ID" hint={resolveRegion(it.title) ? `✓ Auto-resolved: ${resolveRegion(it.title).name}` : 'Type a name to auto-resolve, or enter manually'}>
+                                <Input
+                                    value={it.region_id}
+                                    onChange={e => setItem(i, 'region_id', e.target.value)}
+                                    placeholder="e.g. 2734"
+                                    className={resolveRegion(it.title) ? 'border-emerald-400 focus:border-emerald-500' : ''}
+                                />
+                            </Field>
                         </div>
                         <button onClick={() => setItems(items.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-600 mt-6 flex-shrink-0"><Trash2 size={16} /></button>
                     </div>

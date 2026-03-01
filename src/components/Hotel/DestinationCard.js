@@ -33,7 +33,7 @@ const DestinationCard = ({ title, count, image, onClick }) => {
         <div className="absolute bottom-0 left-0 p-6 z-20 translate-y-2 group-hover:translate-y-0 transition-transform">
             <h3 className="text-2xl font-bold text-white mb-1">{title}</h3>
             <p className="text-white/80 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-                {count} Properties
+                {count != null ? `${count} Properties` : 'Explore Hotels'}
             </p>
         </div>
     </div>

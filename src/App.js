@@ -14,6 +14,7 @@ import PrivatePage from './pages/Private/PrivatePage';
 import PrivateRoute from './components/Common/PrivateRoute';
 import About from './pages/About/About';
 import VisitorPopup from './components/Common/VisitorPopup';
+import NoticeBar from './components/Common/NoticeBar';
 import Footer from './components/Layout/Footer';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
@@ -27,6 +28,7 @@ function App() {
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <AuthProvider>
         <div className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
+          <NoticeBar />
           <Navbar />
           <VisitorPopup />
           <main className="flex-grow">
