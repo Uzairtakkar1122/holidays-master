@@ -17,6 +17,7 @@ import VisitorPopup from './components/Common/VisitorPopup';
 import NoticeBar from './components/Common/NoticeBar';
 import Footer from './components/Layout/Footer';
 import { AuthProvider } from './context/AuthContext';
+import { SiteBrandProvider } from './context/SiteBrandContext';
 import './index.css';
 
 // To enable Google Sign-In, create a .env file in the project root and add:
@@ -26,6 +27,7 @@ const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 function App() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <SiteBrandProvider>
       <AuthProvider>
         <div className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
           <NoticeBar />
@@ -51,6 +53,7 @@ function App() {
           <Footer />
         </div>
       </AuthProvider>
+      </SiteBrandProvider>
     </GoogleOAuthProvider>
   );
 }

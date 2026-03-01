@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useSiteBrand } from '../../context/SiteBrandContext';
 import { REGION_ID_MAPPING } from '../../data/regionIdMapping';
 import {
     LayoutDashboard, MousePointerClick, BookOpen, Megaphone,
@@ -32,6 +33,7 @@ const resolveRegion = (title) => {
 // ─── Sidebar sections config ──────────────────────────────────────────────────
 const NAV = [
     { id: 'overview',      label: 'Overview',            icon: LayoutDashboard },
+    { id: 'branding',      label: 'Site Branding',        icon: Globe },
     { id: 'popup',         label: 'First Visitor Popup', icon: MousePointerClick },
     { id: 'about',         label: 'About Us Page',       icon: BookOpen },
     { id: 'noticebar',     label: 'Notice Bar',           icon: Bell },
@@ -120,6 +122,70 @@ const OverviewSection = ({ user, setActive }) => {
                             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-blue-600">{n.label}</span>
                         </button>
                     ))}
+                </div>
+            </Card>
+        </div>
+    );
+};
+
+// ─── Site Branding ───────────────────────────────────────────────────────────
+const BrandingSection = () => {
+    const { brand, updateBrand } = useSiteBrand();
+    const [form, setForm] = useState({ siteName: brand.siteName, logoUrl: brand.logoUrl });
+    const [saved, setSaved] = useState(false);
+    const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+    const handleSave = () => {
+        updateBrand(form);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+    };
+    return (
+        <div>
+            <SaveBar onSave={handleSave} saved={saved} />
+            <Card title="Website Identity">
+                <Field label="Website Name" hint="Displayed in the navbar and browser tab.">
+                    <Input
+                        value={form.siteName}
+                        onChange={e => set('siteName', e.target.value)}
+                        placeholder="e.g. LuxStay"
+                    />
+                </Field>
+                <Field label="Logo Image URL" hint="Paste a URL to your logo image (PNG/SVG recommended). Leave blank to use the letter icon.">
+                    <Input
+                        value={form.logoUrl}
+                        onChange={e => set('logoUrl', e.target.value)}
+                        placeholder="https://yourdomain.com/logo.png"
+                    />
+                    {form.logoUrl && (
+                        <div className="mt-3 flex items-center gap-4">
+                            <img
+                                src={form.logoUrl}
+                                alt="Logo preview"
+                                className="h-12 object-contain rounded-lg border border-slate-200 dark:border-slate-700 p-1 bg-white dark:bg-slate-800"
+                                onError={e => e.target.style.display = 'none'}
+                            />
+                            <span className="text-xs text-slate-400">Logo preview</span>
+                        </div>
+                    )}
+                </Field>
+            </Card>
+            <Card title="Navbar Preview">
+                <div className="flex items-center gap-2 bg-slate-900 rounded-xl px-5 py-4">
+                    {form.logoUrl ? (
+                        <img
+                            src={form.logoUrl}
+                            alt={form.siteName || 'Logo'}
+                            className="w-8 h-8 object-contain rounded"
+                            onError={e => e.target.style.display = 'none'}
+                        />
+                    ) : (
+                        <div className="w-8 h-8 rounded-tr-xl rounded-bl-xl bg-white text-slate-900 flex items-center justify-center">
+                            <span className="font-bold text-lg">{(form.siteName || 'L')[0]}</span>
+                        </div>
+                    )}
+                    <span className="text-2xl font-serif font-bold tracking-tight text-white">
+                        {form.siteName || 'LuxStay'}
+                    </span>
                 </div>
             </Card>
         </div>
@@ -407,6 +473,7 @@ const PrivatePage = () => {
     const renderSection = () => {
         switch (active) {
             case 'overview':     return <OverviewSection user={user} setActive={setActive} />;
+            case 'branding':     return <BrandingSection />;
             case 'popup':        return <PopupSection />;
             case 'about':        return <AboutSection />;
             case 'noticebar':    return <NoticeBarSection />;
