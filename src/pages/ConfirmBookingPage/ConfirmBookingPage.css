@@ -2,9 +2,9 @@
 
 /* ─── CSS custom properties (light defaults) ──────────────────── */
 .cbp-page, .cbp-status-wrap {
-  --cbp-bg:             #f3f4f6;
-  --cbp-surface:        #ffffff;
-  --cbp-surface-2:      #f9fafb;
+  --cbp-bg:             var(--background);
+  --cbp-surface:        var(--card-bg);
+  --cbp-surface-2:      var(--card-bg);
   --cbp-border:         #e5e7eb;
   --cbp-border-focus:   #0a7c72;
   --cbp-text-primary:   #111827;
@@ -28,9 +28,9 @@
 
 /* ─── dark theme overrides ─────────────────────────────────────── */
 .cbp-page.cbp-dark, .cbp-status-wrap.cbp-dark {
-  --cbp-bg:             #0f172a;
-  --cbp-surface:        #1e293b;
-  --cbp-surface-2:      #162032;
+  --cbp-bg:             var(--background);
+  --cbp-surface:        var(--card-bg);
+  --cbp-surface-2:      var(--card-bg);
   --cbp-border:         #334155;
   --cbp-border-focus:   #34d399;
   --cbp-text-primary:   #f1f5f9;
@@ -445,7 +445,17 @@
 }
 
 /* ─── right summary card ──────────────────────────────────────── */
-.cbp-right { position: sticky; top: 24px; }
+.cbp-right {
+  position: sticky;
+  top: 112px;                        /* navbar (64px) + progress bar gap */
+  max-height: calc(100vh - 128px);  /* never taller than viewport → no double scroll */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cbp-border) transparent;
+}
+.cbp-right::-webkit-scrollbar { width: 4px; }
+.cbp-right::-webkit-scrollbar-thumb { background: var(--cbp-border); border-radius: 4px; }
 
 .cbp-summary-card {
   background: var(--cbp-surface);

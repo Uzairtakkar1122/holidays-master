@@ -21,10 +21,10 @@ const DEFAULT = {
 };
 
 const STATS = [
-    { value: '10,000+', label: 'Hotels Worldwide' },
-    { value: '150+',    label: 'Destinations' },
-    { value: '500K+',   label: 'Happy Travellers' },
-    { value: '4.9★',    label: 'Average Rating' },
+    { value: '3M+',     label: 'Hotels & Properties' },
+    { value: '220+',    label: 'Countries Covered' },
+    { value: '75K+',    label: 'Destinations' },
+    { value: '24/7',    label: 'Expert Support' },
 ];
 
 const VALUES = [
@@ -50,7 +50,7 @@ const About = () => {
     const paragraphs = (data.body || '').split('\n\n').filter(Boolean);
 
     return (
-        <div className="font-sans text-slate-800 dark:text-slate-100 bg-page-bg transition-colors duration-300 overflow-x-hidden">
+        <div className="font-sans text-slate-800 dark:text-slate-100 bg-page-bg transition-colors duration-300 overflow-x-clip">
 
             {/* ── HERO ───────────────────────────────────────────────────── */}
             <section className="relative h-[90vh] min-h-[540px] flex items-end overflow-hidden">
@@ -156,31 +156,29 @@ const About = () => {
                             <span className="text-xs font-black uppercase tracking-[0.2em] text-primary block mb-3">The People</span>
                             <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 dark:text-white">Meet Our Team</h2>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        <div className="flex flex-wrap justify-center gap-4">
                             {data.teamMembers.map((m, i) => (
-                                <div key={i} className="group relative overflow-hidden rounded-3xl border border-card-border bg-card-bg hover:shadow-2xl transition-all duration-500">
-                                    {/* Photo area */}
-                                    <div className="h-56 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 relative overflow-hidden">
+                                <div key={i} className="group relative flex items-center gap-4 rounded-2xl border border-card-border bg-card-bg px-5 py-4 hover:shadow-lg transition-all duration-300 hover:border-primary/30 min-w-[220px] max-w-[280px]">
+                                    {/* Avatar */}
+                                    <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 relative">
                                         {m.photo ? (
                                             <img
                                                 src={m.photo} alt={m.name}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                className="w-full h-full object-cover"
                                                 onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
                                             />
                                         ) : null}
-                                        <div className={`absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 items-center justify-center text-white text-5xl font-black ${m.photo ? 'hidden' : 'flex'}`}>
+                                        <div className={`absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 items-center justify-center text-white text-2xl font-black ${m.photo ? 'hidden' : 'flex'}`}>
                                             {m.name?.[0] || '?'}
                                         </div>
-                                        {/* Hover overlay */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     </div>
                                     {/* Info */}
-                                    <div className="p-6">
-                                        <h3 className="font-black text-slate-900 dark:text-white text-lg">{m.name}</h3>
-                                        <p className="text-sm text-blue-500 font-semibold mt-1">{m.role}</p>
+                                    <div className="min-w-0">
+                                        <h3 className="font-black text-slate-900 dark:text-white text-base leading-tight truncate">{m.name}</h3>
+                                        <p className="text-sm text-primary font-semibold mt-0.5 truncate">{m.role}</p>
                                     </div>
-                                    {/* Accent line */}
-                                    <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary group-hover:w-full transition-all duration-500" />
+                                    {/* Accent bottom line */}
+                                    <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary group-hover:w-full transition-all duration-500 rounded-b-2xl" />
                                 </div>
                             ))}
                         </div>

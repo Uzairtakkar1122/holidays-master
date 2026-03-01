@@ -7,7 +7,7 @@ import {
     LayoutDashboard, MousePointerClick, BookOpen, Megaphone,
     MapPin, Menu, Check, Eye, EyeOff, Save,
     Image, ToggleLeft, ToggleRight, PlusCircle, Trash2,
-    ChevronRight, Globe, Bell, LogOut, Palette, RotateCcw
+    ChevronRight, Globe, Bell, LogOut, Palette, RotateCcw, AlignLeft
 } from 'lucide-react';
 
 // ─── localStorage helpers ─────────────────────────────────────────────────────
@@ -41,6 +41,7 @@ const NAV = [
     { id: 'noticebar',     label: 'Notice Bar',           icon: Bell },
     { id: 'hero',          label: 'Hero Banner',          icon: Image },
     { id: 'destinations',  label: 'Featured Places',      icon: MapPin },
+    { id: 'footer',         label: 'Footer Content',       icon: AlignLeft },
 ];
 
 // ─── Shared UI primitives ─────────────────────────────────────────────────────
@@ -700,6 +701,261 @@ const DestinationsSection = () => {
     );
 };
 
+// ─── Footer Content ─────────────────────────────────────────────────────────
+const HM_FOOTER_KEY = 'hm_footer_content';
+const DEFAULT_FOOTER_DATA = {
+    tagline: "Curating the world's most breathtaking stays for the modern traveler.",
+    socials: [
+        { platform: 'Instagram', url: '#' },
+        { platform: 'Twitter',   url: '#' },
+        { platform: 'Facebook',  url: '#' },
+    ],
+    columns: [
+        { title: 'Company',      links: [{ label: 'About Us', url: '/about' }, { label: 'Careers', url: '#' }, { label: 'Blog', url: '#' }, { label: 'Press', url: '#' }] },
+        { title: 'Support',      links: [{ label: 'Contact Us', url: '#' }, { label: 'Terms & Conditions', url: '#' }, { label: 'Privacy Policy', url: '#' }, { label: 'FAQ', url: '#' }] },
+        { title: 'Destinations', links: [{ label: 'Maldives', url: '/hotels' }, { label: 'Switzerland', url: '/hotels' }, { label: 'Japan', url: '/hotels' }, { label: 'France', url: '/hotels' }] },
+    ],
+    bottomLinks: [
+        { label: 'Privacy', url: '#' },
+        { label: 'Terms',   url: '#' },
+        { label: 'Sitemap', url: '#' },
+    ],
+    copyrightText: '',
+};
+const SOCIAL_PLATFORMS = ['Instagram', 'Twitter', 'Facebook', 'Youtube', 'LinkedIn'];
+
+const FooterSection = () => {
+    const [form, setForm] = useState(() => load(HM_FOOTER_KEY, DEFAULT_FOOTER_DATA));
+    const [saved, setSaved] = useState(false);
+    const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+    const handleSave = () => {
+        persist(HM_FOOTER_KEY, form);
+        window.dispatchEvent(new CustomEvent('hm-footer-updated'));
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+    };
+
+    // ── Socials ──
+    const setSocial = (i, k, v) => { const a = [...form.socials]; a[i] = { ...a[i], [k]: v }; set('socials', a); };
+    const addSocial = () => set('socials', [...form.socials, { platform: 'Instagram', url: '#' }]);
+    const removeSocial = (i) => set('socials', form.socials.filter((_, j) => j !== i));
+
+    // ── Columns ──
+    const setColumnTitle = (ci, v) => { const a = [...form.columns]; a[ci] = { ...a[ci], title: v }; set('columns', a); };
+    const addColumn = () => set('columns', [...form.columns, { title: 'New Column', links: [{ label: '', url: '#' }] }]);
+    const removeColumn = (ci) => set('columns', form.columns.filter((_, j) => j !== ci));
+    const setLink = (ci, li, k, v) => {
+        const a = [...form.columns];
+        const links = [...a[ci].links];
+        links[li] = { ...links[li], [k]: v };
+        a[ci] = { ...a[ci], links };
+        set('columns', a);
+    };
+    const addLink = (ci) => { const a = [...form.columns]; a[ci] = { ...a[ci], links: [...a[ci].links, { label: '', url: '#' }] }; set('columns', a); };
+    const removeLink = (ci, li) => { const a = [...form.columns]; a[ci] = { ...a[ci], links: a[ci].links.filter((_, j) => j !== li) }; set('columns', a); };
+
+    // ── Bottom links ──
+    const setBottomLink = (i, k, v) => { const a = [...form.bottomLinks]; a[i] = { ...a[i], [k]: v }; set('bottomLinks', a); };
+    const addBottomLink = () => set('bottomLinks', [...form.bottomLinks, { label: '', url: '#' }]);
+    const removeBottomLink = (i) => set('bottomLinks', form.bottomLinks.filter((_, j) => j !== i));
+
+    const SelectField = ({ value, onChange }) => (
+        <select value={value} onChange={e => onChange(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-sm outline-none focus:ring-2 focus:ring-primary/30 transition-all">
+            {SOCIAL_PLATFORMS.map(p => <option key={p}>{p}</option>)}
+        </select>
+    );
+
+    return (
+        <div>
+            <SaveBar onSave={handleSave} saved={saved} />
+
+            {/* ── Brand Tagline ── */}
+            <Card title="Brand Tagline">
+                <Field label="Description" hint="Shown below the logo in the footer.">
+                    <Textarea rows={2} value={form.tagline} onChange={e => set('tagline', e.target.value)}
+                        placeholder="Curating the world's most breathtaking stays..." />
+                </Field>
+            </Card>
+
+            {/* ── Social Links ── */}
+            <Card title="Social Media Links">
+                <p className="text-xs text-slate-400 mb-4">Each social icon appears below the tagline. Supported: Instagram, Twitter, Facebook, Youtube, LinkedIn.</p>
+                {form.socials.map((s, i) => (
+                    <div key={i} className="flex gap-2 items-end mb-3">
+                        <div className="w-36 flex-shrink-0">
+                            <Field label={i === 0 ? 'Platform' : ''}>
+                                <SelectField value={s.platform} onChange={v => setSocial(i, 'platform', v)} />
+                            </Field>
+                        </div>
+                        <div className="flex-1">
+                            <Field label={i === 0 ? 'Profile URL' : ''}>
+                                <Input
+                                    value={s.url}
+                                    onChange={e => setSocial(i, 'url', e.target.value)}
+                                    placeholder={`https://www.${s.platform.toLowerCase()}.com/yourpage`} />
+                            </Field>
+                            {s.url && s.url !== '#' && !s.url.startsWith('http') && (
+                                <p className="text-[11px] text-amber-500 font-semibold mt-1 flex items-center gap-1">
+                                    ⚠ Add <span className="font-mono">https://</span> at the start — e.g. <span className="font-mono">https://{s.url}</span>
+                                </p>
+                            )}
+                        </div>
+                        <button onClick={() => removeSocial(i)}
+                            className="text-red-400 hover:text-red-600 mb-5 flex-shrink-0">
+                            <Trash2 size={16} />
+                        </button>
+                    </div>
+                ))}
+                <button onClick={addSocial}
+                    className="flex items-center gap-2 text-sm text-primary font-semibold hover:underline mt-1">
+                    <PlusCircle size={16} /> Add Social Link
+                </button>
+            </Card>
+
+            {/* ── Nav Columns ── */}
+            <Card title="Navigation Columns">
+                <p className="text-xs text-slate-400 mb-5">Each column appears in the footer grid. Rename columns, reorder links, add URLs, or remove entire columns.</p>
+                {form.columns.map((col, ci) => (
+                    <div key={ci} className="mb-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 overflow-hidden">
+                        {/* Column header */}
+                        <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800">
+                            <Input
+                                value={col.title}
+                                onChange={e => setColumnTitle(ci, e.target.value)}
+                                placeholder="Column Title"
+                                className="font-bold flex-1 !py-2"
+                            />
+                            <button onClick={() => removeColumn(ci)}
+                                className="text-red-400 hover:text-red-600 flex-shrink-0 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                                title="Remove column">
+                                <Trash2 size={15} />
+                            </button>
+                        </div>
+                        {/* Links */}
+                        <div className="px-4 py-3 space-y-2">
+                            <div className="grid grid-cols-2 gap-2 mb-1">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Link Label</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">URL</span>
+                            </div>
+                            {col.links.map((lk, li) => (
+                                <div key={li} className="flex gap-2 items-center">
+                                    <Input
+                                        value={lk.label}
+                                        onChange={e => setLink(ci, li, 'label', e.target.value)}
+                                        placeholder="e.g. About Us"
+                                        className="flex-1 !py-2"
+                                    />
+                                    <Input
+                                        value={lk.url}
+                                        onChange={e => setLink(ci, li, 'url', e.target.value)}
+                                        placeholder="/page or https://..."
+                                        className="flex-1 !py-2"
+                                    />
+                                    <button onClick={() => removeLink(ci, li)}
+                                        className="text-red-400 hover:text-red-600 flex-shrink-0">
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                            <button onClick={() => addLink(ci)}
+                                className="flex items-center gap-1.5 text-xs text-primary font-semibold hover:underline pt-1">
+                                <PlusCircle size={13} /> Add Link
+                            </button>
+                        </div>
+                    </div>
+                ))}
+                <button onClick={addColumn}
+                    className="flex items-center gap-2 text-sm text-primary font-semibold hover:underline">
+                    <PlusCircle size={16} /> Add Column
+                </button>
+            </Card>
+
+            {/* ── Bottom Bar Links ── */}
+            <Card title="Bottom Bar Links">
+                <p className="text-xs text-slate-400 mb-4">Small links on the right side of the copyright bar (e.g. Privacy, Terms, Sitemap).</p>
+                <div className="grid grid-cols-2 gap-2 mb-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Label</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">URL</span>
+                </div>
+                {form.bottomLinks.map((l, i) => (
+                    <div key={i} className="flex gap-2 items-center mb-2">
+                        <Input
+                            value={l.label}
+                            onChange={e => setBottomLink(i, 'label', e.target.value)}
+                            placeholder="Privacy"
+                            className="flex-1 !py-2"
+                        />
+                        <Input
+                            value={l.url}
+                            onChange={e => setBottomLink(i, 'url', e.target.value)}
+                            placeholder="/privacy or https://..."
+                            className="flex-1 !py-2"
+                        />
+                        <button onClick={() => removeBottomLink(i)}
+                            className="text-red-400 hover:text-red-600 flex-shrink-0">
+                            <Trash2 size={14} />
+                        </button>
+                    </div>
+                ))}
+                <button onClick={addBottomLink}
+                    className="flex items-center gap-2 text-sm text-primary font-semibold hover:underline mt-2">
+                    <PlusCircle size={16} /> Add Link
+                </button>
+            </Card>
+
+            {/* ── Copyright ── */}
+            <Card title="Copyright Text">
+                <Field label="Custom Copyright Line"
+                    hint={`Leave blank to auto-generate: "© ${new Date().getFullYear()} [Site Name] Inc. All rights reserved."`}>
+                    <Input
+                        value={form.copyrightText}
+                        onChange={e => set('copyrightText', e.target.value)}
+                        placeholder={`© ${new Date().getFullYear()} YourSite Inc. All rights reserved.`}
+                    />
+                </Field>
+            </Card>
+
+            {/* ── Live Preview ── */}
+            <Card title="Live Preview">
+                <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 text-xs">
+                    <div className="px-5 py-6" style={{ backgroundColor: 'var(--hm-footer-bg)', borderTop: '1px solid var(--hm-footer-border)' }}>
+                        <div className={`grid grid-cols-${Math.min(form.columns.length + 1, 4)} gap-6 mb-5`}>
+                            <div>
+                                <div className="font-bold text-base mb-2" style={{ color: 'var(--hm-footer-heading)' }}>🏨 {(form.tagline || '').slice(0, 36)}{(form.tagline || '').length > 36 ? '…' : ''}</div>
+                                <div className="flex gap-2 mt-3">
+                                    {form.socials.slice(0, 3).map((s, i) => (
+                                        <div key={i} className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold"
+                                            style={{ background: 'var(--hm-card-bg)', border: '1px solid var(--hm-footer-border)', color: 'var(--hm-footer-text)' }}>
+                                            {s.platform[0]}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            {form.columns.slice(0, 3).map((col, ci) => (
+                                <div key={ci}>
+                                    <div className="font-black uppercase tracking-wider text-[10px] mb-2" style={{ color: 'var(--hm-footer-heading)' }}>{col.title}</div>
+                                    {col.links.slice(0, 4).map((lk, li) => (
+                                        <div key={li} className="mb-1 font-medium" style={{ color: 'var(--hm-footer-text)' }}>{lk.label}</div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="flex justify-between pt-4" style={{ borderTop: '1px solid var(--hm-footer-border)', color: 'var(--hm-footer-text)' }}>
+                            <span>© {new Date().getFullYear()} {form.copyrightText || 'YourSite Inc.'}</span>
+                            <div className="flex gap-4">
+                                {form.bottomLinks.map((l, i) => <span key={i}>{l.label}</span>)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p className="text-xs text-slate-400 mt-2">Preview reflects current footer colours from Theme & Colours settings.</p>
+            </Card>
+        </div>
+    );
+};
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 const PrivatePage = () => {
     const { user, signOut } = useAuth();
@@ -718,12 +974,13 @@ const PrivatePage = () => {
             case 'noticebar':    return <NoticeBarSection />;
             case 'hero':         return <HeroSection />;
             case 'destinations': return <DestinationsSection />;
+            case 'footer':       return <FooterSection />;
             default:             return null;
         }
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-16 flex">
+        <div className="min-h-screen bg-page-bg dark:bg-slate-950 pt-16 flex">
             {/* Mobile overlay */}
             {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />}
 

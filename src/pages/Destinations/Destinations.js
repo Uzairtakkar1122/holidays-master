@@ -70,7 +70,7 @@ const Destinations = () => {
     };
 
     return (
-        <div className="font-sans text-slate-800 dark:text-slate-100 transition-colors duration-300" style={{ backgroundColor: 'var(--background)' }}>
+        <div className="font-sans text-slate-800 dark:text-slate-100 bg-page-bg transition-colors duration-300">
 
             {/* Destinations Hero */}
             <section className="relative pt-32 pb-20 bg-slate-900 overflow-hidden">

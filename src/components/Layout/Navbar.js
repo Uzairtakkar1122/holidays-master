@@ -106,7 +106,7 @@ const Navbar = () => {
     };
 
     const location = useLocation();
-    const isSearchPage = location.pathname.includes('/search') || location.pathname.includes('/hotel-detail') || location.pathname.includes('/confirm-booking');
+    const isSearchPage = location.pathname.includes('/search') || location.pathname.includes('/hotel-detail') || location.pathname.includes('/confirm-booking') || location.pathname.includes('/private');
 
     // IP-based Detection
     useEffect(() => {

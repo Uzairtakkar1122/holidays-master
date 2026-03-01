@@ -23,13 +23,13 @@ export const THEME_DEFAULTS = {
     footerBorderDark:   '#1e293b',   // slate-800
 
     // Page background (the root wrapper)
-    pageBgLight:        '#ffffff',
+    pageBgLight:        '#f5f0eb',   // warm light beige
     pageBgDark:         '#020617',   // slate-950
 
     // Card / panel backgrounds
     cardBgLight:        '#ffffff',
     cardBgDark:         '#0f172a',   // slate-900
-    cardBorderLight:    '#f1f5f9',   // slate-100
+    cardBorderLight:    '#e8e0d8',   // warm beige border
     cardBorderDark:     '#1e293b',   // slate-800
 
     // Sidebar (admin panel)
