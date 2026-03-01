@@ -370,18 +370,27 @@ const SearchResults = () => {
         const uniqueIds = Array.from(new Set(hotelIds.filter(Boolean).map(id => String(id).trim())));
         if (uniqueIds.length === 0) return {};
 
-        const missing = uniqueIds.filter(id => !hotelInfoCacheRef.current[id]);
-        if (missing.length === 0) return {};
-
         const result = {};
-        for (let i = 0; i < missing.length; i += batchSize) {
-            const chunkIds = missing.slice(i, i + batchSize);
-            const infoById = await fetchHotelsInfoChunk(chunkIds);
-            Object.assign(result, infoById);
-        }
+        const missing = [];
 
-        if (Object.keys(result).length > 0) {
-            hotelInfoCacheRef.current = { ...hotelInfoCacheRef.current, ...result };
+        // 1. Check cache first
+        uniqueIds.forEach(id => {
+            if (hotelInfoCacheRef.current[id]) {
+                result[id] = hotelInfoCacheRef.current[id];
+            } else {
+                missing.push(id);
+            }
+        });
+
+        // 2. Fetch missing in batches
+        if (missing.length > 0) {
+            for (let i = 0; i < missing.length; i += batchSize) {
+                const chunkIds = missing.slice(i, i + batchSize);
+                const infoById = await fetchHotelsInfoChunk(chunkIds);
+                Object.assign(result, infoById);
+                // Also update the ref cache
+                Object.assign(hotelInfoCacheRef.current, infoById);
+            }
         }
 
         return result;
@@ -613,7 +622,6 @@ const SearchResults = () => {
                     const allPricedIds = pricingHotels.map(h => h.id);
                     const allInfoById = await fetchHotelsInfoBatched(allPricedIds, INFO_BATCH_SIZE);
                     if (runId !== searchRunIdRef.current) return;
-                    if (Object.keys(allInfoById).length === 0) return;
                     setAllAvailableHotels(prev => enrichHotelsWithBulkInfo(prev, allInfoById));
                     setFirst10Hotels(prev => enrichHotelsWithBulkInfo(prev, allInfoById));
                 })();
@@ -864,7 +872,7 @@ const SearchResults = () => {
 
         const hydrateVisibleHotels = async () => {
             const infoById = await fetchHotelsInfoBatched(idsNeedingInfo);
-            if (cancelled || Object.keys(infoById).length === 0) return;
+            if (cancelled) return;
 
             setAllAvailableHotels(prev => enrichHotelsWithBulkInfo(prev, infoById));
             setFirst10Hotels(prev => enrichHotelsWithBulkInfo(prev, infoById));
