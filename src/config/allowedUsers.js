@@ -12,6 +12,7 @@ export const ALLOWED_EMAILS = [
     // ← add authorised emails here, one per line
     // 'you@gmail.com',
     'muhammaduzairuzikhan@gmail.com'
+    
 ];
 
 /**

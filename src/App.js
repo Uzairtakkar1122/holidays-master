@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Navbar from './components/Layout/Navbar';
 import Home from './pages/Home/Home';
@@ -25,6 +25,9 @@ import './index.css';
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
 function App() {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/private');
+
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <SiteBrandProvider>
@@ -50,7 +53,7 @@ function App() {
               <Route path="/deals" element={<div className="container" style={{ padding: '2rem' }}>Deals page coming soon...</div>} />
             </Routes>
           </main>
-          <Footer />
+          {!isAdminPage && <Footer />}
         </div>
       </AuthProvider>
       </SiteBrandProvider>

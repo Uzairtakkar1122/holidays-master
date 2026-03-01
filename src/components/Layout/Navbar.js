@@ -13,6 +13,10 @@ const Navbar = () => {
     const { isDark, toggleTheme } = useTheme();
     const { user, signIn, signOut } = useAuth();
     const { brand } = useSiteBrand();
+    const [logoError, setLogoError] = useState(false);
+
+    // Reset error whenever the logo URL changes
+    useEffect(() => { setLogoError(false); }, [brand.logoUrl]);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
@@ -143,19 +147,19 @@ const Navbar = () => {
                 <div className="container mx-auto px-6 flex justify-between items-center">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 group">
-                        {brand.logoUrl ? (
+                        {brand.logoUrl && !logoError ? (
                             <img
                                 src={brand.logoUrl}
                                 alt={brand.siteName || 'Logo'}
-                                className="w-8 h-8 object-contain rounded"
-                                onError={e => { e.target.style.display = 'none'; }}
+                                className="h-8 w-auto max-w-[120px] object-contain"
+                                onError={() => setLogoError(true)}
                             />
                         ) : (
                             <div className={`w-8 h-8 rounded-tr-xl rounded-bl-xl flex items-center justify-center transition-colors ${isSearchPage || isScrolled
                                 ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
                                 : 'bg-white text-slate-900 group-hover:bg-emerald-400'
                                 }`}>
-                                <span className="font-bold text-lg">{(brand.siteName || 'L')[0]}</span>
+                                <span className="font-bold text-lg">{(brand.siteName || 'L')[0].toUpperCase()}</span>
                             </div>
                         )}
                         <span className={`text-2xl font-serif font-bold tracking-tight ${isSearchPage || isScrolled ? 'text-slate-900 dark:text-white' : 'text-white'

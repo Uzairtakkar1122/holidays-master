@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteBrand } from '../../context/SiteBrandContext';
 import { REGION_ID_MAPPING } from '../../data/regionIdMapping';
@@ -133,12 +133,53 @@ const BrandingSection = () => {
     const { brand, updateBrand } = useSiteBrand();
     const [form, setForm] = useState({ siteName: brand.siteName, logoUrl: brand.logoUrl });
     const [saved, setSaved] = useState(false);
+    const [logoMode, setLogoMode] = useState('url'); // 'url' | 'upload'
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState('');
+    const fileRef = useRef(null);
     const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
     const handleSave = () => {
         updateBrand(form);
         setSaved(true);
         setTimeout(() => setSaved(false), 2500);
     };
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploadError('');
+        setUploading(true);
+        try {
+            const data = new FormData();
+            data.append('logo', file);
+            const res = await fetch('/api/upload-logo', { method: 'POST', body: data });
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.error || 'Upload failed');
+            set('logoUrl', `${json.url}?v=${Date.now()}`);
+        } catch (err) {
+            setUploadError(err.message);
+        } finally {
+            setUploading(false);
+            if (fileRef.current) fileRef.current.value = '';
+        }
+    };
+
+    const handleRemoveLogo = async () => {
+        try { await fetch('/api/upload-logo', { method: 'DELETE' }); } catch {}
+        set('logoUrl', '');
+    };
+
+    const TabBtn = ({ id, label }) => (
+        <button
+            onClick={() => setLogoMode(id)}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${logoMode === id
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}>
+            {label}
+        </button>
+    );
+
     return (
         <div>
             <SaveBar onSave={handleSave} saved={saved} />
@@ -150,25 +191,75 @@ const BrandingSection = () => {
                         placeholder="e.g. LuxStay"
                     />
                 </Field>
-                <Field label="Logo Image URL" hint="Paste a URL to your logo image (PNG/SVG recommended). Leave blank to use the letter icon.">
-                    <Input
-                        value={form.logoUrl}
-                        onChange={e => set('logoUrl', e.target.value)}
-                        placeholder="https://yourdomain.com/logo.png"
-                    />
+
+                <Field label="Logo">
+                    {/* Mode tabs */}
+                    <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4 w-full max-w-xs">
+                        <TabBtn id="url" label="🔗 Paste URL" />
+                        <TabBtn id="upload" label="⬆ Upload File" />
+                    </div>
+
+                    {logoMode === 'url' ? (
+                        <Input
+                            value={form.logoUrl}
+                            onChange={e => set('logoUrl', e.target.value)}
+                            placeholder="https://yourdomain.com/logo.png"
+                        />
+                    ) : (
+                        <div>
+                            <label className={`flex flex-col items-center justify-center gap-2 w-full h-28 border-2 border-dashed rounded-xl cursor-pointer transition-all
+                                ${uploading
+                                    ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                                    : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                {uploading ? (
+                                    <span className="text-sm text-blue-500 font-semibold animate-pulse">Uploading…</span>
+                                ) : (
+                                    <>
+                                        <Image size={24} className="text-slate-400" />
+                                        <span className="text-sm text-slate-500 dark:text-slate-400">Click to choose an image</span>
+                                        <span className="text-xs text-slate-400">PNG, JPG, SVG, WEBP — max 5 MB</span>
+                                    </>
+                                )}
+                                <input
+                                    ref={fileRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                    disabled={uploading}
+                                />
+                            </label>
+                            {uploadError && (
+                                <p className="mt-2 text-xs text-red-500 font-semibold">{uploadError}</p>
+                            )}
+                            <p className="mt-2 text-xs text-slate-400">
+                                Saved as <span className="font-mono bg-slate-100 dark:bg-slate-800 px-1 rounded">public/assets/site-logo.*</span> and served as a static URL automatically.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Preview + remove */}
                     {form.logoUrl && (
-                        <div className="mt-3 flex items-center gap-4">
+                        <div className="mt-4 flex items-center gap-4">
                             <img
                                 src={form.logoUrl}
                                 alt="Logo preview"
                                 className="h-12 object-contain rounded-lg border border-slate-200 dark:border-slate-700 p-1 bg-white dark:bg-slate-800"
                                 onError={e => e.target.style.display = 'none'}
                             />
-                            <span className="text-xs text-slate-400">Logo preview</span>
+                            <div>
+                                <p className="text-xs text-slate-400 mb-1">Current logo</p>
+                                <button
+                                    onClick={handleRemoveLogo}
+                                    className="text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1">
+                                    <Trash2 size={12} /> Remove logo
+                                </button>
+                            </div>
                         </div>
                     )}
                 </Field>
             </Card>
+
             <Card title="Navbar Preview">
                 <div className="flex items-center gap-2 bg-slate-900 rounded-xl px-5 py-4">
                     {form.logoUrl ? (
