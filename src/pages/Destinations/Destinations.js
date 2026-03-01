@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import DestinationCard from '../components/DestinationCard';
-import FadeInSection from '../components/FadeInSection';
-import { buildSearchUrl } from '../utils/buildSearchUrl';
+import DestinationCard from '../../components/Hotel/DestinationCard';
+import FadeInSection from '../../components/Common/FadeInSection';
+import { buildSearchUrl } from '../../utils/buildSearchUrl';
 
 const Destinations = () => {
     const navigate = useNavigate();

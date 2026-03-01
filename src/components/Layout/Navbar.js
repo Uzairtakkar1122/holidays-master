@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, Globe, ChevronDown, Check, Moon, Sun, LogOut, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { currencies, countries } from '../data/geoData';
-import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
+import { currencies, countries } from '../../data/geoData';
+import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import { useGoogleLogin } from '@react-oauth/google';
-import GlobalSelectorModal from './GlobalSelectorModal';
+import GlobalSelectorModal from '../Common/GlobalSelectorModal';
 
 const Navbar = () => {
     const { isDark, toggleTheme } = useTheme();

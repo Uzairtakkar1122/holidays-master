@@ -1,13 +1,13 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import Hero from '../components/Hero';
-import DestinationCard from '../components/DestinationCard';
-import HotelCard from '../components/HotelCard';
-import FeatureSection from '../components/FeatureSection';
-import FadeInSection from '../components/FadeInSection';
-import NearbyHotels from '../components/NearbyHotels';
-import { buildSearchUrl } from '../utils/buildSearchUrl';
+import Hero from '../../components/Common/Hero';
+import DestinationCard from '../../components/Hotel/DestinationCard';
+import HotelCard from '../../components/Hotel/HotelCard';
+import FeatureSection from '../../components/Common/FeatureSection';
+import FadeInSection from '../../components/Common/FadeInSection';
+import NearbyHotels from '../../components/Hotel/NearbyHotels';
+import { buildSearchUrl } from '../../utils/buildSearchUrl';
 
 const Home = () => {
     const navigate = useNavigate();

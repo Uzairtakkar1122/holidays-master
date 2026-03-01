@@ -3,15 +3,15 @@ import { useLocation } from 'react-router-dom';
 import Flatpickr from 'react-flatpickr';
 import { Calendar } from 'lucide-react';
 import 'flatpickr/dist/themes/light.css';
-import HotelCard from '../components/HotelCard';
-import FadeInSection from '../components/FadeInSection';
+import HotelCard from '../../components/Hotel/HotelCard';
+import FadeInSection from '../../components/Common/FadeInSection';
 
 const FASTAPI_BASE = 'https://fastapiratehawk.co.uk';
 const PER_PAGE = 9;
 
 const fmtDate = (d) => {
     const dt = new Date(d);
-    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
 };
 const getTodayTomorrow = () => {
     const today = new Date();
@@ -27,7 +27,7 @@ const getUserPrefs = () => {
             const p = JSON.parse(s);
             return { currency: p.code || 'USD', currencySymbol: p.symbol || '$', residency: r || 'gb' };
         }
-    } catch (_) {}
+    } catch (_) { }
     return { currency: 'USD', currencySymbol: '$', residency: 'gb' };
 };
 

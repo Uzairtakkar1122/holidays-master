@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
-import { phoneCodes } from '../data/geoData';
+import { useTheme } from '../../context/ThemeContext';
+import { phoneCodes } from '../../data/geoData';
 import './ConfirmBookingPage.css';
 
 /* â”€â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -33,32 +33,32 @@ async function getUserIp() {
 }
 
 const PARTNER_OPS_EMAIL = 'holidaysmasters2024@gmail.com';
-const POLL_INTERVAL_MS  = 5000;
+const POLL_INTERVAL_MS = 5000;
 const GENERAL_TIMEOUT_MS = 2 * 60 * 1000;
 
 
 /* â”€â”€â”€ main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 export default function ConfirmBookingPage() {
-    const location  = useLocation();
-    const navigate  = useNavigate();
+    const location = useLocation();
+    const navigate = useNavigate();
     const { isDark } = useTheme();
-    const params    = new URLSearchParams(location.search);
+    const params = new URLSearchParams(location.search);
 
     /* --- URL / localStorage data -------------------------------- */
-    const bookHash     = params.get('book_hash') || '';
-    const checkin      = params.get('checkin') || '';
-    const checkout     = params.get('checkout') || '';
+    const bookHash = params.get('book_hash') || '';
+    const checkin = params.get('checkin') || '';
+    const checkout = params.get('checkout') || '';
     const hotelIdParam = params.get('hotel_id') || '';
-    const totalAmtParam= parseFloat(params.get('total_amount') || '0');
-    const currencyParam= params.get('currency') || 'USD';
+    const totalAmtParam = parseFloat(params.get('total_amount') || '0');
+    const currencyParam = params.get('currency') || 'USD';
     const hotelNameParam = decodeURIComponent(params.get('hotel_name') || 'Hotel Booking');
-    const roomNameParam  = decodeURIComponent(params.get('room_name') || 'Room');
+    const roomNameParam = decodeURIComponent(params.get('room_name') || 'Room');
 
     let guestList = [{ adults: 1, children: [] }];
     try {
         const raw = decodeURIComponent(params.get('guests') || '');
         if (raw) guestList = JSON.parse(raw);
-    } catch {}
+    } catch { }
 
     const nights = checkin && checkout
         ? Math.max(1, Math.round((new Date(checkout) - new Date(checkin)) / 86400000))
@@ -67,41 +67,41 @@ export default function ConfirmBookingPage() {
     const totalGuests = guestList.reduce((a, r) => a + (r.adults || 1) + (r.children?.length || 0), 0);
 
     /* --- state -------------------------------------------------- */
-    const [phase, setPhase]         = useState('init'); // init | form | processing | success | error
+    const [phase, setPhase] = useState('init'); // init | form | processing | success | error
     const [statusMsg, setStatusMsg] = useState({ title: 'Preparing your booking...', text: 'Retrieving the best rates and availability.', type: 'loading' });
-    const [itemId, setItemId]       = useState(null);
+    const [itemId, setItemId] = useState(null);
     const [paymentType, setPaymentType] = useState(null);   // selected payment type object from API
     const [partnerOrderId, setPartnerOrderId] = useState('');
 
     // room / hotel display
-    const [roomImages, setRoomImages]   = useState([]);
+    const [roomImages, setRoomImages] = useState([]);
     const hotelName = hotelNameParam;
-    const roomName  = roomNameParam;
+    const roomName = roomNameParam;
     const displayAmount = totalAmtParam;
     const displayCurrency = currencyParam;
 
     // form fields
-    const [firstName, setFirstName]     = useState('');
-    const [lastName, setLastName]       = useState('');
-    const [email, setEmail]             = useState('');
-    const [phoneDial, setPhoneDial]     = useState('+1');
-    const [phone, setPhone]             = useState('');
-    const [comment, setComment]         = useState('');
-    const [cardHolder, setCardHolder]   = useState('');
-    const [cardNumber, setCardNumber]   = useState('');
-    const [cardMonth, setCardMonth]     = useState('');
-    const [cardYear, setCardYear]       = useState('');
-    const [cardCvc, setCardCvc]         = useState('');
-    const [guestNames, setGuestNames]   = useState({}); // { 'r0a0_first': '', ... }
-    const [errors, setErrors]           = useState({});
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phoneDial, setPhoneDial] = useState('+1');
+    const [phone, setPhone] = useState('');
+    const [comment, setComment] = useState('');
+    const [cardHolder, setCardHolder] = useState('');
+    const [cardNumber, setCardNumber] = useState('');
+    const [cardMonth, setCardMonth] = useState('');
+    const [cardYear, setCardYear] = useState('');
+    const [cardCvc, setCardCvc] = useState('');
+    const [guestNames, setGuestNames] = useState({}); // { 'r0a0_first': '', ... }
+    const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState('');
-    const [submitting, setSubmitting]   = useState(false);
-    const [refundable, setRefundable]   = useState(null); // null | { before, text }
+    const [submitting, setSubmitting] = useState(false);
+    const [refundable, setRefundable] = useState(null); // null | { before, text }
     const [showSpecial, setShowSpecial] = useState(false);
     const [progressStep, setProgressStep] = useState(1); // 1=Details, 2=Payment, 3=Confirmation
 
     // live card preview
-    const [cardType, setCardType]       = useState('default'); // visa | mastercard | amex | discover | default
+    const [cardType, setCardType] = useState('default'); // visa | mastercard | amex | discover | default
     const [cardPreview, setCardPreview] = useState({ number: '', holder: '', expiry: '' });
 
     // image carousel
@@ -120,7 +120,7 @@ export default function ConfirmBookingPage() {
         try {
             const imgs = JSON.parse(localStorage.getItem('hm_room_images') || localStorage.getItem('hm_hotel_images') || '[]');
             if (Array.isArray(imgs) && imgs.length > 0) setRoomImages(imgs);
-        } catch {}
+        } catch { }
     }, []);
 
     /* --- auto-fill from Google auth user ----------------------- */
@@ -128,7 +128,7 @@ export default function ConfirmBookingPage() {
         try {
             const authUser = JSON.parse(localStorage.getItem('auth_user') || 'null');
             if (authUser) {
-                if (authUser.given_name)  setFirstName(authUser.given_name);
+                if (authUser.given_name) setFirstName(authUser.given_name);
                 if (authUser.family_name) setLastName(authUser.family_name);
                 else if (authUser.name) {
                     const parts = authUser.name.split(' ');
@@ -137,7 +137,7 @@ export default function ConfirmBookingPage() {
                 }
                 if (authUser.email) setEmail(authUser.email);
             }
-        } catch {}
+        } catch { }
     }, []);
 
     /* --- call hotel-booking-form on mount ---------------------- */
@@ -150,7 +150,7 @@ export default function ConfirmBookingPage() {
             return;
         }
         initBookingForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const initBookingForm = async () => {
@@ -173,7 +173,7 @@ export default function ConfirmBookingPage() {
             console.log('[Booking] hotel-booking-form response:', JSON.stringify(data).substring(0, 700));
             if (data?.status === 'success' && data.data?.status === 'ok') {
                 const form = data.data.data;
-                const iid  = form?.item_id;
+                const iid = form?.item_id;
                 if (!iid) throw new Error('No item_id returned from booking form API');
                 setItemId(iid);
                 console.log('[Booking] item_id:', iid);
@@ -205,7 +205,7 @@ export default function ConfirmBookingPage() {
             } else {
                 // pull out the actual RateHawk error from the nested response
                 const rhStatus = data?.data?.data?.status || data?.data?.status;
-                const rhError  = data?.data?.data?.error  || data?.data?.error  || data?.error;
+                const rhError = data?.data?.data?.error || data?.data?.error || data?.error;
                 const msg = rhError || rhStatus || 'Booking form request failed';
                 throw new Error(msg);
             }
@@ -219,10 +219,10 @@ export default function ConfirmBookingPage() {
     /* --- card type detection ----------------------------------- */
     const detectCardType = (num) => {
         const n = num.replace(/\s/g, '');
-        if (n.startsWith('4'))           return 'visa';
-        if (/^5[1-5]/.test(n))          return 'mastercard';
-        if (/^3[47]/.test(n))           return 'amex';
-        if (/^6(?:011|5)/.test(n))      return 'discover';
+        if (n.startsWith('4')) return 'visa';
+        if (/^5[1-5]/.test(n)) return 'mastercard';
+        if (/^3[47]/.test(n)) return 'amex';
+        if (/^6(?:011|5)/.test(n)) return 'discover';
         return 'default';
     };
 
@@ -261,10 +261,10 @@ export default function ConfirmBookingPage() {
     const validate = () => {
         const errs = {};
         if (!firstName.trim()) errs.firstName = 'Required';
-        if (!lastName.trim())  errs.lastName  = 'Required';
+        if (!lastName.trim()) errs.lastName = 'Required';
         if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = 'Valid email required';
-        if (!phone.trim())     errs.phone     = 'Required';
-        if (!cardHolder.trim())  errs.cardHolder  = 'Required';
+        if (!phone.trim()) errs.phone = 'Required';
+        if (!cardHolder.trim()) errs.cardHolder = 'Required';
         const cn = cardNumber.replace(/\s/g, '');
         if (!cn || cn.length < 13) errs.cardNumber = 'Enter a valid card number';
         if (!cardMonth.trim() || parseInt(cardMonth) < 1 || parseInt(cardMonth) > 12) errs.cardMonth = 'Invalid month';
@@ -274,11 +274,11 @@ export default function ConfirmBookingPage() {
         guestList.forEach((room, ri) => {
             for (let ai = 0; ai < (room.adults || 1); ai++) {
                 if (!guestNames[`r${ri}a${ai}_first`]?.trim()) errs[`r${ri}a${ai}_first`] = 'Required';
-                if (!guestNames[`r${ri}a${ai}_last`]?.trim())  errs[`r${ri}a${ai}_last`]  = 'Required';
+                if (!guestNames[`r${ri}a${ai}_last`]?.trim()) errs[`r${ri}a${ai}_last`] = 'Required';
             }
             (room.children || []).forEach((_, ci) => {
                 if (!guestNames[`r${ri}c${ci}_first`]?.trim()) errs[`r${ri}c${ci}_first`] = 'Required';
-                if (!guestNames[`r${ri}c${ci}_last`]?.trim())  errs[`r${ri}c${ci}_last`]  = 'Required';
+                if (!guestNames[`r${ri}c${ci}_last`]?.trim()) errs[`r${ri}c${ci}_last`] = 'Required';
             });
         });
         setErrors(errs);
@@ -291,13 +291,13 @@ export default function ConfirmBookingPage() {
         for (let ai = 0; ai < (room.adults || 1); ai++) {
             guests.push({
                 first_name: guestNames[`r${ri}a${ai}_first`]?.trim() || (ri === 0 && ai === 0 ? firstName : ''),
-                last_name:  guestNames[`r${ri}a${ai}_last`]?.trim()  || (ri === 0 && ai === 0 ? lastName  : ''),
+                last_name: guestNames[`r${ri}a${ai}_last`]?.trim() || (ri === 0 && ai === 0 ? lastName : ''),
             });
         }
         (room.children || []).forEach((age, ci) => {
             guests.push({
                 first_name: guestNames[`r${ri}c${ci}_first`]?.trim() || '',
-                last_name:  guestNames[`r${ri}c${ci}_last`]?.trim()  || '',
+                last_name: guestNames[`r${ri}c${ci}_last`]?.trim() || '',
                 is_child: true,
                 age: Number(age),
             });
@@ -326,7 +326,7 @@ export default function ConfirmBookingPage() {
             setProgressStep(2);
             setPhase('processing');
             setStatusMsg({ title: 'Securing payment...', text: 'Encrypting your card details securely.', type: 'loading' });
-            const payUuid  = generateUUID();
+            const payUuid = generateUUID();
             const initUuid = generateUUID();
             console.log('[Booking] create-card-token called, object_id:', itemId, 'pay_uuid:', payUuid);
             const tokenRes = await fetch('/api/create-card-token', {
@@ -358,7 +358,7 @@ export default function ConfirmBookingPage() {
             if (tokenFailed) {
                 // Pick up the error code: Payota uses tokenInner.error, our server uses tokenData.code
                 const code = tokenInner?.error || tokenData?.data?.code || tokenData?.code || 'card_error';
-                const msg  = tokenInner?.message || tokenData?.message || 'Card processing failed';
+                const msg = tokenInner?.message || tokenData?.message || 'Card processing failed';
                 const fieldErrMap = {
                     invalid_cvc: 'cardCvc', invalid_card_number: 'cardNumber',
                     luhn_algorithm_error: 'cardNumber', invalid_card_holder: 'cardHolder',
@@ -385,7 +385,7 @@ export default function ConfirmBookingPage() {
             setStatusMsg({ title: 'Processing booking...', text: 'Contacting the hotel to confirm your reservation.', type: 'loading' });
             const returnUrl = `${window.location.origin}/confirm-booking?booking_return=3ds_complete&partner_order_id=${encodeURIComponent(currentOrderId)}`;
             const guestMeta = { guest_email: email.trim(), guest_name: `${firstName} ${lastName}`, booking_source: 'HolidaysMaster', booking_timestamp: new Date().toISOString() };
-            try { localStorage.setItem('guest_email', email.trim()); localStorage.setItem('guest_name', `${firstName} ${lastName}`); } catch {}
+            try { localStorage.setItem('guest_email', email.trim()); localStorage.setItem('guest_name', `${firstName} ${lastName}`); } catch { }
 
             const bookPayload = {
                 user: { email: PARTNER_OPS_EMAIL, phone: phoneDial + phone.trim(), comment: comment || '' },
@@ -427,9 +427,9 @@ export default function ConfirmBookingPage() {
 
             // If the booking finish itself returned a hard error, surface it immediately
             // rather than silently falling through to polling (which will return page_not_found)
-            const finishInner  = bookData?.data?.data || bookData?.data || {};
+            const finishInner = bookData?.data?.data || bookData?.data || {};
             const finishStatus = finishInner?.status || bookData?.status;
-            const finishError  = finishInner?.error  || bookData?.error;
+            const finishError = finishInner?.error || bookData?.error;
             console.log('[Booking] finish decoded — status:', finishStatus, '| error:', finishError, '| data.data:', bookData?.data?.data);
 
             // If data.data is null, RateHawk received the booking but hasn't registered it yet.
@@ -437,15 +437,15 @@ export default function ConfirmBookingPage() {
             const dataDataIsNull = bookData?.data?.data === null || bookData?.data?.data === undefined;
 
             const HARD_ERRORS = ['page_not_found', 'bad_book_hash', 'invalid_book_hash',
-                                  'book_limit', 'soldout', 'block'];
+                'book_limit', 'soldout', 'block'];
             if (HARD_ERRORS.includes(finishStatus) || HARD_ERRORS.includes(finishError)) {
                 const MSG = {
-                    page_not_found:    'Your booking session has expired. Please go back and select the room again.',
-                    bad_book_hash:     'The booking link has expired. Please go back and select the room again.',
+                    page_not_found: 'Your booking session has expired. Please go back and select the room again.',
+                    bad_book_hash: 'The booking link has expired. Please go back and select the room again.',
                     invalid_book_hash: 'The booking link is invalid. Please go back and search again.',
-                    book_limit:        'Too many booking attempts. Please wait a moment and try again.',
-                    soldout:           'Sorry, this room just sold out. Please go back and choose another room.',
-                    block:             'Payment blocked. Please try a different card.',
+                    book_limit: 'Too many booking attempts. Please wait a moment and try again.',
+                    soldout: 'Sorry, this room just sold out. Please go back and choose another room.',
+                    block: 'Payment blocked. Please try a different card.',
                 };
                 const code = HARD_ERRORS.find(c => c === finishStatus || c === finishError);
                 const msg = MSG[code] || `Booking failed (${code}). Please go back and try again.`;
@@ -496,96 +496,96 @@ export default function ConfirmBookingPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ partner_order_id: orderId }),
             })
-            .then(async r => {
-                const d = await r.json().catch(() => null);
-                // If RateHawk returns 404 and we're within the first 45 seconds,
-                // the booking is still being registered — retry instead of failing
-                if (!r.ok) {
-                    const elapsed = Date.now() - startTime;
-                    if (r.status === 404 && elapsed < 45000) {
-                        console.log('[Booking] 404 on status poll, booking still registering... retry in 5s (elapsed:', Math.round(elapsed/1000), 's)');
-                        pollingRef.current = setTimeout(check, POLL_INTERVAL_MS);
+                .then(async r => {
+                    const d = await r.json().catch(() => null);
+                    // If RateHawk returns 404 and we're within the first 45 seconds,
+                    // the booking is still being registered — retry instead of failing
+                    if (!r.ok) {
+                        const elapsed = Date.now() - startTime;
+                        if (r.status === 404 && elapsed < 45000) {
+                            console.log('[Booking] 404 on status poll, booking still registering... retry in 5s (elapsed:', Math.round(elapsed / 1000), 's)');
+                            pollingRef.current = setTimeout(check, POLL_INTERVAL_MS);
+                            return;
+                        }
+                        // For other HTTP errors or 404 after 45s, treat as not found
+                        const errTxt = d?.message || d?.data?.message || `HTTP ${r.status}`;
+                        setStatusMsg({ title: 'Booking Not Found', text: `Could not retrieve booking status (${errTxt}). Please contact support with ref: ${orderId.substring(0, 8).toUpperCase()}`, type: 'error' });
+                        setPhase('error');
                         return;
                     }
-                    // For other HTTP errors or 404 after 45s, treat as not found
-                    const errTxt = d?.message || d?.data?.message || `HTTP ${r.status}`;
-                    setStatusMsg({ title: 'Booking Not Found', text: `Could not retrieve booking status (${errTxt}). Please contact support with ref: ${orderId.substring(0,8).toUpperCase()}`, type: 'error' });
-                    setPhase('error');
-                    return;
-                }
-                return d;
-            })
-            .then(d => {
-                if (!d) return; // handled above (null = retry or error already set)
-                // Server wraps RateHawk: { status:'success', data:{ status:'ok', data:{ status:'...', error:'...' } } }
-                // Actual booking status is at d.data.data.status
-                const inner   = d?.data?.data;             // RateHawk inner payload
-                const status  = inner?.status || d?.data?.status || d?.status;
-                const errCode = inner?.error  || d?.data?.error  || d?.error;
-                const data3ds = inner?.data_3ds || d?.data?.data_3ds;
-                switch (status) {
-                    case 'ok': case 'completed': case 'confirmed':
-                        setStatusMsg({ title: 'Booking Confirmed!', text: `Your reservation is confirmed. Booking reference: ${orderId}`, type: 'success' });
-                        setPhase('success');
-                        break;
-                    case 'processing': case 'pending': case 'requested':
-                        setStatusMsg({ title: 'Processing...', text: 'Finalising your reservation with the hotel.', type: 'loading' });
-                        pollingRef.current = setTimeout(check, POLL_INTERVAL_MS);
-                        break;
-                    // Hard-failure statuses returned directly as the status field
-                    case 'page_not_found':
-                        setStatusMsg({ title: 'Session Expired', text: 'Your booking session has expired. Please go back and select the room again.', type: 'error' });
-                        setPhase('error');
-                        break;
-                    case 'not_found':
-                        setStatusMsg({ title: 'Booking Not Found', text: 'We could not find this booking. Please contact support with your reference: ' + orderId.substring(0,8).toUpperCase(), type: 'error' });
-                        setPhase('error');
-                        break;
-                    case '3ds':
-                        if (data3ds?.action_url) {
-                            setStatusMsg({ title: '3D Secure Required', text: 'Redirecting to your bank for verification...', type: 'loading' });
-                            const form = document.createElement('form');
-                            form.method = data3ds.method || 'POST';
-                            form.action = data3ds.action_url;
-                            if (data3ds.data && typeof data3ds.data === 'object') {
-                                Object.entries(data3ds.data).forEach(([k, v]) => {
-                                    const inp = document.createElement('input');
-                                    inp.type = 'hidden'; inp.name = k; inp.value = v;
-                                    form.appendChild(inp);
-                                });
-                            }
-                            document.body.appendChild(form);
-                            setTimeout(() => form.submit(), 500);
-                        } else {
+                    return d;
+                })
+                .then(d => {
+                    if (!d) return; // handled above (null = retry or error already set)
+                    // Server wraps RateHawk: { status:'success', data:{ status:'ok', data:{ status:'...', error:'...' } } }
+                    // Actual booking status is at d.data.data.status
+                    const inner = d?.data?.data;             // RateHawk inner payload
+                    const status = inner?.status || d?.data?.status || d?.status;
+                    const errCode = inner?.error || d?.data?.error || d?.error;
+                    const data3ds = inner?.data_3ds || d?.data?.data_3ds;
+                    switch (status) {
+                        case 'ok': case 'completed': case 'confirmed':
+                            setStatusMsg({ title: 'Booking Confirmed!', text: `Your reservation is confirmed. Booking reference: ${orderId}`, type: 'success' });
+                            setPhase('success');
+                            break;
+                        case 'processing': case 'pending': case 'requested':
+                            setStatusMsg({ title: 'Processing...', text: 'Finalising your reservation with the hotel.', type: 'loading' });
                             pollingRef.current = setTimeout(check, POLL_INTERVAL_MS);
-                        }
-                        break;
-                    case 'error':
-                        const errMsgs = {
-                            soldout:        'This room is sold out. Please search for an alternative room.',
-                            block:          'Payment blocked by your bank. Please try a different card.',
-                            charge:         'Card charge failed. Please check your card details and try again.',
-                            book_limit:     'Booking session expired. Please go back and start a new booking.',
-                            provider:       'Hotel system error. Please try again in a few minutes.',
-                            page_not_found: 'Your booking session has expired. Please go back and search again.',
-                            'page not found': 'Your booking session has expired. Please go back and search again.',
-                            '3ds':          '3D Secure authentication failed. Please try again.',
-                        };
-                        setStatusMsg({ title: 'Booking Failed', text: errMsgs[errCode] || errMsgs[String(errCode).replace(/_/g,' ')] || `Payment or booking error (${errCode || 'unknown'}). Please contact support.`, type: 'error' });
-                        setPhase('error');
-                        break;
-                    default:
+                            break;
+                        // Hard-failure statuses returned directly as the status field
+                        case 'page_not_found':
+                            setStatusMsg({ title: 'Session Expired', text: 'Your booking session has expired. Please go back and select the room again.', type: 'error' });
+                            setPhase('error');
+                            break;
+                        case 'not_found':
+                            setStatusMsg({ title: 'Booking Not Found', text: 'We could not find this booking. Please contact support with your reference: ' + orderId.substring(0, 8).toUpperCase(), type: 'error' });
+                            setPhase('error');
+                            break;
+                        case '3ds':
+                            if (data3ds?.action_url) {
+                                setStatusMsg({ title: '3D Secure Required', text: 'Redirecting to your bank for verification...', type: 'loading' });
+                                const form = document.createElement('form');
+                                form.method = data3ds.method || 'POST';
+                                form.action = data3ds.action_url;
+                                if (data3ds.data && typeof data3ds.data === 'object') {
+                                    Object.entries(data3ds.data).forEach(([k, v]) => {
+                                        const inp = document.createElement('input');
+                                        inp.type = 'hidden'; inp.name = k; inp.value = v;
+                                        form.appendChild(inp);
+                                    });
+                                }
+                                document.body.appendChild(form);
+                                setTimeout(() => form.submit(), 500);
+                            } else {
+                                pollingRef.current = setTimeout(check, POLL_INTERVAL_MS);
+                            }
+                            break;
+                        case 'error':
+                            const errMsgs = {
+                                soldout: 'This room is sold out. Please search for an alternative room.',
+                                block: 'Payment blocked by your bank. Please try a different card.',
+                                charge: 'Card charge failed. Please check your card details and try again.',
+                                book_limit: 'Booking session expired. Please go back and start a new booking.',
+                                provider: 'Hotel system error. Please try again in a few minutes.',
+                                page_not_found: 'Your booking session has expired. Please go back and search again.',
+                                'page not found': 'Your booking session has expired. Please go back and search again.',
+                                '3ds': '3D Secure authentication failed. Please try again.',
+                            };
+                            setStatusMsg({ title: 'Booking Failed', text: errMsgs[errCode] || errMsgs[String(errCode).replace(/_/g, ' ')] || `Payment or booking error (${errCode || 'unknown'}). Please contact support.`, type: 'error' });
+                            setPhase('error');
+                            break;
+                        default:
+                            pollingRef.current = setTimeout(check, POLL_INTERVAL_MS);
+                    }
+                })
+                .catch(() => {
+                    if (Date.now() + POLL_INTERVAL_MS <= timeoutAt) {
                         pollingRef.current = setTimeout(check, POLL_INTERVAL_MS);
-                }
-            })
-            .catch(() => {
-                if (Date.now() + POLL_INTERVAL_MS <= timeoutAt) {
-                    pollingRef.current = setTimeout(check, POLL_INTERVAL_MS);
-                } else {
-                    setStatusMsg({ title: 'Connection Error', text: 'Unable to verify status. Please contact support.', type: 'error' });
-                    setPhase('error');
-                }
-            });
+                    } else {
+                        setStatusMsg({ title: 'Connection Error', text: 'Unable to verify status. Please contact support.', type: 'error' });
+                        setPhase('error');
+                    }
+                });
         };
         check();
     }, []);
@@ -603,7 +603,7 @@ export default function ConfirmBookingPage() {
             setPhase('processing');
             pollStatus(returnOrder, Date.now());
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     /* â”€â”€ guest name field helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -617,10 +617,10 @@ export default function ConfirmBookingPage() {
     );
 
     /* â”€â”€â”€ sidebar price info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-    const showAmount   = paymentType?.display_amount || displayAmount;
+    const showAmount = paymentType?.display_amount || displayAmount;
     const showCurrency = paymentType?.display_currency || displayCurrency;
-    const taxAmt       = (showAmount * 0.12).toFixed(2);
-    const payToday     = showAmount.toFixed(2);
+    const taxAmt = (showAmount * 0.12).toFixed(2);
+    const payToday = showAmount.toFixed(2);
 
     /* â”€â”€â”€ render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     if (phase === 'init' || phase === 'processing') {
@@ -629,17 +629,17 @@ export default function ConfirmBookingPage() {
                 <div className={`cbp-status-card cbp-status-${statusMsg.type}`}>
                     {statusMsg.type === 'loading' && (
                         <div className="cbp-spinner-ring">
-                            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" strokeWidth="4"/></svg>
+                            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" strokeWidth="4" /></svg>
                         </div>
                     )}
                     {statusMsg.type === 'success' && (
                         <div className="cbp-status-icon cbp-success-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                         </div>
                     )}
                     {statusMsg.type === 'error' && (
                         <div className="cbp-status-icon cbp-error-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                         </div>
                     )}
                     <h2 className="cbp-status-title">{statusMsg.title}</h2>
@@ -654,7 +654,7 @@ export default function ConfirmBookingPage() {
             <div className={`cbp-status-wrap${isDark ? ' cbp-dark' : ''}`}>
                 <div className="cbp-status-card cbp-status-success">
                     <div className="cbp-status-icon cbp-success-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
                     <h2 className="cbp-status-title">Booking Confirmed!</h2>
                     <p className="cbp-status-text">{statusMsg.text}</p>
@@ -676,12 +676,12 @@ export default function ConfirmBookingPage() {
             <div className={`cbp-status-wrap${isDark ? ' cbp-dark' : ''}`}>
                 <div className="cbp-status-card cbp-status-error">
                     <div className="cbp-status-icon cbp-error-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                     </div>
                     <h2 className="cbp-status-title">{statusMsg.title}</h2>
                     <p className="cbp-status-text">{statusMsg.text}</p>
                     <button className="cbp-retry-btn" onClick={() => navigate(-1)}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
                         Go Back
                     </button>
                 </div>
@@ -697,19 +697,19 @@ export default function ConfirmBookingPage() {
             <div className="cbp-progress">
                 {['Details', 'Payment', 'Confirmation'].map((label, i) => {
                     const step = i + 1;
-                    const done   = progressStep > step;
+                    const done = progressStep > step;
                     const active = progressStep === step;
                     return (
                         <React.Fragment key={label}>
                             <div className={`cbp-prog-step${done ? ' cbp-prog-done' : ''}${active ? ' cbp-prog-active' : ''}`}>
                                 <div className="cbp-prog-indicator">
                                     {done
-                                        ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                        ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                                         : step}
                                 </div>
                                 <div className="cbp-prog-label">{label}</div>
                             </div>
-                            {i < 2 && <div className={`cbp-prog-line${done ? ' cbp-prog-line-done' : ''}`}/>}
+                            {i < 2 && <div className={`cbp-prog-line${done ? ' cbp-prog-line-done' : ''}`} />}
                         </React.Fragment>
                     );
                 })}
@@ -723,7 +723,7 @@ export default function ConfirmBookingPage() {
                     {/* Refund Policy Banner */}
                     {refundable && (
                         <div className="cbp-refund-banner">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#047857" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#047857" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                             <div>
                                 <strong>{refundable.text}</strong>
                                 <p>Fully refundable &mdash; you can cancel for a full refund if plans change.</p>
@@ -737,7 +737,7 @@ export default function ConfirmBookingPage() {
                         <div className="cbp-section">
                             <div className="cbp-section-header">
                                 <div className="cbp-section-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                                 </div>
                                 <div className="cbp-section-meta">
                                     <h3 className="cbp-section-title">Contact Details</h3>
@@ -786,7 +786,7 @@ export default function ConfirmBookingPage() {
                         <div className="cbp-section">
                             <div className="cbp-section-header">
                                 <div className="cbp-section-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
                                 </div>
                                 <div className="cbp-section-meta">
                                     <h3 className="cbp-section-title">Guest Information</h3>
@@ -801,7 +801,7 @@ export default function ConfirmBookingPage() {
                                     return (
                                         <div key={ri} className="cbp-guest-room-block">
                                             <div className="cbp-guest-room-header">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
                                                 Room {ri + 1} ({adultCount} Adult{adultCount > 1 ? 's' : ''}{childCount > 0 ? `, ${childCount} Child${childCount > 1 ? 'ren' : ''}` : ''})
                                             </div>
                                             {Array.from({ length: adultCount }).map((_, ai) => (
@@ -844,7 +844,7 @@ export default function ConfirmBookingPage() {
                         <div className="cbp-section">
                             <div className="cbp-section-header">
                                 <div className="cbp-section-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                                 </div>
                                 <div className="cbp-section-meta">
                                     <h3 className="cbp-section-title">Secure Payment</h3>
@@ -858,7 +858,7 @@ export default function ConfirmBookingPage() {
                                     {/* top row: chip + brand logo */}
                                     <div className="cbp-card-top-row">
                                         <div className="cbp-card-chip">
-                                            <div className="cbp-chip-line"/><div className="cbp-chip-line"/><div className="cbp-chip-line"/>
+                                            <div className="cbp-chip-line" /><div className="cbp-chip-line" /><div className="cbp-chip-line" />
                                         </div>
                                         <div className="cbp-card-brand">
                                             {cardType === 'visa' && (
@@ -866,9 +866,9 @@ export default function ConfirmBookingPage() {
                                             )}
                                             {cardType === 'mastercard' && (
                                                 <svg viewBox="0 0 40 26" width="40" height="26" fill="none">
-                                                    <circle cx="14" cy="13" r="13" fill="#eb001b" opacity=".95"/>
-                                                    <circle cx="26" cy="13" r="13" fill="#f79e1b" opacity=".95"/>
-                                                    <path d="M20 6.2a13 13 0 0 1 0 13.6 13 13 0 0 1 0-13.6z" fill="#ff5f00"/>
+                                                    <circle cx="14" cy="13" r="13" fill="#eb001b" opacity=".95" />
+                                                    <circle cx="26" cy="13" r="13" fill="#f79e1b" opacity=".95" />
+                                                    <path d="M20 6.2a13 13 0 0 1 0 13.6 13 13 0 0 1 0-13.6z" fill="#ff5f00" />
                                                 </svg>
                                             )}
                                             {cardType === 'amex' && (
@@ -878,7 +878,7 @@ export default function ConfirmBookingPage() {
                                                 <svg viewBox="0 0 90 18" height="16"><text y="13" fontSize="11" fontWeight="700" fill="white" fontFamily="Arial,sans-serif">DISCOVER</text></svg>
                                             )}
                                             {cardType === 'default' && (
-                                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
                                             )}
                                         </div>
                                     </div>
@@ -892,7 +892,7 @@ export default function ConfirmBookingPage() {
                                             <div className="cbp-card-field-label">Card Holder</div>
                                             <div className="cbp-card-holder-display">{cardPreview.holder || 'YOUR NAME'}</div>
                                         </div>
-                                        <div style={{textAlign:'right'}}>
+                                        <div style={{ textAlign: 'right' }}>
                                             <div className="cbp-card-field-label">Expires</div>
                                             <div className="cbp-card-expiry-display">{cardPreview.expiry || 'MM / YY'}</div>
                                         </div>
@@ -911,7 +911,7 @@ export default function ConfirmBookingPage() {
                                     <label>Card Number <span className="cbp-required">*</span></label>
                                     <div className="cbp-input-icon-wrap">
                                         <input className={`cbp-input${errors.cardNumber ? ' cbp-error' : ''}`} placeholder="0000 0000 0000 0000" value={cardNumber} onChange={e => handleCardNumber(e.target.value)} maxLength={19} inputMode="numeric" autoComplete="cc-number" />
-                                        <svg className="cbp-lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                        <svg className="cbp-lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                     </div>
                                     {errors.cardNumber && <span className="cbp-err-msg">{errors.cardNumber}</span>}
                                 </div>
@@ -930,7 +930,7 @@ export default function ConfirmBookingPage() {
                                         <label>CVC / CVV <span className="cbp-required">*</span></label>
                                         <div className="cbp-input-icon-wrap">
                                             <input className={`cbp-input${errors.cardCvc ? ' cbp-error' : ''}`} placeholder="123" maxLength={4} value={cardCvc} onChange={e => { setCardCvc(e.target.value.replace(/\D/g, '')); clearErr('cardCvc'); }} inputMode="numeric" autoComplete="cc-csc" />
-                                            <svg className="cbp-lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" title="3 or 4 digit code on the back of your card"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="#9ca3af"/></svg>
+                                            <svg className="cbp-lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" title="3 or 4 digit code on the back of your card"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><circle cx="12" cy="16" r="0.5" fill="#9ca3af" /></svg>
                                         </div>
                                         {errors.cardCvc && <span className="cbp-err-msg">{errors.cardCvc}</span>}
                                     </div>
@@ -940,15 +940,15 @@ export default function ConfirmBookingPage() {
                             {/* Security Badges */}
                             <div className="cbp-security-badges">
                                 <div className="cbp-badge">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                     SSL Secure
                                 </div>
                                 <div className="cbp-badge">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                                     PCI DSS Compliant
                                 </div>
                                 <div className="cbp-badge">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12" /></svg>
                                     3D Secure Ready
                                 </div>
                             </div>
@@ -957,7 +957,7 @@ export default function ConfirmBookingPage() {
                         {/* Submit error */}
                         {submitError && (
                             <div className="cbp-submit-error">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
                                 {submitError}
                             </div>
                         )}
@@ -966,10 +966,10 @@ export default function ConfirmBookingPage() {
                         <div className="cbp-submit-wrap">
                             <button type="submit" className="cbp-submit-btn" disabled={submitting}>
                                 {submitting ? (
-                                    <><svg className="cbp-btn-spinner" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" strokeWidth="5"/></svg> Processing...</>
+                                    <><svg className="cbp-btn-spinner" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" strokeWidth="5" /></svg> Processing...</>
                                 ) : (
                                     <>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                         Complete Booking
                                     </>
                                 )}
@@ -996,7 +996,7 @@ export default function ConfirmBookingPage() {
                         {/* Hotel & Room info */}
                         <div className="cbp-hotel-preview">
                             <div className="cbp-hotel-icon">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                             </div>
                             <div className="cbp-hotel-info">
                                 <h4 className="cbp-hotel-name-sm">{hotelName}</h4>
@@ -1019,14 +1019,14 @@ export default function ConfirmBookingPage() {
                                 {roomImages.length > 1 && (
                                     <>
                                         <button type="button" className="cbp-car-btn cbp-car-btn-prev" onClick={prevImg} aria-label="Previous image">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
                                         </button>
                                         <button type="button" className="cbp-car-btn cbp-car-btn-next" onClick={nextImg} aria-label="Next image">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6" /></svg>
                                         </button>
                                         <div className="cbp-carousel-dots">
                                             {roomImages.map((_, di) => (
-                                                <button type="button" key={di} className={`cbp-dot${di === imgIdx ? " cbp-dot-active" : ""}`} onClick={() => setImgIdx(di)} aria-label={`Image ${di + 1}`}/>
+                                                <button type="button" key={di} className={`cbp-dot${di === imgIdx ? " cbp-dot-active" : ""}`} onClick={() => setImgIdx(di)} aria-label={`Image ${di + 1}`} />
                                             ))}
                                         </div>
                                     </>
@@ -1035,14 +1035,14 @@ export default function ConfirmBookingPage() {
                             </div>
                         ) : (
                             <div className="cbp-carousel cbp-carousel-empty">
-                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                                 <span>No images available</span>
                             </div>
                         )}
                         {/* Booking details */}
                         <div className="cbp-booking-details">
                             <div className="cbp-detail-row">
-                                <div className="cbp-detail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
+                                <div className="cbp-detail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /><path d="M8 14h.01M12 14h.01M16 14h.01" /></svg></div>
                                 <div className="cbp-detail-content">
                                     <span className="cbp-detail-label">Check-in</span>
                                     <span className="cbp-detail-value">{fmt(checkin)}</span>
@@ -1050,7 +1050,7 @@ export default function ConfirmBookingPage() {
                                 </div>
                             </div>
                             <div className="cbp-detail-row">
-                                <div className="cbp-detail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                                <div className="cbp-detail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></div>
                                 <div className="cbp-detail-content">
                                     <span className="cbp-detail-label">Check-out</span>
                                     <span className="cbp-detail-value">{fmt(checkout)}</span>
@@ -1058,14 +1058,14 @@ export default function ConfirmBookingPage() {
                                 </div>
                             </div>
                             <div className="cbp-detail-row">
-                                <div className="cbp-detail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+                                <div className="cbp-detail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg></div>
                                 <div className="cbp-detail-content">
                                     <span className="cbp-detail-label">Nights</span>
                                     <span className="cbp-detail-value">{nights} night{nights > 1 ? 's' : ''}</span>
                                 </div>
                             </div>
                             <div className="cbp-detail-row">
-                                <div className="cbp-detail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                                <div className="cbp-detail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg></div>
                                 <div className="cbp-detail-content">
                                     <span className="cbp-detail-label">Guests</span>
                                     <span className="cbp-detail-value">{totalGuests} Guest{totalGuests > 1 ? 's' : ''}</span>
@@ -1099,14 +1099,14 @@ export default function ConfirmBookingPage() {
                         {/* Support */}
                         <div className="cbp-support-section">
                             <div className="cbp-support-avatar">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.11h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.11h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
                             </div>
                             <div className="cbp-support-info">
                                 <span className="cbp-support-title">Need Help?</span>
                                 <span className="cbp-support-text">Contact our 24/7 support team</span>
                             </div>
                             <a href={`mailto:${PARTNER_OPS_EMAIL}`} className="cbp-support-link">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                             </a>
                         </div>
 

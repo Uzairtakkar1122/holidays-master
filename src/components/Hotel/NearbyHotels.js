@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HotelCard from './HotelCard';
-import FadeInSection from './FadeInSection';
+import FadeInSection from '../Common/FadeInSection';
 
 const FASTAPI_BASE = 'https://fastapiratehawk.co.uk';
 
@@ -25,11 +25,11 @@ const getUserPrefs = () => {
     try {
         const s = localStorage.getItem('user_currency');
         if (s) { const p = JSON.parse(s); if (p?.code) currency = p.code; if (p?.symbol) currencySymbol = p.symbol; }
-    } catch (_) {}
+    } catch (_) { }
     try {
         const s = localStorage.getItem('user_residency');
         if (s) residency = s;
-    } catch (_) {}
+    } catch (_) { }
     return { currency, residency, currencySymbol };
 };
 

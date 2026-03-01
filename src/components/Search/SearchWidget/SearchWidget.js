@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Flatpickr from 'react-flatpickr';
 import { MapPin, Calendar, Users, Search, Minus, Plus, ChevronDown, Bed, Info } from 'lucide-react';
-import { rateHawkService } from '../../api/ratehawk';
-import { countries } from '../../data/geoData';
+import { rateHawkService } from '../../../api/ratehawk';
+import { countries } from '../../../data/geoData';
 import "flatpickr/dist/themes/light.css";
 import './SearchWidget.css';
 

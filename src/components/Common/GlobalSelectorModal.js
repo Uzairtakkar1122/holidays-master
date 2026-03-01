@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { X, Search, Check, Globe, CreditCard } from 'lucide-react';
-import { currencies, countries } from '../data/geoData';
+import { currencies, countries } from '../../data/geoData';
 
 const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCurrency, currentResidency }) => {
     const [activeTab, setActiveTab] = useState(currentType || 'residency');

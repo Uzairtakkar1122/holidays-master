@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import HotelCard from '../components/HotelCard';
-import { Star, SlidersHorizontal, Search, Info } from 'lucide-react';
-import FadeInSection from '../components/FadeInSection';
+import HotelCard from '../../components/Hotel/HotelCard';
+import FadeInSection from '../../components/Common/FadeInSection';
 
 const Hotels = () => {
     const [searchTerm, setSearchTerm] = useState('');

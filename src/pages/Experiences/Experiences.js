@@ -1,6 +1,6 @@
 import React from 'react';
 import { Compass, Map, Camera, Wind, Mountain, Waves } from 'lucide-react';
-import FadeInSection from '../components/FadeInSection';
+import FadeInSection from '../../components/Common/FadeInSection';
 
 const Experiences = () => {
     const experiences = [

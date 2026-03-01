@@ -1,5 +1,5 @@
 import React from 'react';
-import SearchWidget from './SearchWidget/SearchWidget';
+import SearchWidget from '../Search/SearchWidget/SearchWidget';
 import FadeInSection from './FadeInSection';
 import HeroParticlesBackground from './HeroParticlesBackground';
 
