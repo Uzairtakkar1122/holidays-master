@@ -5,7 +5,9 @@
  * authentication and forwards requests to RateHawk SANDBOX API
  */
 
-const BASE_URL = "http://localhost:5000/api";
+import { PROXY_API_PATH } from '../constants';
+
+const BASE_URL = PROXY_API_PATH;
 
 class RateHawkService {
     /**

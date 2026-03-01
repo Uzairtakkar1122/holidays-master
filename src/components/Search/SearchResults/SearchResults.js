@@ -36,6 +36,7 @@ import {
     Zap
 } from 'lucide-react';
 import './SearchResults.css';
+import { FASTAPI_BASE, PROXY_API_PATH } from '../../../constants';
 
 const normalizeAmenityText = (value) => {
     return String(value || '')
@@ -351,7 +352,7 @@ const SearchResults = () => {
         if (!ids.length) return {};
 
         try {
-            const res = await fetch('https://fastapiratehawk.co.uk/get-hotels-info', {
+            const res = await fetch(`${FASTAPI_BASE}/get-hotels-info`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ hotel_ids: ids })
@@ -479,7 +480,7 @@ const SearchResults = () => {
             console.log('📡 Step 1: Fetching hotels from FastAPI...');
             try {
                 const metadata = await fetchJsonWithTimeout(
-                    `https://fastapiratehawk.co.uk/hotels/search?region_id=${searchParams.region_id}&limit=200`,
+                    `${FASTAPI_BASE}/hotels/search?region_id=${searchParams.region_id}&limit=200`,
                     {},
                     20000
                 );
@@ -525,7 +526,7 @@ const SearchResults = () => {
             const activeCurrency = currentCurrency?.code || searchParams.currency || 'USD';
             console.log('💰 Step 3: Fetching pricing from RateHawk with residency:', activeResidency, 'and currency:', activeCurrency);
             const pricingData = await fetchJsonWithTimeout(
-                '/api/search',
+                `${PROXY_API_PATH}/search`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

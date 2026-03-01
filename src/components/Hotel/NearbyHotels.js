@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import HotelCard from './HotelCard';
 import FadeInSection from '../Common/FadeInSection';
 
-const FASTAPI_BASE = 'https://fastapiratehawk.co.uk';
+import { FASTAPI_BASE } from '../../constants';
 
 /* â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const fmtDate = (d) => {

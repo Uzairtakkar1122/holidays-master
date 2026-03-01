@@ -4,6 +4,7 @@ import Flatpickr from 'react-flatpickr';
 import { Calendar, Users, Minus, Plus, ChevronDown, ChevronLeft, ChevronRight, Info, Check, X, Utensils, Bed, Search, MapPin, Lock, Wifi, Tv, Wind, Coffee, ShieldCheck } from 'lucide-react';
 import "flatpickr/dist/themes/light.css";
 import './HotelDetailPage.css';
+import { FASTAPI_BASE, PROXY_API_PATH } from '../../constants';
 
 /* --- helpers --- */
 const imgUrl = (tpl, size) => {
@@ -28,13 +29,13 @@ const formatDateDisplay = (d) => {
 /* --- helpers --- */
 const sortObject = o =>
     Array.isArray(o) ? o.map(sortObject)
-    : (o && typeof o === 'object') ? Object.keys(o).sort().reduce((acc, k) => { acc[k] = sortObject(o[k]); return acc; }, {})
-    : o;
+        : (o && typeof o === 'object') ? Object.keys(o).sort().reduce((acc, k) => { acc[k] = sortObject(o[k]); return acc; }, {})
+            : o;
 
 const safeKey = v =>
     typeof v === 'string' ? v.trim().toLowerCase()
-    : (v && typeof v === 'object') ? JSON.stringify(sortObject(v))
-    : '';
+        : (v && typeof v === 'object') ? JSON.stringify(sortObject(v))
+            : '';
 
 const getRoomRgExt = room =>
     room?.rg_ext_code ?? room?.rg_ext_id ?? room?.rg_ext?.code ?? room?.rg_ext?.rg_ext ?? room?.rg_ext ?? null;
@@ -158,23 +159,23 @@ const AMENITY_MAP = {
 };
 
 const CATEGORY_LABELS = {
-    exterior:       'Exterior',
-    lobby:          'Lobby',
-    guest_rooms:    'Guest Rooms',
-    bathroom:       'Bathroom',
-    meal:           'Dining',
-    pool:           'Pool',
-    spa:            'Spa & Wellness',
-    fitness:        'Fitness Center',
+    exterior: 'Exterior',
+    lobby: 'Lobby',
+    guest_rooms: 'Guest Rooms',
+    bathroom: 'Bathroom',
+    meal: 'Dining',
+    pool: 'Pool',
+    spa: 'Spa & Wellness',
+    fitness: 'Fitness Center',
     hotel_services: 'Hotel Services',
-    common_areas:   'Common Areas',
-    meeting:        'Meeting Rooms',
-    kitchen:        'Kitchen',
-    bedroom:        'Bedroom',
-    living_room:    'Living Room',
-    view:           'View',
-    parking:        'Parking',
-    unspecified:    'Other',
+    common_areas: 'Common Areas',
+    meeting: 'Meeting Rooms',
+    kitchen: 'Kitchen',
+    bedroom: 'Bedroom',
+    living_room: 'Living Room',
+    view: 'View',
+    parking: 'Parking',
+    unspecified: 'Other',
 };
 
 /* A-"----A-"----A-"---- amenity icon svgs A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
@@ -263,21 +264,21 @@ const AmenityIcon = ({ type }) => {
         ),
         elevator: (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                <rect x="3" y="2" width="18" height="20" rx="2"/>
-                <path d="M9 10l3-3 3 3"/><path d="M9 14l3 3 3-3"/>
+                <rect x="3" y="2" width="18" height="20" rx="2" />
+                <path d="M9 10l3-3 3 3" /><path d="M9 14l3 3 3-3" />
             </svg>
         ),
         concierge: (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                <path d="M22 17H2a5 5 0 0 1 10 0"/><circle cx="12" cy="7" r="4"/>
+                <path d="M22 17H2a5 5 0 0 1 10 0" /><circle cx="12" cy="7" r="4" />
             </svg>
         ),
         luggage: (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-                <rect x="6" y="7" width="12" height="14" rx="2"/>
-                <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
-                <line x1="12" y1="11" x2="12" y2="17"/>
-                <line x1="9" y1="14" x2="15" y2="14"/>
+                <rect x="6" y="7" width="12" height="14" rx="2" />
+                <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                <line x1="12" y1="11" x2="12" y2="17" />
+                <line x1="9" y1="14" x2="15" y2="14" />
             </svg>
         ),
     };
@@ -293,68 +294,68 @@ const NearbyPlaceIcon = ({ type }) => {
     const t = (type || '').toLowerCase();
     if (/restaurant|cafe|fast_food|food/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+            <path d="M3 11l19-9-9 19-2-8-8-2z" />
         </svg>
     );
     if (/bar|pub/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <path d="M8 22V12L3 3h18l-5 9v10"/><path d="M8 22h8"/>
+            <path d="M8 22V12L3 3h18l-5 9v10" /><path d="M8 22h8" />
         </svg>
     );
     if (/hospital|pharmacy|clinic|medical/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <path d="M12 8v8"/><path d="M8 12h8"/>
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M12 8v8" /><path d="M8 12h8" />
         </svg>
     );
     if (/mosque|church|temple|worship|religious/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <path d="M12 2L2 10h3v10h14V10h3L12 2z"/>
-            <rect x="9" y="14" width="6" height="6"/>
+            <path d="M12 2L2 10h3v10h14V10h3L12 2z" />
+            <rect x="9" y="14" width="6" height="6" />
         </svg>
     );
     if (/bank|atm/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <rect x="3" y="10" width="18" height="11" rx="1"/>
-            <path d="M3 10l9-7 9 7"/>
-            <line x1="9" y1="10" x2="9" y2="21"/><line x1="15" y1="10" x2="15" y2="21"/>
+            <rect x="3" y="10" width="18" height="11" rx="1" />
+            <path d="M3 10l9-7 9 7" />
+            <line x1="9" y1="10" x2="9" y2="21" /><line x1="15" y1="10" x2="15" y2="21" />
         </svg>
     );
     if (/museum|attraction|artwork|gallery/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <path d="M3 10l9-7 9 7v2H3v-2z"/>
-            <rect x="5" y="12" width="4" height="9"/><rect x="10" y="12" width="4" height="9"/><rect x="15" y="12" width="4" height="9"/>
-            <line x1="3" y1="21" x2="21" y2="21"/>
+            <path d="M3 10l9-7 9 7v2H3v-2z" />
+            <rect x="5" y="12" width="4" height="9" /><rect x="10" y="12" width="4" height="9" /><rect x="15" y="12" width="4" height="9" />
+            <line x1="3" y1="21" x2="21" y2="21" />
         </svg>
     );
     if (/park|garden|nature/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <path d="M12 22V11"/>
-            <path d="M5 9a7 7 0 0 1 14 0c0 3.87-3.13 7-7 7s-7-3.13-7-7z" fill="none"/>
+            <path d="M12 22V11" />
+            <path d="M5 9a7 7 0 0 1 14 0c0 3.87-3.13 7-7 7s-7-3.13-7-7z" fill="none" />
         </svg>
     );
     if (/school|university|college|education/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <path d="M22 10v6m-10 4V10"/><path d="M2 10l10-5 10 5-10 5-10-5z"/>
-            <path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5"/>
+            <path d="M22 10v6m-10 4V10" /><path d="M2 10l10-5 10 5-10 5-10-5z" />
+            <path d="M6 12v5c0 1 2 2 6 2s6-1 6-2v-5" />
         </svg>
     );
     if (/cinema|theatre|theater/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <rect x="2" y="4" width="20" height="16" rx="2"/>
-            <path d="M16 12l-6 4V8l6 4z" fill="currentColor" stroke="none"/>
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="M16 12l-6 4V8l6 4z" fill="currentColor" stroke="none" />
         </svg>
     );
     if (/mall|supermarket|convenience|shop|store/.test(t)) return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <path d="M16 10a4 4 0 0 1-8 0"/>
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
         </svg>
     );
     return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" />
         </svg>
     );
 };
@@ -368,23 +369,23 @@ export default function HotelDetailPage() {
     const hotelId = params.get('hotel_id') || '';
 
     const bookingParams = useRef({
-        checkin:   params.get('checkin') || '',
-        checkout:  params.get('checkout') || '',
-        currency:  params.get('currency') || 'USD',
+        checkin: params.get('checkin') || '',
+        checkout: params.get('checkout') || '',
+        currency: params.get('currency') || 'USD',
         residency: params.get('residency') || 'gb',
-        guests:    (() => { try { return JSON.parse(params.get('guests') || '[]'); } catch (_) { return [{ adults: 2, children: [] }]; } })()
+        guests: (() => { try { return JSON.parse(params.get('guests') || '[]'); } catch (_) { return [{ adults: 2, children: [] }]; } })()
     });
 
     /* A-"----A-"---- state A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
-    const [hotel, setHotel]               = useState(null);
-    const [loading, setLoading]           = useState(true);
-    const [error, setError]               = useState(null);
-    const [rates, setRates]               = useState([]);
+    const [hotel, setHotel] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [rates, setRates] = useState([]);
     const [ratesLoading, setRatesLoading] = useState(false);
-    const [roomGroups, setRoomGroups]     = useState([]);
+    const [roomGroups, setRoomGroups] = useState([]);
 
     /* gallery */
-    const [lightboxIdx, setLightboxIdx]     = useState(null);
+    const [lightboxIdx, setLightboxIdx] = useState(null);
     const [showAllPhotos, setShowAllPhotos] = useState(false);
     const [photoCategory, setPhotoCategory] = useState('all');
 
@@ -405,30 +406,30 @@ export default function HotelDetailPage() {
     const clickLockRef = useRef(false);
 
     /* date filter */
-    const [filterCheckin,  setFilterCheckin]  = useState(bookingParams.current.checkin);
+    const [filterCheckin, setFilterCheckin] = useState(bookingParams.current.checkin);
     const [filterCheckout, setFilterCheckout] = useState(bookingParams.current.checkout);
     const fpRef = useRef(null);
 
     /* guest picker */
-    const [filterAdults,   setFilterAdults]   = useState(() => bookingParams.current.guests[0]?.adults || 2);
+    const [filterAdults, setFilterAdults] = useState(() => bookingParams.current.guests[0]?.adults || 2);
     const [filterChildren, setFilterChildren] = useState(() => bookingParams.current.guests[0]?.children || []);
     const [showGuestPopup, setShowGuestPopup] = useState(false);
     const guestBarRef = useRef(null);
 
     /* room modal */
-    const [modalRoom,     setModalRoom]     = useState(null);
-    const [modalRate,     setModalRate]     = useState(null);
-    const [modalImgIdx,   setModalImgIdx]   = useState(0);
+    const [modalRoom, setModalRoom] = useState(null);
+    const [modalRate, setModalRate] = useState(null);
+    const [modalImgIdx, setModalImgIdx] = useState(0);
     const [showRoomModal, setShowRoomModal] = useState(false);
     const [showAllAmenities, setShowAllAmenities] = useState(false);
 
     /* room filters */
-    const [bedFilter,  setBedFilter]  = useState('all');
-    const [roomSort,   setRoomSort]   = useState('price-asc');
+    const [bedFilter, setBedFilter] = useState('all');
+    const [roomSort, setRoomSort] = useState('price-asc');
 
     /* prebook */
-    const [prebookLoading,  setPrebookLoading]  = useState(false);
-    const [prebookError,    setPrebookError]    = useState(null);
+    const [prebookLoading, setPrebookLoading] = useState(false);
+    const [prebookError, setPrebookError] = useState(null);
     const [priceChangeData, setPriceChangeData] = useState(null);
     const [pendingBookHash, setPendingBookHash] = useState(null);
 
@@ -437,7 +438,7 @@ export default function HotelDetailPage() {
         if (!hotelId) { setError('No hotel ID provided.'); setLoading(false); return; }
         setLoading(true);
 
-        fetch('https://fastapiratehawk.co.uk/get-hotels-info', {
+        fetch(`${FASTAPI_BASE}/get-hotels-info`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ hotel_ids: [hotelId] })
@@ -467,7 +468,7 @@ export default function HotelDetailPage() {
                 setHotel(hotelObj);
                 setLoading(false);
 
-                fetch('/api/hotel-info', {
+                fetch(`${PROXY_API_PATH}/hotel-info`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: hotelId, language: 'en' })
@@ -495,7 +496,7 @@ export default function HotelDetailPage() {
                             metapolicy_struct: rh.metapolicy_struct || null,
                         }));
                     })
-                    .catch(() => {});
+                    .catch(() => { });
             })
             .catch(() => { setError('Failed to load hotel information.'); setLoading(false); });
     }, [hotelId]);
@@ -503,13 +504,13 @@ export default function HotelDetailPage() {
     /* A-"----A-"---- fetch room groups (FastAPI) A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
     useEffect(() => {
         if (!hotelId) return;
-        fetch(`https://fastapiratehawk.co.uk/hotel/${encodeURIComponent(hotelId)}`)
+        fetch(`${FASTAPI_BASE}/hotel/${encodeURIComponent(hotelId)}`)
             .then(r => r.json())
             .then(d => {
                 const groups = d?.data?.room_groups || [];
                 setRoomGroups(groups);
             })
-            .catch(() => {});
+            .catch(() => { });
     }, [hotelId]);
 
     /* A-"----A-"---- fetch rates A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
@@ -518,7 +519,7 @@ export default function HotelDetailPage() {
         const bp = bookingParams.current;
         if (!bp.checkin || !bp.checkout) return;
         setRatesLoading(true);
-        fetch('/api/hotel-hp', {
+        fetch(`${PROXY_API_PATH}/hotel-hp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -633,7 +634,7 @@ export default function HotelDetailPage() {
     /* A-"----A-"---- hotel facts A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
     const facts = hotel ? (hotel.facts || {}) : {};
     const detailRows = hotel ? [
-        { label: 'Check-in',  value: formatTime12(hotel.check_in_time) },
+        { label: 'Check-in', value: formatTime12(hotel.check_in_time) },
         { label: 'Check-out', value: formatTime12(hotel.check_out_time) },
         hotel.phone ? { label: 'Phone', value: hotel.phone } : null,
         hotel.email ? { label: 'Email', value: hotel.email } : null,
@@ -649,18 +650,18 @@ export default function HotelDetailPage() {
 
     const proceedToBooking = useCallback((bookHash, selectedRate, roomData = null) => {
         const hotelName = hotel?.name || 'Hotel Booking';
-        const roomName  = selectedRate?.room_name || 'Room';
+        const roomName = selectedRate?.room_name || 'Room';
         const priceInfo = getDisplayPriceObj(selectedRate);
         const payload = {
-            book_hash:    bookHash,
-            checkin:      bp.checkin,
-            checkout:     bp.checkout,
-            guests:       encodeURIComponent(JSON.stringify(bp.guests)),
-            hotel_id:     hotelId,
-            hotel_name:   encodeURIComponent(hotelName),
-            room_name:    encodeURIComponent(roomName),
+            book_hash: bookHash,
+            checkin: bp.checkin,
+            checkout: bp.checkout,
+            guests: encodeURIComponent(JSON.stringify(bp.guests)),
+            hotel_id: hotelId,
+            hotel_name: encodeURIComponent(hotelName),
+            room_name: encodeURIComponent(roomName),
             total_amount: (priceInfo.amount * nights).toFixed(2),
-            currency:     priceInfo.currency,
+            currency: priceInfo.currency,
         };
         try {
             localStorage.setItem('hm_booking_data', JSON.stringify({ ...payload, hotel_name: hotelName, room_name: roomName, guests: JSON.stringify(bp.guests) }));
@@ -681,14 +682,14 @@ export default function HotelDetailPage() {
             }
             localStorage.setItem('hm_room_images', JSON.stringify(roomImgUrls));
             localStorage.setItem('hm_hotel_images', JSON.stringify(roomImgUrls)); // backward compat
-        } catch (_) {}
+        } catch (_) { }
         navigate(`/confirm-booking?${new URLSearchParams(payload).toString()}`);
     }, [hotel, hotelId, bp, nights, navigate]);
 
     const handleBookRoom = useCallback((bookHash, originalRate) => {
         setPrebookLoading(true);
         setPrebookError(null);
-        fetch('/api/hotel-prebook', {
+        fetch(`${PROXY_API_PATH}/hotel-prebook`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ hash: bookHash, price_increase_percent: 20 })
@@ -784,7 +785,7 @@ export default function HotelDetailPage() {
                             ref={fpRef}
                             options={fpOptions}
                             value={[
-                                filterCheckin  ? new Date(filterCheckin  + 'T12:00:00') : null,
+                                filterCheckin ? new Date(filterCheckin + 'T12:00:00') : null,
                                 filterCheckout ? new Date(filterCheckout + 'T12:00:00') : null,
                             ].filter(Boolean)}
                             onChange={(selectedDates) => {
@@ -837,12 +838,12 @@ export default function HotelDetailPage() {
                                         <div className="hdp-guest-sub">Age 18+</div>
                                     </div>
                                     <div className="hdp-guest-controls">
-                                        <button type="button" className="hdp-guest-btn" onClick={() => setFilterAdults(a => Math.max(1, a - 1))} disabled={filterAdults <= 1}><Minus size={15} strokeWidth={2.5}/></button>
+                                        <button type="button" className="hdp-guest-btn" onClick={() => setFilterAdults(a => Math.max(1, a - 1))} disabled={filterAdults <= 1}><Minus size={15} strokeWidth={2.5} /></button>
                                         <span className="hdp-guest-count">{filterAdults}</span>
-                                        <button type="button" className="hdp-guest-btn" onClick={() => setFilterAdults(a => Math.min(6, a + 1))} disabled={filterAdults >= 6}><Plus size={15} strokeWidth={2.5}/></button>
+                                        <button type="button" className="hdp-guest-btn" onClick={() => setFilterAdults(a => Math.min(6, a + 1))} disabled={filterAdults >= 6}><Plus size={15} strokeWidth={2.5} /></button>
                                     </div>
                                 </div>
-                                <div className="hdp-guest-divider"/>
+                                <div className="hdp-guest-divider" />
                                 {/* Children */}
                                 <div className="hdp-guest-row">
                                     <div className="hdp-guest-info">
@@ -850,17 +851,17 @@ export default function HotelDetailPage() {
                                         <div className="hdp-guest-sub">Age 0&ndash;17</div>
                                     </div>
                                     <div className="hdp-guest-controls">
-                                        <button type="button" className="hdp-guest-btn" onClick={() => setFilterChildren(c => c.slice(0, -1))} disabled={filterChildren.length === 0}><Minus size={15} strokeWidth={2.5}/></button>
+                                        <button type="button" className="hdp-guest-btn" onClick={() => setFilterChildren(c => c.slice(0, -1))} disabled={filterChildren.length === 0}><Minus size={15} strokeWidth={2.5} /></button>
                                         <span className="hdp-guest-count">{filterChildren.length}</span>
-                                        <button type="button" className="hdp-guest-btn" onClick={() => setFilterChildren(c => [...c, 5])} disabled={filterChildren.length >= 4}><Plus size={15} strokeWidth={2.5}/></button>
+                                        <button type="button" className="hdp-guest-btn" onClick={() => setFilterChildren(c => [...c, 5])} disabled={filterChildren.length >= 4}><Plus size={15} strokeWidth={2.5} /></button>
                                     </div>
                                 </div>
                                 {filterChildren.length > 0 && (
                                     <>
-                                        <div className="hdp-guest-divider"/>
+                                        <div className="hdp-guest-divider" />
                                         <div className="hdp-child-ages">
                                             <div className="hdp-child-ages-label">
-                                                <Info size={13} style={{ color: '#1a6ef5' }}/>
+                                                <Info size={13} style={{ color: '#1a6ef5' }} />
                                                 Children&apos;s Ages
                                             </div>
                                             <div className="hdp-child-ages-grid">
@@ -875,7 +876,7 @@ export default function HotelDetailPage() {
                                                                 <option key={a} value={a}>Age {a}</option>
                                                             ))}
                                                         </select>
-                                                        <ChevronDown size={12} className="hdp-child-age-chevron"/>
+                                                        <ChevronDown size={12} className="hdp-child-age-chevron" />
                                                     </div>
                                                 ))}
                                             </div>
@@ -973,14 +974,14 @@ export default function HotelDetailPage() {
 
                 {ratesLoading && (
                     <div className="hdp-rooms-loading">
-                        <div className="hdp-rooms-spinner"/>
+                        <div className="hdp-rooms-spinner" />
                         <p>Finding the best rooms for you…</p>
                     </div>
                 )}
 
                 {!ratesLoading && !hasRates && (
                     <div className="hdp-rooms-empty">
-                        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 21h18"/><path d="M5 21V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v14"/></svg>
+                        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 21h18" /><path d="M5 21V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v14" /></svg>
                         <h3>No Rooms Available</h3>
                         <p>Try adjusting your dates or number of guests.</p>
                     </div>
@@ -998,28 +999,28 @@ export default function HotelDetailPage() {
                                 <div key={rate.book_hash || idx} className="hdp-room-card" onClick={() => openRoomModal(null, rate)}>
                                     <div className="hdp-room-img-wrap">
                                         <div className="hdp-room-img-placeholder">
-                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                                         </div>
                                     </div>
                                     <div className="hdp-room-card-body">
                                         <h3 className="hdp-room-name">{rate.room_name || 'Standard Room'}</h3>
                                         <div className="hdp-room-status-tags">
                                             {meal && (
-                                                <div className="hdp-status-tag hdp-tag-green"><Utensils size={13}/>{meal}</div>
+                                                <div className="hdp-status-tag hdp-tag-green"><Utensils size={13} />{meal}</div>
                                             )}
                                             {policy.freeBefore && !policy.nonRefundable && (
-                                                <div className="hdp-status-tag hdp-tag-green"><Check size={13}/>Free cancellation</div>
+                                                <div className="hdp-status-tag hdp-tag-green"><Check size={13} />Free cancellation</div>
                                             )}
                                             {policy.nonRefundable && (
-                                                <div className="hdp-status-tag hdp-tag-red"><X size={13}/>Non-refundable</div>
+                                                <div className="hdp-status-tag hdp-tag-red"><X size={13} />Non-refundable</div>
                                             )}
                                             {!meal && (
-                                                <div className="hdp-status-tag hdp-tag-slate"><Bed size={13}/>Room only</div>
+                                                <div className="hdp-status-tag hdp-tag-slate"><Bed size={13} />Room only</div>
                                             )}
                                         </div>
                                         {tx.totalExcluded > 0 && <div className="hdp-tax-note">+ {currency} {tx.totalExcluded.toFixed(0)} taxes at hotel</div>}
                                         <button className="hdp-view-link" onClick={e => { e.stopPropagation(); openRoomModal(null, rate); }}>
-                                            View details <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                            View details <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                                         </button>
                                     </div>
                                     <div className="hdp-room-price-section">
@@ -1031,7 +1032,7 @@ export default function HotelDetailPage() {
                                             <div className="hdp-room-price-night">Price for {nights} night{nights !== 1 ? 's' : ''}</div>
                                         </div>
                                         <button className="hdp-book-btn" onClick={e => { e.stopPropagation(); openRoomModal(null, rate); }}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                             Book Now
                                         </button>
                                     </div>
@@ -1045,13 +1046,13 @@ export default function HotelDetailPage() {
                     <div className="hdp-room-grid">
                         {displayRooms.map(({ room, rate }, idx) => {
                             const { amount, currency } = getDisplayPriceObj(rate);
-                            const policy   = extractPolicy(rate);
-                            const tx       = extractTaxes(rate);
-                            const meal     = renderMealLabel(rate);
+                            const policy = extractPolicy(rate);
+                            const tx = extractTaxes(rate);
+                            const meal = renderMealLabel(rate);
                             const roomImgs = (room.images || []).map(u => imgUrl(u, '640x400'));
                             const amenities = (room.room_amenities || []).slice(0, 4);
-                            const capacity  = room.rg_ext?.capacity;
-                            const bedding   = room.name_struct?.bedding_type;
+                            const capacity = room.rg_ext?.capacity;
+                            const bedding = room.name_struct?.bedding_type;
 
                             return (
                                 <div key={idx} className="hdp-room-card rich" onClick={() => openRoomModal(room, rate)}>
@@ -1059,12 +1060,12 @@ export default function HotelDetailPage() {
                                     {/* image */}
                                     <div className="hdp-room-img-wrap">
                                         {roomImgs.length > 0
-                                            ? <img src={roomImgs[0]} alt={room.name} className="hdp-room-img"/>
-                                            : <div className="hdp-room-img-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+                                            ? <img src={roomImgs[0]} alt={room.name} className="hdp-room-img" />
+                                            : <div className="hdp-room-img-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg></div>
                                         }
                                         {roomImgs.length > 1 && (
                                             <span className="hdp-img-count">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                                                 {roomImgs.length}
                                             </span>
                                         )}
@@ -1076,8 +1077,8 @@ export default function HotelDetailPage() {
 
                                         {(capacity || bedding) && (
                                             <div className="hdp-room-meta">
-                                                {capacity && <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>{capacity} Guest{capacity > 1 ? 's' : ''}</span>}
-                                                {bedding && <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 4v16M22 4v16M2 8h20M2 16h20"/></svg>{bedding}</span>}
+                                                {capacity && <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>{capacity} Guest{capacity > 1 ? 's' : ''}</span>}
+                                                {bedding && <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 4v16M22 4v16M2 8h20M2 16h20" /></svg>{bedding}</span>}
                                             </div>
                                         )}
 
@@ -1093,23 +1094,23 @@ export default function HotelDetailPage() {
 
                                         <div className="hdp-room-status-tags">
                                             {meal && (
-                                                <div className="hdp-status-tag hdp-tag-green"><Utensils size={13}/>{meal}</div>
+                                                <div className="hdp-status-tag hdp-tag-green"><Utensils size={13} />{meal}</div>
                                             )}
                                             {policy.freeBefore && !policy.nonRefundable && (
-                                                <div className="hdp-status-tag hdp-tag-green"><Check size={13}/>Free cancellation</div>
+                                                <div className="hdp-status-tag hdp-tag-green"><Check size={13} />Free cancellation</div>
                                             )}
                                             {policy.nonRefundable && (
-                                                <div className="hdp-status-tag hdp-tag-red"><X size={13}/>Non-refundable</div>
+                                                <div className="hdp-status-tag hdp-tag-red"><X size={13} />Non-refundable</div>
                                             )}
                                             {!meal && (
-                                                <div className="hdp-status-tag hdp-tag-slate"><Bed size={13}/>Room only</div>
+                                                <div className="hdp-status-tag hdp-tag-slate"><Bed size={13} />Room only</div>
                                             )}
                                         </div>
 
                                         {tx.totalExcluded > 0 && <div className="hdp-tax-note">+ {currency} {tx.totalExcluded.toFixed(0)} taxes due at hotel</div>}
 
                                         <button className="hdp-view-link" onClick={e => { e.stopPropagation(); openRoomModal(room, rate); }}>
-                                            View details <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                            View details <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                                         </button>
                                     </div>
 
@@ -1123,7 +1124,7 @@ export default function HotelDetailPage() {
                                             <div className="hdp-room-price-night">Price for {nights} night{nights !== 1 ? 's' : ''}</div>
                                         </div>
                                         <button className="hdp-book-btn" onClick={e => { e.stopPropagation(); openRoomModal(room, rate); }}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                             Book Now
                                         </button>
                                     </div>
@@ -1142,20 +1143,20 @@ export default function HotelDetailPage() {
     const renderRoomModal = () => {
         if (!showRoomModal || !modalRate) return null;
         const { amount, currency } = getDisplayPriceObj(modalRate);
-        const policy      = extractPolicy(modalRate);
-        const tx          = extractTaxes(modalRate);
-        const meal        = renderMealLabel(modalRate);
-        const roomName    = modalRoom?.name || modalRate.room_name || 'Standard Room';
-        const roomImgs    = modalRoom ? (modalRoom.images || []).map(u => imgUrl(u, '1024x768')) : [];
-        const amenities   = modalRoom?.room_amenities || [];
-        const capacity    = modalRoom?.rg_ext?.capacity;
-        const bedding     = modalRoom?.name_struct?.bedding_type;
-        const mainName    = modalRoom?.name_struct?.main_name;
-        const totalAmt    = (amount * nights).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const policy = extractPolicy(modalRate);
+        const tx = extractTaxes(modalRate);
+        const meal = renderMealLabel(modalRate);
+        const roomName = modalRoom?.name || modalRate.room_name || 'Standard Room';
+        const roomImgs = modalRoom ? (modalRoom.images || []).map(u => imgUrl(u, '1024x768')) : [];
+        const amenities = modalRoom?.room_amenities || [];
+        const capacity = modalRoom?.rg_ext?.capacity;
+        const bedding = modalRoom?.name_struct?.bedding_type;
+        const mainName = modalRoom?.name_struct?.main_name;
+        const totalAmt = (amount * nights).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         const totalAdults = bp.guests.reduce((s, g) => s + (g.adults || 0), 0);
         const totalChildren = bp.guests.reduce((s, g) => s + (g.children?.length || 0), 0);
-        const roomSub     = [bedding, mainName].filter(Boolean).join(' \u2022 ');
-        const cancelText  = policy.freeBefore
+        const roomSub = [bedding, mainName].filter(Boolean).join(' \u2022 ');
+        const cancelText = policy.freeBefore
             ? `Free until ${formatUtc0(policy.freeBefore)}`
             : policy.nonRefundable ? 'Non-refundable' : 'Policy applies';
         const cancelColor = policy.freeBefore ? '#16a34a' : policy.nonRefundable ? '#dc2626' : '';
@@ -1400,15 +1401,15 @@ export default function HotelDetailPage() {
         if (!priceChangeData) return null;
         const { original, updated } = priceChangeData;
         const origP = getDisplayPriceObj(original);
-        const newP  = getDisplayPriceObj(updated);
+        const newP = getDisplayPriceObj(updated);
         const delta = newP.amount - origP.amount;
-        const isUp  = delta > 0;
-        const pct   = origP.amount > 0 ? Math.abs((delta / origP.amount) * 100).toFixed(1) : '0.0';
+        const isUp = delta > 0;
+        const pct = origP.amount > 0 ? Math.abs((delta / origP.amount) * 100).toFixed(1) : '0.0';
         return (
             <div className="hdp-pc-overlay">
                 <div className="hdp-pc-modal">
                     <div className="hdp-pc-header">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
                         Price Change Alert
                     </div>
                     <div className="hdp-pc-body">
@@ -1447,18 +1448,18 @@ export default function HotelDetailPage() {
     A¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢ÂA¢"¢Â */
     const renderGallery = () => {
         if (!images.length) return null;
-        const visible   = images.slice(0, 7);
+        const visible = images.slice(0, 7);
         const remaining = images.length - 7;
         return (
             <div className="hdp-gallery-wrap">
                 <div className="hdp-gallery" ref={mapRef}>
                     {visible.map((img, idx) => {
-                        const url    = imgUrl(img.url, '1024x768');
+                        const url = imgUrl(img.url, '1024x768');
                         const isLast = idx === 6 && remaining > 0;
                         const isHero = idx === 0;
                         return (
                             <div key={idx} className={isHero ? 'hdp-hero' : isLast ? 'hdp-more-tile' : ''} onClick={() => setLightboxIdx(idx)}>
-                                <img src={url} alt=""/>
+                                <img src={url} alt="" />
                                 {isLast && images.length > 1 && (
                                     <button className="hdp-show-all-btn" onClick={e => { e.stopPropagation(); setShowAllPhotos(true); }}>
                                         Show all {images.length} photos
@@ -1480,7 +1481,7 @@ export default function HotelDetailPage() {
     /* A-"----A-"---- lightbox A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"----A-"---- */
     const renderLightbox = () => {
         if (lightboxIdx === null) return null;
-        const img    = images[lightboxIdx];
+        const img = images[lightboxIdx];
         const thumbs = images.slice(0, 20);
         return (
             <div className="hdp-lb-overlay" onClick={() => setLightboxIdx(null)}>
@@ -1488,14 +1489,14 @@ export default function HotelDetailPage() {
                 <button className="hdp-lb-close" onClick={() => setLightboxIdx(null)}>A¢Å“"¢</button>
                 <div className="hdp-lb-inner" onClick={e => e.stopPropagation()}>
                     <button className="hdp-lb-prev" onClick={e => { e.stopPropagation(); setLightboxIdx(i => (i - 1 + images.length) % images.length); }}>&#8249;</button>
-                    <img className="hdp-lb-img" src={imgUrl(img.url, '1024x768')} alt=""/>
+                    <img className="hdp-lb-img" src={imgUrl(img.url, '1024x768')} alt="" />
                     <button className="hdp-lb-next" onClick={e => { e.stopPropagation(); setLightboxIdx(i => (i + 1) % images.length); }}>&#8250;</button>
                 </div>
                 <div className="hdp-lb-thumbs">
                     {thumbs.map((t, i) => (
                         <img key={i} className={`hdp-lb-thumb${i === lightboxIdx ? ' active' : ''}`}
                             src={imgUrl(t.url, '240x240')} alt=""
-                            onClick={e => { e.stopPropagation(); setLightboxIdx(i); }}/>
+                            onClick={e => { e.stopPropagation(); setLightboxIdx(i); }} />
                     ))}
                 </div>
             </div>
@@ -1520,7 +1521,7 @@ export default function HotelDetailPage() {
                 <div className="hdp-ap-header">
                     <span className="hdp-ap-header-title">All Photos <span className="hdp-ap-count">({images.length})</span></span>
                     <button className="hdp-ap-close-btn" onClick={() => { setShowAllPhotos(false); setPhotoCategory('all'); }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                     </button>
                 </div>
                 {hasCategories && (
@@ -1535,7 +1536,7 @@ export default function HotelDetailPage() {
                 <div className="hdp-ap-grid">
                     {activeImages.map((img, idx) => (
                         <div key={idx} className="hdp-ap-photo" onClick={() => { setShowAllPhotos(false); setLightboxIdx(images.indexOf(img)); }}>
-                            <img src={imgUrl(img.url, '640x400')} alt=""/>
+                            <img src={imgUrl(img.url, '640x400')} alt="" />
                             {hasCategories && img.category_slug && img.category_slug !== 'unspecified' && (
                                 <span className="hdp-ap-photo-label">{CATEGORY_LABELS[img.category_slug] || img.category_slug}</span>
                             )}
@@ -1561,8 +1562,8 @@ export default function HotelDetailPage() {
                     const R = 6371000;
                     const dLat = (lat2 - lat1) * Math.PI / 180;
                     const dLon = (lon2 - lon1) * Math.PI / 180;
-                    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-                    return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+                    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+                    return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
                 };
                 const seen = new Set();
                 const places = (data.elements || [])
@@ -1577,11 +1578,11 @@ export default function HotelDetailPage() {
                     .slice(0, 4)
                     .map(p => ({
                         ...p,
-                        distLabel: p.dist < 1000 ? `${p.dist} m` : `${(p.dist/1000).toFixed(1)} km`,
+                        distLabel: p.dist < 1000 ? `${p.dist} m` : `${(p.dist / 1000).toFixed(1)} km`,
                     }));
                 setNearbyPlaces(places);
             })
-            .catch(() => {});
+            .catch(() => { });
     }, [hotel?.latitude, hotel?.longitude]);
 
     useEffect(() => {
@@ -1592,7 +1593,7 @@ export default function HotelDetailPage() {
     }, [hotel?.description_struct]);
 
     useEffect(() => {
-        const sectionIds = ['sec-overview','sec-about','sec-rooms','sec-policies','sec-amenities'];
+        const sectionIds = ['sec-overview', 'sec-about', 'sec-rooms', 'sec-policies', 'sec-amenities'];
         const onScroll = () => {
             if (clickLockRef.current) return;
             let active = 'sec-overview';
@@ -1639,35 +1640,35 @@ export default function HotelDetailPage() {
         const groupIconMap = (name) => {
             const n = (name || '').toLowerCase();
             if (n.includes('bathroom') || n.includes('bath'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6 6 3 3 6"/><path d="M3 6v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6"/><path d="M3 10h18"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6 6 3 3 6" /><path d="M3 6v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6" /><path d="M3 10h18" /></svg>;
             if (n.includes('kitchen') || n.includes('cooking') || n.includes('kitchenette'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /><path d="M7 2v20" /><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z" /></svg>;
             if (n.includes('outdoor') || n.includes('garden') || n.includes('terrace') || n.includes('pool'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20A14.5 14.5 0 0 0 12 2"/><path d="M2 12h20"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20A14.5 14.5 0 0 0 12 2" /><path d="M2 12h20" /></svg>;
             if (n.includes('media') || n.includes('technology') || n.includes('entertainment') || n.includes('tv'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2" /><polyline points="17 2 12 7 7 2" /></svg>;
             if (n.includes('food') || n.includes('drink') || n.includes('dining') || n.includes('meal') || n.includes('restaurant'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /><path d="M7 2v20" /><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z" /></svg>;
             if (n.includes('internet') || n.includes('wifi') || n.includes('wi-fi'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12.55a11 11 0 0 1 14.08 0" /><path d="M1.42 9a16 16 0 0 1 21.16 0" /><path d="M8.53 16.11a6 6 0 0 1 6.95 0" /><circle cx="12" cy="20" r="1" fill="currentColor" /></svg>;
             if (n.includes('parking'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 17V7h4a3 3 0 0 1 0 6H9" /></svg>;
             if (n.includes('front desk') || n.includes('reception') || n.includes('concierge') || n.includes('service'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10" /><path d="M12 20V4" /><path d="M6 20v-6" /></svg>;
             if (n.includes('family') || n.includes('child') || n.includes('kid'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
             if (n.includes('cleaning') || n.includes('housekeep') || n.includes('laundry'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>;
             if (n.includes('safety') || n.includes('security'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>;
             if (n.includes('accessibility') || n.includes('wheelchair') || n.includes('disabled'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="4" r="2"/><path d="M9 9h6l-1 7-2 4-2-4"/><path d="M7 21a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="4" r="2" /><path d="M9 9h6l-1 7-2 4-2-4" /><path d="M7 21a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4" /></svg>;
             if (n.includes('language') || n.includes('spoken'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 8l6 6" /><path d="M4 14l6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" /><path d="M22 22l-5-10-5 10" /><path d="M14 18h6" /></svg>;
             if (n.includes('room') || n.includes('general') || n.includes('ameniti'))
-                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+                return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>;
             // default
-            return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>;
+            return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>;
         };
 
         // Detect surcharge/additional-charge in item string
@@ -1693,14 +1694,14 @@ export default function HotelDetailPage() {
                                 <div className="hdp-amen2-group-card">
                                     <div className="hdp-amen2-group-header">
                                         <span className="hdp-amen2-group-icon">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
                                         </span>
                                         <span className="hdp-amen2-group-title">Great for your stay</span>
                                     </div>
                                     <ul className="hdp-amen2-list">
                                         {popularChips.map(a => (
                                             <li key={a.key} className="hdp-amen2-item">
-                                                <svg className="hdp-amen2-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                <svg className="hdp-amen2-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                                                 <span className="hdp-amen2-item-label">{a.label}</span>
                                             </li>
                                         ))}
@@ -1721,7 +1722,7 @@ export default function HotelDetailPage() {
                                             const { label, isExtra } = parseAmenityItem(a);
                                             return (
                                                 <li key={ai} className="hdp-amen2-item">
-                                                    <svg className="hdp-amen2-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    <svg className="hdp-amen2-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                                                     <span className="hdp-amen2-item-label">{label}</span>
                                                     {isExtra && <span className="hdp-amen2-badge">Additional charge</span>}
                                                 </li>
@@ -1744,15 +1745,15 @@ export default function HotelDetailPage() {
         if (!extraInfo && !policyStruct) return null;
 
         const policyMeta = {
-            internet:  { title: 'Internet & Wi-Fi', color: '#3b82f6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg> },
-            meal:      { title: 'Dining & Meals',    color: '#f59e0b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z"/></svg> },
-            parking:   { title: 'Parking',           color: '#8b5cf6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg> },
-            pets:      { title: 'Pet Policy',        color: '#10b981', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg> },
-            extra_bed: { title: 'Extra Bed',         color: '#ec4899', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 9V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z"/><path d="M4 18v2"/><path d="M20 18v2"/></svg> },
-            children:  { title: 'Children Policy',  color: '#f97316', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 3"/></svg> },
-            shuttle:   { title: 'Airport Shuttle',  color: '#06b6d4', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-4.3c.3-2.7.2-6.7-.8-8.3H2"/><path d="M9 18H5.2L5 10H2.8c-.8 0-.8 0-.8.8V18h2"/><circle cx="7" cy="18" r="2"/><circle cx="15" cy="18" r="2"/></svg> },
-            visa:      { title: 'Visa Info',         color: '#64748b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> },
-            deposit:   { title: 'Deposit',           color: '#14b8a6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> },
+            internet: { title: 'Internet & Wi-Fi', color: '#3b82f6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12.55a11 11 0 0 1 14.08 0" /><path d="M1.42 9a16 16 0 0 1 21.16 0" /><path d="M8.53 16.11a6 6 0 0 1 6.95 0" /><circle cx="12" cy="20" r="1" fill="currentColor" /></svg> },
+            meal: { title: 'Dining & Meals', color: '#f59e0b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /><path d="M7 2v20" /><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3z" /></svg> },
+            parking: { title: 'Parking', color: '#8b5cf6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 17V7h4a3 3 0 0 1 0 6H9" /></svg> },
+            pets: { title: 'Pet Policy', color: '#10b981', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="4" r="2" /><circle cx="18" cy="8" r="2" /><circle cx="20" cy="16" r="2" /><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z" /></svg> },
+            extra_bed: { title: 'Extra Bed', color: '#ec4899', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 9V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3" /><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z" /><path d="M4 18v2" /><path d="M20 18v2" /></svg> },
+            children: { title: 'Children Policy', color: '#f97316', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 12h.01" /><path d="M15 12h.01" /><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" /><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 3" /></svg> },
+            shuttle: { title: 'Airport Shuttle', color: '#06b6d4', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 6v6" /><path d="M15 6v6" /><path d="M2 12h19.6" /><path d="M18 18h3s.5-1.7.8-4.3c.3-2.7.2-6.7-.8-8.3H2" /><path d="M9 18H5.2L5 10H2.8c-.8 0-.8 0-.8.8V18h2" /><circle cx="7" cy="18" r="2" /><circle cx="15" cy="18" r="2" /></svg> },
+            visa: { title: 'Visa Info', color: '#64748b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg> },
+            deposit: { title: 'Deposit', color: '#14b8a6', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg> },
         };
 
         const buildPolicyItems = (struct) => {
@@ -1762,7 +1763,7 @@ export default function HotelDetailPage() {
             const fmtMoney = (amount, currency) => amount ? `${currency || ''} ${parseFloat(amount).toFixed(2)}`.trim() : null;
             Object.entries(struct).forEach(([key, arr]) => {
                 if (!Array.isArray(arr) || arr.length === 0) return;
-                const meta = policyMeta[key] || { title: fmt(key), color: '#64748b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> };
+                const meta = policyMeta[key] || { title: fmt(key), color: '#64748b', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg> };
                 arr.forEach(item => {
                     if (!item || typeof item !== 'object') return;
                     const parts = [];
@@ -1796,7 +1797,7 @@ export default function HotelDetailPage() {
                         <div className="hdp-hotel-info-banner">
                             <div className="hdp-hib-header">
                                 <span className="hdp-hib-icon-wrap">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="8" /><line x1="12" y1="12" x2="12" y2="16" /></svg>
                                 </span>
                                 <span className="hdp-hib-title">Important Hotel Information</span>
                             </div>
@@ -1809,7 +1810,7 @@ export default function HotelDetailPage() {
                     {policyItems.length > 0 && (
                         <div className="hdp-policies-card">
                             <div className="hdp-policies-header">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" /><rect x="9" y="3" width="6" height="4" rx="1" /><path d="M9 12h6" /><path d="M9 16h4" /></svg>
                                 <span className="hdp-policies-header-title">Hotel Policies</span>
                                 <span className="hdp-policies-count">{policyItems.length}</span>
                             </div>
@@ -1849,8 +1850,8 @@ export default function HotelDetailPage() {
                         <span className="hdp-map-title">{hotel.name || 'Location'}</span>
                         <button className="hdp-close-btn" onClick={() => setShowMap(false)}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"/>
-                                <line x1="6" y1="6" x2="18" y2="18"/>
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
                             Close
                         </button>
@@ -1877,7 +1878,7 @@ export default function HotelDetailPage() {
             {loading && (
                 <div className="hdp-center-box">
                     <div style={{ textAlign: 'center' }}>
-                        <div className="hdp-spinner"/>
+                        <div className="hdp-spinner" />
                         <p className="hdp-spin-text">Loading hotel detailsA¢â‚¬Â¦</p>
                     </div>
                 </div>
@@ -1904,7 +1905,7 @@ export default function HotelDetailPage() {
                                     {Array.from({ length: hotel.star_rating }).map((_, i) => (
                                         <svg key={i} width="14" height="14" viewBox="0 0 24 24">
                                             <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
-                                                fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"/>
+                                                fill="#f59e0b" stroke="#f59e0b" strokeWidth="1" />
                                         </svg>
                                     ))}
                                     <span className="hdp-stars-label">{hotel.star_rating}-Star Hotel</span>
@@ -1914,13 +1915,13 @@ export default function HotelDetailPage() {
                         <div className="hdp-meta-row">
                             {(hotel.address || hotel.region) && (
                                 <span className="hdp-address">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                                     {[hotel.address, hotel.region?.name].filter(Boolean).join(', ')}
                                 </span>
                             )}
                             {hotel.latitude && hotel.longitude && (
                                 <button className="hdp-map-btn" onClick={() => setShowMap(true)}>
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                                     View on Map
                                 </button>
                             )}
@@ -1933,11 +1934,11 @@ export default function HotelDetailPage() {
                     {/* sticky section tabs */}
                     <div className="hdp-tabs-bar">
                         {[
-                            { id: 'sec-overview',      label: 'Overview' },
-                            { id: 'sec-about',         label: 'About' },
-                            { id: 'sec-rooms',         label: 'Rooms' },
-                            { id: 'sec-policies',      label: 'Policies' },
-                            { id: 'sec-amenities',    label: 'Amenities' },
+                            { id: 'sec-overview', label: 'Overview' },
+                            { id: 'sec-about', label: 'About' },
+                            { id: 'sec-rooms', label: 'Rooms' },
+                            { id: 'sec-policies', label: 'Policies' },
+                            { id: 'sec-amenities', label: 'Amenities' },
                         ].map(t => (
                             <button
                                 key={t.id}
@@ -1958,7 +1959,7 @@ export default function HotelDetailPage() {
                         ))}
                     </div>
 
-                    <hr className="hdp-divider"/>
+                    <hr className="hdp-divider" />
 
                     {/* 3+4. about + explore area — two-column layout */}
                     <div className="hdp-about-area-row">
@@ -1980,7 +1981,7 @@ export default function HotelDetailPage() {
                                                 </div>
                                             ))}
                                         </div>
-                                        {aboutOverflows && !aboutExpanded && <div className="hdp-about-fade"/>}
+                                        {aboutOverflows && !aboutExpanded && <div className="hdp-about-fade" />}
                                     </div>
                                     {aboutOverflows && (
                                         <button className="hdp-about-toggle" onClick={() => setAboutExpanded(e => !e)}>
@@ -1996,7 +1997,7 @@ export default function HotelDetailPage() {
                                     <div className="hdp-amenities-grid">
                                         {namedAmenities.map(a => (
                                             <div key={a.key} className="hdp-amenity-chip">
-                                                <AmenityIcon type={a.key}/>
+                                                <AmenityIcon type={a.key} />
                                                 <span>{a.label}</span>
                                             </div>
                                         ))}
@@ -2026,13 +2027,13 @@ export default function HotelDetailPage() {
                                             )}
                                         </div>
                                         <div className="hdp-explore-addr-row">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="hdp-explore-pin-icon"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="hdp-explore-pin-icon"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                                             <span className="hdp-explore-addr-text">
                                                 {[hotel.address, hotel.region?.name].filter(Boolean).join(', ')}
                                             </span>
                                         </div>
                                         <button className="hdp-explore-view-btn" onClick={() => setShowMap(true)}>
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                                             View in a map
                                         </button>
                                         {locationBlurb && (
@@ -2058,7 +2059,7 @@ export default function HotelDetailPage() {
                         })()}
                     </div>
 
-                    <hr className="hdp-divider"/>
+                    <hr className="hdp-divider" />
 
                     {/* 5. date filter + rooms */}
                     {renderDateFilter()}
@@ -2067,7 +2068,7 @@ export default function HotelDetailPage() {
                     {renderHotelInfoPolicies()}
                     {renderAllAmenities()}
 
-                    <hr className="hdp-divider"/>
+                    <hr className="hdp-divider" />
 
                     {/* 6. details accordion */}
                     {detailRows.length > 0 && (
@@ -2076,7 +2077,7 @@ export default function HotelDetailPage() {
                                 <span className="hdp-accordion-title">Hotel Details</span>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                                     className={`hdp-accordion-chevron${accordionOpen ? ' open' : ''}`}>
-                                    <polyline points="6 9 12 15 18 9"/>
+                                    <polyline points="6 9 12 15 18 9" />
                                 </svg>
                             </div>
                             {accordionOpen && (

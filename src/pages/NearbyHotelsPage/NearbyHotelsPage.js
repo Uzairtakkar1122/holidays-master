@@ -6,7 +6,7 @@ import 'flatpickr/dist/themes/light.css';
 import HotelCard from '../../components/Hotel/HotelCard';
 import FadeInSection from '../../components/Common/FadeInSection';
 
-const FASTAPI_BASE = 'https://fastapiratehawk.co.uk';
+import { FASTAPI_BASE } from '../../constants';
 const PER_PAGE = 9;
 
 const fmtDate = (d) => {

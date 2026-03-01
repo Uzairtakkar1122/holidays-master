@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { phoneCodes } from '../../data/geoData';
 import './ConfirmBookingPage.css';
+import { PROXY_API_PATH } from '../../constants';
 
 /* â”€â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const fmt = (d) => {
@@ -164,7 +165,7 @@ export default function ConfirmBookingPage() {
             const payload = { partner_order_id: orderId, book_hash: bookHash, language: 'en' };
             if (userIp) payload.user_ip = userIp;
             console.log('[Booking] hotel-booking-form called — partner_order_id:', orderId);
-            const res = await fetch('/api/hotel-booking-form', {
+            const res = await fetch(`${PROXY_API_PATH}/hotel-booking-form`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -329,7 +330,7 @@ export default function ConfirmBookingPage() {
             const payUuid = generateUUID();
             const initUuid = generateUUID();
             console.log('[Booking] create-card-token called, object_id:', itemId, 'pay_uuid:', payUuid);
-            const tokenRes = await fetch('/api/create-card-token', {
+            const tokenRes = await fetch(`${PROXY_API_PATH}/create-card-token`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -402,7 +403,7 @@ export default function ConfirmBookingPage() {
             }
 
             console.log('[Booking] start-booking-process calling, partner_order_id:', currentOrderId);
-            const bookRes = await fetch('/api/start-booking-process', {
+            const bookRes = await fetch(`${PROXY_API_PATH}/start-booking-process`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(bookPayload),
@@ -491,7 +492,7 @@ export default function ConfirmBookingPage() {
                 setPhase('error');
                 return;
             }
-            fetch('/api/booking-status', {
+            fetch(`${PROXY_API_PATH}/booking-status`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ partner_order_id: orderId }),
