@@ -10,6 +10,10 @@ import SearchResults from './components/Search/SearchResults/SearchResults';
 import NearbyHotelsPage from './pages/NearbyHotelsPage/NearbyHotelsPage';
 import HotelDetailPage from './pages/HotelDetailPage/HotelDetailPage';
 import ConfirmBookingPage from './pages/ConfirmBookingPage/ConfirmBookingPage';
+import PrivatePage from './pages/Private/PrivatePage';
+import PrivateRoute from './components/Common/PrivateRoute';
+import About from './pages/About/About';
+import VisitorPopup from './components/Common/VisitorPopup';
 import Footer from './components/Layout/Footer';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
@@ -24,10 +28,12 @@ function App() {
       <AuthProvider>
         <div className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
           <Navbar />
+          <VisitorPopup />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/hotels" element={<Hotels />} />
+              <Route path="/about" element={<About />} />
               <Route path="/destinations" element={<Destinations />} />
               <Route path="/experiences" element={<Experiences />} />
               <Route path="/search" element={<SearchResults />} />
@@ -35,6 +41,7 @@ function App() {
               <Route path="/hotel-detail-data" element={<HotelDetailPage />} />
               <Route path="/confirm-booking" element={<ConfirmBookingPage />} />
               {/* Placeholder routes for future expansion */}
+              <Route path="/private" element={<PrivateRoute pageName="Private Dashboard"><PrivatePage /></PrivateRoute>} />
               <Route path="/flights" element={<div className="container" style={{ padding: '2rem' }}>Flights page coming soon...</div>} />
               <Route path="/deals" element={<div className="container" style={{ padding: '2rem' }}>Deals page coming soon...</div>} />
             </Routes>

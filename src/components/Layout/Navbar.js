@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { currencies, countries } from '../../data/geoData';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import { isAllowedUser } from '../../config/allowedUsers';
 import { useGoogleLogin } from '@react-oauth/google';
 import GlobalSelectorModal from '../Common/GlobalSelectorModal';
 
@@ -202,8 +203,9 @@ const Navbar = () => {
 
                         {[
                             { name: 'Destinations', path: '/destinations' },
-                            { name: 'Hotels', path: '/hotels' },
+                            { name: 'About', path: '/about' },
                             { name: 'Experiences', path: '/experiences' },
+                            ...(user && isAllowedUser(user.email) ? [{ name: 'Dashboard', path: '/private' }] : []),
                         ].map((item) => (
                             <Link
                                 key={item.name}
@@ -341,14 +343,15 @@ const Navbar = () => {
                     <div className="absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl py-6 px-6 flex flex-col gap-4 md:hidden animate-fade-in-down border-t dark:border-slate-800 transition-colors duration-300">
                         {[
                             { name: 'Destinations', path: '/destinations' },
-                            { name: 'Hotels', path: '/hotels' },
+                            { name: 'About', path: '/about' },
                             { name: 'Experiences', path: '/experiences' },
-                            { name: 'About', path: '#' },
+                            ...(user && isAllowedUser(user.email) ? [{ name: 'Dashboard', path: '/private' }] : []),
                         ].map((item) => (
                             <Link
                                 key={item.name}
                                 to={item.path}
                                 className="text-slate-800 dark:text-slate-200 font-medium text-lg"
+                                onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 {item.name}
                             </Link>
