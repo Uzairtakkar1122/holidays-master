@@ -18,6 +18,7 @@ import NoticeBar from './components/Common/NoticeBar';
 import Footer from './components/Layout/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { SiteBrandProvider } from './context/SiteBrandContext';
+import { ThemeCustomProvider } from './context/ThemeCustomContext';
 import './index.css';
 
 // To enable Google Sign-In, create a .env file in the project root and add:
@@ -30,9 +31,10 @@ function App() {
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <ThemeCustomProvider>
       <SiteBrandProvider>
       <AuthProvider>
-        <div className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
+        <div className="flex flex-col min-h-screen transition-colors duration-300" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
           <NoticeBar />
           <Navbar />
           <VisitorPopup />
@@ -57,6 +59,7 @@ function App() {
         </div>
       </AuthProvider>
       </SiteBrandProvider>
+      </ThemeCustomProvider>
     </GoogleOAuthProvider>
   );
 }

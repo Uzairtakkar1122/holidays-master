@@ -902,7 +902,7 @@ const SearchResults = () => {
             </div>
 
             {/* Main Results Container */}
-            <div className="bg-gradient-to-br from-slate-50/50 via-white to-slate-50/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 min-h-screen transition-colors duration-300">
+            <div className="bg-page-bg min-h-screen transition-colors duration-300">
                 <div className="container mx-auto px-4 max-w-7xl py-6">
                     <div className="results-layout">
                         {/* Sidebar Filters */}
@@ -937,7 +937,7 @@ const SearchResults = () => {
                                                     onChange={(e) => handleFilterChange('priceRange', [0, parseInt(e.target.value)])}
                                                     className="w-full accent-blue-600 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
                                                 />
-                                                <div className="flex justify-between mt-3 text-xs font-bold text-blue-600 dark:text-blue-400">
+                                                <div className="flex justify-between mt-3 text-xs font-bold text-primary">
                                                     <span>{currentCurrency?.code || 'USD'} 0</span>
                                                     <span>Up to {currentCurrency?.code || 'USD'} {filters.priceRange[1].toLocaleString()}</span>
                                                 </div>
@@ -975,10 +975,10 @@ const SearchResults = () => {
 
                         {/* Results Main Section */}
                         <div className="results-container">
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 mb-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 transition-colors duration-300">
+                            <div className="bg-card-bg rounded-2xl border border-card-border p-6 mb-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 transition-colors duration-300">
                                 <div>
                                     <h1 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">
-                                        Hotels in <span className="text-blue-600 dark:text-blue-400 underline decoration-blue-100 dark:decoration-blue-900 underline-offset-4">{searchParams.location}</span>
+                                        Hotels in <span className="text-primary underline decoration-primary/20 dark:decoration-primary/30 underline-offset-4">{searchParams.location}</span>
                                     </h1>
                                     <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
                                         {loading
@@ -992,7 +992,7 @@ const SearchResults = () => {
                                 <div className="flex items-center gap-4">
                                     <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sort:</span>
                                     <select
-                                        className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer"
+                                        className="bg-card-bg border border-card-border rounded-xl px-4 py-2 text-sm font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer"
                                         value={sortOrder}
                                         onChange={(e) => setSortOrder(e.target.value)}
                                     >
@@ -1016,14 +1016,14 @@ const SearchResults = () => {
                                         />
                                     ))
                                 ) : (
-                                    <div className="text-center py-24 bg-white rounded-2xl border border-slate-100 shadow-sm animate-fade-in">
+                                    <div className="text-center py-24 bg-card-bg rounded-2xl border border-card-border shadow-sm animate-fade-in">
                                         <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                             <Search className="text-slate-300" size={40} />
                                         </div>
                                         <h3 className="text-xl font-bold text-slate-800">No hotels match your filters</h3>
                                         <p className="text-slate-500 mt-2">Try clearing your filters to see more available options.</p>
                                         <button
-                                            className="mt-8 text-blue-600 font-black uppercase text-[10px] tracking-widest hover:underline"
+                                            className="mt-8 text-primary font-black uppercase text-[10px] tracking-widest hover:underline"
                                             onClick={() => setFilters({ stars: [], priceRange: [0, priceStats.max || 100000], amenities: [], mealPlans: [] })}
                                         >
                                             Clear All Filters
@@ -1194,7 +1194,7 @@ const HotelResultCard = ({ hotel, searchParams, currentCurrency, currentResidenc
 
                         {/* Location */}
                         <div className="location-text">
-                            <MapPin size={14} className="text-blue-600" />
+                            <MapPin size={14} className="text-primary" />
                             <span>{hotel.address || 'Location Not Available'}</span>
                         </div>
 

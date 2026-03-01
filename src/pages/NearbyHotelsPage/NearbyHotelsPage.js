@@ -46,7 +46,7 @@ const normalizeInfoResponse = (data) => {
 };
 
 const CardSkeleton = () => (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-xl border border-transparent dark:border-slate-800 animate-pulse">
+    <div className="bg-card-bg rounded-3xl overflow-hidden shadow-xl border border-card-border animate-pulse">
         <div className="h-64 bg-slate-200 dark:bg-slate-800" />
         <div className="p-6 space-y-3">
             <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
@@ -242,7 +242,7 @@ const NearbyHotelsPage = () => {
     const hasMore = visible < hotels.length;
 
     return (
-        <div className="font-sans text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950 transition-colors duration-300 min-h-screen">
+        <div className="font-sans text-slate-800 dark:text-slate-200 bg-page-bg transition-colors duration-300 min-h-screen">
             <section className="relative pt-32 pb-12 bg-slate-900 overflow-hidden px-6">
                 <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
                 <div className="container mx-auto max-w-6xl relative z-10">
@@ -297,7 +297,7 @@ const NearbyHotelsPage = () => {
                 ) : error ? (
                     <div className="text-center py-24">
                         <p className="text-slate-500 font-semibold mb-4">{error}</p>
-                        <button onClick={fetchAll} className="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-colors">
+                        <button onClick={fetchAll} className="px-6 py-2 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary/90 transition-colors">
                             Try Again
                         </button>
                     </div>

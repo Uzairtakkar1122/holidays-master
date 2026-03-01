@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Search, Star, SlidersHorizontal, Info } from 'lucide-react';
 import HotelCard from '../../components/Hotel/HotelCard';
 import FadeInSection from '../../components/Common/FadeInSection';
 
@@ -57,7 +58,7 @@ const Hotels = () => {
     ];
 
     return (
-        <div className="bg-white dark:bg-slate-950 min-h-screen transition-colors duration-300">
+        <div className="bg-page-bg min-h-screen transition-colors duration-300">
             {/* Header / Hero */}
             <div className="bg-slate-900 pt-32 pb-16 px-6 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
@@ -72,14 +73,14 @@ const Hotels = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-20 z-40 shadow-sm transition-colors">
+            <div className="bg-card-bg border-b border-card-border sticky top-20 z-40 shadow-sm transition-colors">
                 <div className="container mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
                     <div className="relative flex-1 min-w-[280px]">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
                         <input
                             type="text"
                             placeholder="Filter by name or location..."
-                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-full px-12 py-3 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-full px-12 py-3 text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -102,7 +103,7 @@ const Hotels = () => {
                     <h2 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-widest transition-colors">
                         {featuredHotels.length} <span className="text-slate-400 dark:text-slate-500">Properties</span>
                     </h2>
-                    <select className="bg-transparent border-none text-emerald-600 dark:text-emerald-400 font-bold text-sm focus:ring-0 cursor-pointer">
+                    <select className="bg-transparent border-none text-accent font-bold text-sm focus:ring-0 cursor-pointer">
                         <option>Sort by: Recommended</option>
                         <option>Price: Low to High</option>
                         <option>Price: High to Low</option>

@@ -45,9 +45,9 @@ const PrivateRoute = ({ children, pageName = 'Private Page' }) => {
     if (!user) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-4 pt-24">
-                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-2xl p-10 max-w-md w-full text-center">
-                    <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <LogIn size={32} className="text-blue-600 dark:text-blue-400" />
+                <div className="bg-card-bg border border-card-border rounded-3xl shadow-2xl p-10 max-w-md w-full text-center">
+                    <div className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <LogIn size={32} className="text-primary" />
                     </div>
                     <h1 className="text-2xl font-black text-slate-800 dark:text-white mb-2">{pageName}</h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">
@@ -61,10 +61,10 @@ const PrivateRoute = ({ children, pageName = 'Private Page' }) => {
                     <button
                         onClick={() => { setLoading(true); googleLogin(); }}
                         disabled={loading}
-                        className="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 text-slate-700 dark:text-slate-200 font-bold py-3.5 px-6 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-primary/70 text-slate-700 dark:text-slate-200 font-bold py-3.5 px-6 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         {loading ? (
-                            <Loader2 size={20} className="animate-spin text-blue-600" />
+                            <Loader2 size={20} className="animate-spin text-primary" />
                         ) : (
                             <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -84,7 +84,7 @@ const PrivateRoute = ({ children, pageName = 'Private Page' }) => {
     if (!isAllowedUser(user.email)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-red-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 px-4 pt-24">
-                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-2xl p-10 max-w-md w-full text-center">
+                <div className="bg-card-bg border border-card-border rounded-3xl shadow-2xl p-10 max-w-md w-full text-center">
                     <div className="w-16 h-16 bg-red-50 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <ShieldOff size={32} className="text-red-500 dark:text-red-400" />
                     </div>

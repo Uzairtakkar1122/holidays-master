@@ -106,7 +106,7 @@ const Navbar = () => {
     };
 
     const location = useLocation();
-    const isSearchPage = location.pathname.includes('/search') || location.pathname.includes('/hotel-detail');
+    const isSearchPage = location.pathname.includes('/search') || location.pathname.includes('/hotel-detail') || location.pathname.includes('/confirm-booking');
 
     // IP-based Detection
     useEffect(() => {
@@ -139,10 +139,15 @@ const Navbar = () => {
     return (
         <>
             <nav
-                className={`fixed top-0 w-full z-50 transition-all duration-300 ${isSearchPage || isScrolled
-                    ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg py-4'
-                    : 'bg-transparent py-6'
+                className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+                    isSearchPage || isScrolled
+                        ? 'backdrop-blur-md shadow-lg py-4'
+                        : 'bg-transparent py-6'
                     }`}
+                style={isSearchPage || isScrolled ? {
+                    backgroundColor: 'var(--hm-nav-bg)',
+                    color: 'var(--hm-nav-text)',
+                } : {}}
             >
                 <div className="container mx-auto px-6 flex justify-between items-center">
                     {/* Logo */}
@@ -252,7 +257,7 @@ const Navbar = () => {
                                     {user.picture ? (
                                         <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full object-cover" referrerPolicy="no-referrer" />
                                     ) : (
-                                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-sm">
+                                        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white font-bold text-sm">
                                             {user.given_name?.[0] || user.name?.[0] || '?'}
                                         </div>
                                     )}
@@ -266,7 +271,7 @@ const Navbar = () => {
                                             {user.picture ? (
                                                 <img src={user.picture} alt={user.name} className="w-11 h-11 rounded-full object-cover flex-shrink-0" referrerPolicy="no-referrer" />
                                             ) : (
-                                                <div className="w-11 h-11 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                                                <div className="w-11 h-11 rounded-full bg-accent flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                                                     {user.given_name?.[0] || user.name?.[0] || '?'}
                                                 </div>
                                             )}
@@ -292,7 +297,7 @@ const Navbar = () => {
                             <div className="relative" ref={loginDropdownRef}>
                                 <button
                                     onClick={() => setLoginDropdownOpen(o => !o)}
-                                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/30 flex items-center gap-1.5"
+                                    className="bg-accent hover:bg-accent/90 text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all transform hover:scale-105 shadow-lg shadow-accent/30 flex items-center gap-1.5"
                                 >
                                     Sign In
                                     <ChevronDown size={14} className={`transition-transform ${loginDropdownOpen ? 'rotate-180' : ''}`} />
@@ -376,7 +381,7 @@ const Navbar = () => {
                                 {user.picture ? (
                                     <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" referrerPolicy="no-referrer" />
                                 ) : (
-                                    <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold">
+                                    <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-bold">
                                         {user.given_name?.[0] || '?'}
                                     </div>
                                 )}
@@ -395,7 +400,7 @@ const Navbar = () => {
                             <button
                                 onClick={() => { googleLogin(); setIsMobileMenuOpen(false); }}
                                 disabled={authLoading}
-                                className="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white py-3 rounded-lg font-medium disabled:opacity-60"
+                                className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium disabled:opacity-60"
                             >
                                 <svg width="16" height="16" viewBox="0 0 48 48">
                                     <path fill="#fff" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.84l6.1-6.1C34.46 3.19 29.52 1 24 1 14.82 1 7.07 6.48 3.64 14.22l7.1 5.52C12.5 13.67 17.8 9.5 24 9.5z"/>

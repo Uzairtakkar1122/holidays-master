@@ -109,7 +109,7 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
                                     key={item.code}
                                     onClick={() => onSelect(activeTab, item)}
                                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left group ${isSelected
-                                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20 ring-1 ring-emerald-500 shadow-sm'
+                                        ? 'border-accent bg-accent/5 dark:bg-accent/20 ring-1 ring-accent shadow-sm'
                                         : 'border-white dark:border-slate-900 bg-white dark:bg-slate-900 shadow-sm hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-md'
                                         }`}
                                 >
@@ -132,7 +132,7 @@ const GlobalSelectorModal = ({ isOpen, onClose, currentType, onSelect, currentCu
                                         </div>
                                     </div>
                                     {isSelected ? (
-                                        <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white flex-shrink-0 ml-2">
+                                        <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-white flex-shrink-0 ml-2">
                                             <Check size={14} strokeWidth={3} />
                                         </div>
                                     ) : (

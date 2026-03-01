@@ -55,7 +55,7 @@ const Home = () => {
     ];
 
     return (
-        <div className="font-sans text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-950 selection:bg-emerald-200 transition-colors duration-300">
+        <div className="font-sans text-slate-800 dark:text-slate-200 bg-page-bg selection:bg-accent/20 transition-colors duration-300">
 
             <Hero />
 
@@ -67,7 +67,7 @@ const Home = () => {
                             <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 dark:text-white mb-2">Trending Destinations</h2>
                             <p className="text-slate-500 dark:text-slate-400">Explore the most visited places this season.</p>
                         </div>
-                        <Link to="/destinations" className="hidden md:flex items-center gap-2 text-emerald-600 font-bold hover:gap-3 transition-all">
+                        <Link to="/destinations" className="hidden md:flex items-center gap-2 text-accent font-bold hover:gap-3 transition-all">
                             View All <ArrowRight className="w-5 h-5" />
                         </Link>
                     </div>
@@ -87,7 +87,7 @@ const Home = () => {
 
             {/* Featured Hotels */}
             <section className="py-12 bg-slate-50 dark:bg-slate-900/50 relative overflow-hidden transition-colors" id="hotels">
-                <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-100/50 dark:bg-emerald-900/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-accent/10 dark:bg-accent/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="container mx-auto px-6 relative z-10">
                     <FadeInSection>
                         <div className="text-center max-w-2xl mx-auto mb-10">

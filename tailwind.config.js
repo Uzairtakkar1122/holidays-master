@@ -6,6 +6,17 @@ module.exports = {
     ],
     theme: {
         extend: {
+            colors: {
+                // CSS-var-based tokens — Tailwind v3 syntax with <alpha-value> for opacity modifiers
+                // e.g. bg-primary, bg-primary/90, text-primary/50 all work correctly
+                primary: 'rgb(var(--hm-primary-rgb) / <alpha-value>)',
+                accent:  'rgb(var(--hm-accent-rgb)  / <alpha-value>)',
+                'page-bg':    'var(--hm-page-bg)',
+                'card-bg':    'var(--hm-card-bg)',
+                'card-border':'var(--hm-card-border)',
+                'nav-bg':     'var(--hm-nav-bg)',
+                'nav-text':   'var(--hm-nav-text)',
+            },
             fontFamily: {
                 serif: ['"Cormorant Garamond"', 'serif'],
                 sans: ['Inter', 'sans-serif'],

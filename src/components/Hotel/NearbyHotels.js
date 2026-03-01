@@ -179,7 +179,7 @@ const NearbyHotels = () => {
 
     return (
         <section className="py-12 bg-slate-50 dark:bg-slate-900/50 relative overflow-hidden transition-colors">
-            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-blue-100/50 dark:bg-blue-900/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary/10 dark:bg-primary/10 rounded-full blur-3xl pointer-events-none" />
             <div className="container mx-auto px-6 relative z-10">
                 <FadeInSection>
                     <div className="text-center max-w-2xl mx-auto mb-10">

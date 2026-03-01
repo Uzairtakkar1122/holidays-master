@@ -29,9 +29,9 @@ const HotelCard = ({ name, location, price, rating, image, tags = [], currencySy
                         <span className="line-clamp-1">{location}</span>
                     </div>
                 </div>
-                <div className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-lg">
-                    <Star className="w-4 h-4 text-emerald-500 fill-emerald-500" />
-                    <span className="font-bold text-slate-700 dark:text-emerald-300">{rating}</span>
+                <div className="flex items-center gap-1 bg-accent/10 dark:bg-accent/20 px-2 py-1 rounded-lg">
+                    <Star className="w-4 h-4 text-accent fill-accent" />
+                    <span className="font-bold text-slate-700 dark:text-accent/90">{rating}</span>
                 </div>
             </div>
             <div className="w-full h-px bg-slate-100 dark:bg-slate-800 my-4" />

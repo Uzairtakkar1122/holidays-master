@@ -50,7 +50,7 @@ const About = () => {
     const paragraphs = (data.body || '').split('\n\n').filter(Boolean);
 
     return (
-        <div className="font-sans text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-950 transition-colors duration-300 overflow-x-hidden">
+        <div className="font-sans text-slate-800 dark:text-slate-100 bg-page-bg transition-colors duration-300 overflow-x-hidden">
 
             {/* ── HERO ───────────────────────────────────────────────────── */}
             <section className="relative h-[90vh] min-h-[540px] flex items-end overflow-hidden">
@@ -132,13 +132,13 @@ const About = () => {
                 <section className="py-24 bg-slate-50 dark:bg-slate-900/60">
                     <div className="max-w-6xl mx-auto px-6 md:px-12">
                         <div className="text-center mb-16">
-                            <span className="text-xs font-black uppercase tracking-[0.2em] text-blue-500 block mb-3">What Drives Us</span>
+                            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary block mb-3">What Drives Us</span>
                             <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 dark:text-white">Our Core Values</h2>
                         </div>
                         <div className="grid md:grid-cols-3 gap-6">
                             {VALUES.map((v, i) => (
-                                <div key={i} className="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 md:p-10 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-xl transition-all duration-300">
-                                    <div className="text-3xl text-blue-500 mb-6 group-hover:scale-110 transition-transform duration-300 inline-block">{v.icon}</div>
+                                <div key={i} className="group bg-card-bg border border-card-border rounded-3xl p-8 md:p-10 hover:border-primary/30 hover:shadow-xl transition-all duration-300">
+                                    <div className="text-3xl text-primary mb-6 group-hover:scale-110 transition-transform duration-300 inline-block">{v.icon}</div>
                                     <h3 className="text-xl font-black text-slate-900 dark:text-white mb-3">{v.title}</h3>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{v.desc}</p>
                                 </div>
@@ -153,12 +153,12 @@ const About = () => {
                 <FadeInSection>
                     <section className="py-24 md:py-32 max-w-6xl mx-auto px-6 md:px-12">
                         <div className="text-center mb-16">
-                            <span className="text-xs font-black uppercase tracking-[0.2em] text-blue-500 block mb-3">The People</span>
+                            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary block mb-3">The People</span>
                             <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 dark:text-white">Meet Our Team</h2>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {data.teamMembers.map((m, i) => (
-                                <div key={i} className="group relative overflow-hidden rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-2xl transition-all duration-500">
+                                <div key={i} className="group relative overflow-hidden rounded-3xl border border-card-border bg-card-bg hover:shadow-2xl transition-all duration-500">
                                     {/* Photo area */}
                                     <div className="h-56 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 relative overflow-hidden">
                                         {m.photo ? (
@@ -180,7 +180,7 @@ const About = () => {
                                         <p className="text-sm text-blue-500 font-semibold mt-1">{m.role}</p>
                                     </div>
                                     {/* Accent line */}
-                                    <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-blue-500 group-hover:w-full transition-all duration-500" />
+                                    <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary group-hover:w-full transition-all duration-500" />
                                 </div>
                             ))}
                         </div>
@@ -194,7 +194,7 @@ const About = () => {
                     {/* Background texture */}
                     <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
                     {/* Glow blobs */}
-                    <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
                     <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
 
                     <div className="relative z-10 max-w-4xl mx-auto px-6 md:px-12 text-center">
